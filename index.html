@@ -517,7 +517,7 @@
                             <th>Игрок</th>
                             <th>Steam ID</th>
                             <th>Статус</th>
-                            <th>Время в игре</th>
+                            <th>Пинг</th>
                             <th>Действия</th>
                         </tr>
                     </thead>
@@ -541,10 +541,6 @@
                 <div class="sidebar-card">
                     <h3><i class="fas fa-terminal" style="color: #4ecdc4;"></i> Консоль сервера</h3>
                     <div class="server-console" id="console">
-                        <div class="console-line">[12:34] Игрок JohnDoe подключился</div>
-                        <div class="console-line">[12:35] Администратор выдал бан</div>
-                        <div class="console-line">[12:36] Карта загружена: gm_construct</div>
-                        <div class="console-line">[12:37] Сервер: автосохранение</div>
                     </div>
                 </div>
             </div>
@@ -595,337 +591,29 @@
         </div>
     </div>
 
+    <div class="modal" id="whitelistModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <h3><i class="fas fa-id-card" style="color: #ffbb33;"></i> Вайтлист <span id="whPlayerName" style="color: #4ecdc4;"></span></h3>
+            <p style="color: rgba(255,255,255,0.5); margin-bottom: 15px; font-size: 13px;" id="whSteamId"></p>
+            <div id="whitelistContent" style="max-height: 400px; overflow-y: auto;">
+                <p style="color: rgba(255,255,255,0.5);">Загрузка...</p>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Добавьте в начало скрипта
-
-        class GModServerAPI {
-            constructor() {
-                // ⬇️ ЗАМЕНИТЕ 'your-app-name' на ваш домен из Railway после деплоя
-                this.serverUrl = 'https://gmod-admin-panel-production.up.railway.app';
-                this.websocketUrl = 'wss://gmod-admin-panel-production.up.railway.app';
-                this.useWebSocket = true; // Переключите на false для HTTP
-            }
-
-            async fetchPlayers() {
-                if (this.useWebSocket) {
-                    // Данные приходят через WebSocket
-                    return;
-                } else {
-                    try {
-                        const response = await fetch(`${this.serverUrl}/api/players`);
-                        const players = await response.json();
-                        return players;
-                    } catch (error) {
-                        console.error('Ошибка получения данных игроков:', error);
-                    }
-                }
-            }
-
-            async fetchStats() {
-                if (this.useWebSocket) return;
-                
-                try {
-                    const response = await fetch(`${this.serverUrl}/api/stats`);
-                    const stats = await response.json();
-                    return stats;
-                } catch (error) {
-                    console.error('Ошибка получения статистики:', error);
-                }
-            }
-
-            // Внутри класса GModServerAPI или просто в скрипте:
-            async sendCommand(command, target, data = {}) {
-                // Формируем объект запроса
-                const payload = {
-                    command: command, // например, 'kick', 'ban', 'message'
-                    target: target,   // имя игрока или его SteamID
-                    data: data,       // объект с доп. данными (причина, время)
-                    admin: "WebAdmin",
-                    timestamp: new Date().toISOString()
-                };
-
-                // Проверяем, открыто ли соединение WebSocket
-                if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-                    try {
-                        this.socket.send(JSON.stringify(payload));
-                        console.log(`🚀 Команда ${command} отправлена для ${target}`);
-                    } catch (err) {
-                        console.error("Ошибка при отправке через WS:", err);
-                    }
-                } else {
-                    console.error("❌ Ошибка: WebSocket не подключен к серверу!");
-                    // Можно добавить уведомление для пользователя на экране
-                    alert("Нет соединения с сервером!");
-                }
-            }
-
-            connectWebSocket() {
-                if (!this.useWebSocket) return;
-
-                const ws = new WebSocket(this.websocketUrl);
-                
-                ws.onopen = () => {
-                    console.log('Подключено к серверу GMod');
-                    addToConsole(`[${new Date().toLocaleTimeString()}] ✅ Подключение к серверу установлено`);
-                    setConnectionStatus('connected', 'Подключено');
-                };
-
-                ws.onmessage = (event) => {
-                    const data = JSON.parse(event.data);
-                    this.updateUI(data);
-                };
-
-                ws.onerror = (err) => {
-                    console.error('Ошибка WebSocket:', err);
-                    addToConsole(`[${new Date().toLocaleTimeString()}] ❌ Ошибка соединения`);
-                    setConnectionStatus('disconnected', 'Ошибка');
-                };
-
-                ws.onclose = () => {
-                    console.log('Отключено от сервера');
-                    addToConsole(`[${new Date().toLocaleTimeString()}] ⚠️ Соединение потеряно. Переподключение через 5сек...`);
-                    setConnectionStatus('reconnecting', 'Переподключение...');
-                    // Пытаемся переподключиться через 5 секунд
-                    setTimeout(() => this.connectWebSocket(), 5000);
-                };
-            }
-
-            updateUI(data) {
-                if (data.players) {
-                    this.updatePlayers(data.players);
-                }
-                if (data.stats) {
-                    this.updateStats(data.stats);
-                }
-                if (data.console) {
-                    data.console.forEach(line => addToConsole(line));
-                }
-            }
-
-            updatePlayers(players) {
-                // Обновляем таблицу игроков
-                const tbody = document.getElementById('playersList');
-                tbody.innerHTML = '';
-
-                players.forEach(player => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>
-                            <div class="player-name">
-                                <div class="player-avatar">${player.avatar || player.name.substring(0,2)}</div>
-                                ${player.name}
-                            </div>
-                        </td>
-                        <td>${player.steamId}</td>
-                        <td><span class="player-status status-${player.status}">${player.status === 'active' ? 'В игре' : 'AFK'}</span></td>
-                        <td>${player.time}</td>
-                        <td>${player.ping} ms</td>
-                        <td>
-                            <div class="player-actions">
-                                <button class="action-btn" onclick="api.sendCommand('message', '${player.name}')" title="Сообщение">
-                                    <i class="fas fa-envelope"></i>
-                                </button>
-                                <button class="action-btn" onclick="api.sendCommand('kick', '${player.name}')" title="Кикнуть">
-                                    <i class="fas fa-user-slash"></i>
-                                </button>
-                                <button class="action-btn" onclick="api.sendCommand('ban', '${player.name}')" title="Забанить">
-                                    <i class="fas fa-ban"></i>
-                                </button>
-                            </div>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
-
-                document.getElementById('playerCount').textContent = players.length + ' игрока';
-            }
-
-            updateStats(stats) {
-                document.getElementById('onlineCount').textContent = stats.online || '0';
-                document.getElementById('curonl').textContent = stats.online + '/64' || '0/64';
-                document.getElementById('adminCount').textContent = stats.admins || '0';
-                document.getElementById('banCount').textContent = stats.bans || '0';
-                document.getElementById('uptime').textContent = stats.uptime || '0:00';
-            }
-        }
-
-        // Инициализация API
-        const api = new GModServerAPI();
-        api.connectWebSocket();
-
-        // Обновление команд для работы с сервером
-        async function kickPlayer() {
-            const reason = document.getElementById('kickReason').value || 'Без причины';
-            const result = await api.sendCommand('kick', currentPlayer, { reason: reason });
-            if (result.success) {
-                addToConsole(`[${new Date().toLocaleTimeString()}] Игрок ${currentPlayer} был кикнут. Причина: ${reason}`);
-                closeModals();
-            }
-        }
-
-        async function banPlayer() {
-            const duration = document.getElementById('banDuration').value;
-            const reason = document.getElementById('banReason').value || 'Без причины';
-            const durationText = document.getElementById('banDuration').selectedOptions[0].text;
-            
-            const result = await api.sendCommand('ban', currentPlayer, { 
-                reason: reason, 
-                duration: duration 
-            });
-            
-            if (result.success) {
-                addToConsole(`[${new Date().toLocaleTimeString()}] Игрок ${currentPlayer} забанен на ${durationText}. Причина: ${reason}`);
-                closeModals();
-            }
-        }
-
-        async function sendMessage() {
-            const message = document.getElementById('messageText').value;
-            if (message) {
-                const result = await api.sendCommand('message', currentPlayer, { message: message });
-                if (result.success) {
-                    addToConsole(`[${new Date().toLocaleTimeString()}] Личное сообщение для ${currentPlayer}: "${message}"`);
-                    closeModals();
-                }
-            }
-        }
-
-        // Sample player data
-        const players = [
-            { id: 1, name: 'JohnDoe', steamId: 'STEAM_0:1:12345678', status: 'active', time: '2:30', avatar: 'JD' },
-            { id: 2, name: 'GModPlayer', steamId: 'STEAM_0:0:87654321', status: 'idle', time: '0:45', avatar: 'GP' },
-            { id: 3, name: 'AdminUser', steamId: 'STEAM_0:1:55555555', status: 'active', time: '5:15', avatar: 'AU' },
-            { id: 4, name: 'NewPlayer', steamId: 'STEAM_0:0:99999999', status: 'active', time: '0:10', avatar: 'NP' },
-            { id: 5, name: 'DarkRP_Fan', steamId: 'STEAM_0:1:44444444', status: 'idle', time: '1:20', avatar: 'DF' },
-        ];
-
         let currentPlayer = null;
-        let currentAction = null;
+        let currentPlayerSteamId = null;
+        let livePlayers = [];
 
-        // Render players table
-        function renderPlayers(filterText = '') {
-            const tbody = document.getElementById('playersList');
-            tbody.innerHTML = '';
-
-            const filteredPlayers = players.filter(p => 
-                p.name.toLowerCase().includes(filterText.toLowerCase()) ||
-                p.steamId.includes(filterText)
-            );
-
-            filteredPlayers.forEach(player => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>
-                        <div class="player-name">
-                            <div class="player-avatar">${player.avatar}</div>
-                            ${player.name}
-                        </div>
-                    </td>
-                    <td>${player.steamId}</td>
-                    <td><span class="player-status status-${player.status}">${player.status === 'active' ? 'В игре' : 'AFK'}</span></td>
-                    <td>${player.time}</td>
-                    <td>
-                        <div class="player-actions">
-                            <button class="action-btn" onclick="openMessageModal('${player.name}')" title="Сообщение">
-                                <i class="fas fa-envelope"></i>
-                            </button>
-                            <button class="action-btn" onclick="openKickModal('${player.name}')" title="Кикнуть">
-                                <i class="fas fa-user-slash"></i>
-                            </button>
-                            <button class="action-btn" onclick="openBanModal('${player.name}')" title="Забанить">
-                                <i class="fas fa-ban"></i>
-                            </button>
-                            <button class="action-btn" onclick="teleportTo('${player.name}')" title="Телепортироваться">
-                                <i class="fas fa-map-marker-alt"></i>
-                            </button>
-                            <button class="action-btn" onclick="bringPlayer('${player.name}')" title="Призвать">
-                                <i class="fas fa-user-plus"></i>
-                            </button>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-
-            document.getElementById('playerCount').textContent = filteredPlayers.length + ' игрока';
-        }
-
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            renderPlayers(e.target.value);
-        });
-
-        // Modal functions
-        function openKickModal(playerName) {
-            currentPlayer = playerName;
-            currentAction = 'kick';
-            document.getElementById('kickPlayerName').textContent = playerName;
-            document.getElementById('kickModal').classList.add('active');
-        }
-
-        function openBanModal(playerName) {
-            currentPlayer = playerName;
-            currentAction = 'ban';
-            document.getElementById('banPlayerName').textContent = playerName;
-            document.getElementById('banModal').classList.add('active');
-        }
-
-        function openMessageModal(playerName) {
-            currentPlayer = playerName;
-            currentAction = 'message';
-            document.getElementById('messagePlayerName').textContent = playerName;
-            document.getElementById('messageModal').classList.add('active');
-        }
-
-        function closeModals() {
-            document.querySelectorAll('.modal').forEach(modal => {
-                modal.classList.remove('active');
-            });
-        }
-
-        // Action functions
-        function kickPlayer() {
-            const reason = document.getElementById('kickReason').value || 'Без причины';
-            addToConsole(`[${new Date().toLocaleTimeString()}] Игрок ${currentPlayer} был кикнут. Причина: ${reason}`);
-            closeModals();
-            alert(`Игрок ${currentPlayer} кикнут. Причина: ${reason}`);
-        }
-
-        function banPlayer() {
-            const duration = document.getElementById('banDuration').value;
-            const reason = document.getElementById('banReason').value || 'Без причины';
-            const durationText = document.getElementById('banDuration').selectedOptions[0].text;
-            addToConsole(`[${new Date().toLocaleTimeString()}] Игрок ${currentPlayer} забанен на ${durationText}. Причина: ${reason}`);
-            closeModals();
-            alert(`Игрок ${currentPlayer} забанен на ${durationText}. Причина: ${reason}`);
-        }
-
-        function sendMessage() {
-            const message = document.getElementById('messageText').value;
-            if (message) {
-                addToConsole(`[${new Date().toLocaleTimeString()}] Личное сообщение для ${currentPlayer}: "${message}"`);
-                closeModals();
-                alert(`Сообщение отправлено игроку ${currentPlayer}`);
-            }
-        }
-
-        function teleportTo(playerName) {
-            addToConsole(`[${new Date().toLocaleTimeString()}] Администратор телепортировался к ${playerName}`);
-            alert(`Телепортация к ${playerName}`);
-        }
-
-        function bringPlayer(playerName) {
-            addToConsole(`[${new Date().toLocaleTimeString()}] Администратор призвал ${playerName}`);
-            alert(`Игрок ${playerName} призван`);
-        }
-
+        // ----- УТИЛИТЫ -----
         function addToConsole(message) {
-            const console = document.getElementById('console');
+            const con = document.getElementById('console');
             const line = document.createElement('div');
             line.className = 'console-line';
             line.textContent = message;
-            console.appendChild(line);
-            console.scrollTop = console.scrollHeight;
+            con.appendChild(line);
+            con.scrollTop = con.scrollHeight;
         }
 
         function setConnectionStatus(state, text) {
@@ -937,48 +625,270 @@
             label.textContent = text;
         }
 
-        // Close modal on escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeModals();
+        function ts() { return new Date().toLocaleTimeString(); }
+
+        // ----- API КЛАСС -----
+        class GModServerAPI {
+            constructor() {
+                this.websocketUrl = 'wss://gmod-admin-panel-production.up.railway.app';
+                this.socket = null;
             }
+
+            sendCommand(command, target, data = {}) {
+                const payload = {
+                    command: command,
+                    target: target,
+                    data: data,
+                    admin: "WebAdmin",
+                    timestamp: new Date().toISOString()
+                };
+
+                if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+                    this.socket.send(JSON.stringify(payload));
+                    addToConsole(`[${ts()}] Команда: ${command} → ${target}`);
+                } else {
+                    addToConsole(`[${ts()}] Нет соединения с сервером!`);
+                }
+            }
+
+            connectWebSocket() {
+                const ws = new WebSocket(this.websocketUrl);
+                this.socket = ws;
+
+                ws.onopen = () => {
+                    addToConsole(`[${ts()}] Подключение к серверу установлено`);
+                    setConnectionStatus('connected', 'Подключено');
+                };
+
+                ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    this.handleMessage(data);
+                };
+
+                ws.onerror = () => {
+                    addToConsole(`[${ts()}] Ошибка соединения`);
+                    setConnectionStatus('disconnected', 'Ошибка');
+                };
+
+                ws.onclose = () => {
+                    this.socket = null;
+                    addToConsole(`[${ts()}] Соединение потеряно. Переподключение через 5сек...`);
+                    setConnectionStatus('reconnecting', 'Переподключение...');
+                    setTimeout(() => this.connectWebSocket(), 5000);
+                };
+            }
+
+            handleMessage(data) {
+                if (data.type === 'update') {
+                    if (data.players) this.updatePlayers(data.players);
+                    if (data.stats) this.updateStats(data.stats);
+                }
+                if (data.type === 'response') {
+                    const icon = data.success ? '✅' : '❌';
+                    addToConsole(`[${ts()}] ${icon} ${data.message || data.command}`);
+                }
+                if (data.type === 'whitelist_data') {
+                    renderWhitelistData(data);
+                }
+            }
+
+            updatePlayers(players) {
+                livePlayers = players;
+                const searchVal = document.getElementById('searchInput').value.toLowerCase();
+                const filtered = searchVal
+                    ? players.filter(p => p.name.toLowerCase().includes(searchVal) || p.steamId.includes(searchVal))
+                    : players;
+
+                const tbody = document.getElementById('playersList');
+                tbody.innerHTML = '';
+
+                filtered.forEach(p => {
+                    const initials = p.rpname ? p.rpname.substring(0,2) : p.name.substring(0,2);
+                    const escapedName = p.name.replace(/'/g, "\\'");
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <div class="player-name">
+                                <div class="player-avatar">${initials}</div>
+                                <div>
+                                    <div>${p.rpname || p.name}</div>
+                                    <div style="font-size:11px;color:rgba(255,255,255,0.4)">${p.team || ''} ${p.rank || ''}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${p.steamId}</td>
+                        <td><span class="player-status status-${p.status}">${p.status === 'active' ? 'В игре' : 'AFK'}</span></td>
+                        <td>${p.ping} ms</td>
+                        <td>
+                            <div class="player-actions">
+                                <button class="action-btn" onclick="openMessageModal('${escapedName}','${p.steamId}')" title="Сообщение">
+                                    <i class="fas fa-envelope"></i>
+                                </button>
+                                <button class="action-btn kick" onclick="openKickModal('${escapedName}','${p.steamId}')" title="Кикнуть">
+                                    <i class="fas fa-user-slash"></i>
+                                </button>
+                                <button class="action-btn ban" onclick="openBanModal('${escapedName}','${p.steamId}')" title="Забанить">
+                                    <i class="fas fa-ban"></i>
+                                </button>
+                                <button class="action-btn" onclick="openWhitelistModal('${escapedName}','${p.steamId}')" title="Вайтлист">
+                                    <i class="fas fa-id-card"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                document.getElementById('playerCount').textContent = players.length + ' игрок(ов)';
+            }
+
+            updateStats(stats) {
+                document.getElementById('onlineCount').textContent = stats.online || '0';
+                document.getElementById('curonl').textContent = (stats.online || 0) + '/64';
+                document.getElementById('adminCount').textContent = stats.admins || '0';
+                document.getElementById('banCount').textContent = stats.bans || '0';
+                document.getElementById('uptime').textContent = stats.uptime || '0:00';
+            }
+        }
+
+        const api = new GModServerAPI();
+        api.connectWebSocket();
+
+        // ----- МОДАЛКИ -----
+        function openKickModal(name, steamId) {
+            currentPlayer = name;
+            currentPlayerSteamId = steamId;
+            document.getElementById('kickPlayerName').textContent = name;
+            document.getElementById('kickReason').value = '';
+            document.getElementById('kickModal').classList.add('active');
+        }
+
+        function openBanModal(name, steamId) {
+            currentPlayer = name;
+            currentPlayerSteamId = steamId;
+            document.getElementById('banPlayerName').textContent = name;
+            document.getElementById('banReason').value = '';
+            document.getElementById('banModal').classList.add('active');
+        }
+
+        function openMessageModal(name, steamId) {
+            currentPlayer = name;
+            currentPlayerSteamId = steamId;
+            document.getElementById('messagePlayerName').textContent = name;
+            document.getElementById('messageText').value = '';
+            document.getElementById('messageModal').classList.add('active');
+        }
+
+        function openWhitelistModal(name, steamId) {
+            currentPlayer = name;
+            currentPlayerSteamId = steamId;
+            document.getElementById('whPlayerName').textContent = name;
+            document.getElementById('whSteamId').textContent = steamId;
+            document.getElementById('whitelistContent').innerHTML = '<p style="color:rgba(255,255,255,0.5)">Загрузка...</p>';
+            document.getElementById('whitelistModal').classList.add('active');
+            api.sendCommand('get_whitelist', steamId);
+        }
+
+        function closeModals() {
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+        }
+
+        // ----- ДЕЙСТВИЯ -----
+        function kickPlayer() {
+            const reason = document.getElementById('kickReason').value || 'Без причины';
+            api.sendCommand('kick', currentPlayerSteamId || currentPlayer, { reason });
+            closeModals();
+        }
+
+        function banPlayer() {
+            const duration = document.getElementById('banDuration').value;
+            const reason = document.getElementById('banReason').value || 'Без причины';
+            api.sendCommand('ban', currentPlayerSteamId || currentPlayer, { reason, duration });
+            closeModals();
+        }
+
+        function sendMessage() {
+            const message = document.getElementById('messageText').value;
+            if (!message) return;
+            api.sendCommand('message', currentPlayerSteamId || currentPlayer, { message });
+            closeModals();
+        }
+
+        // ----- ВАЙТЛИСТ РЕНДЕР -----
+        function renderWhitelistData(data) {
+            const container = document.getElementById('whitelistContent');
+            if (!data.chars || data.chars.length === 0) {
+                container.innerHTML = '<p style="color:#ff6b6b;">Персонажи не найдены для этого SteamID.</p>';
+                return;
+            }
+
+            let html = '';
+            data.chars.forEach((char, idx) => {
+                html += `
+                <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:15px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.05);">
+                    <div style="color:#ffbb33;font-size:13px;margin-bottom:10px;">Персонаж #${char.char_id}</div>
+                    <label style="color:rgba(255,255,255,0.6);font-size:12px;">Имя</label>
+                    <input type="text" id="wh_name_${idx}" value="${char.name || ''}" style="width:100%;padding:8px;margin-bottom:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:white;">
+                    <label style="color:rgba(255,255,255,0.6);font-size:12px;">RP ID</label>
+                    <input type="text" id="wh_rpid_${idx}" value="${char.rpid || ''}" style="width:100%;padding:8px;margin-bottom:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:white;">
+                    <label style="color:rgba(255,255,255,0.6);font-size:12px;">Звание</label>
+                    <input type="text" id="wh_rank_${idx}" value="${char.rank || ''}" style="width:100%;padding:8px;margin-bottom:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:white;">
+                    <label style="color:rgba(255,255,255,0.6);font-size:12px;">Приписки</label>
+                    <input type="text" id="wh_pripiski_${idx}" value="${char.pripiski || ''}" style="width:100%;padding:8px;margin-bottom:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:white;">
+                    <div class="modal-buttons" style="margin-top:5px;">
+                        <button class="modal-btn cancel" onclick="closeModals()">Закрыть</button>
+                        <button class="modal-btn confirm" onclick="saveWhitelist(${char.char_id}, ${idx}, '${data.steamId}')">Сохранить</button>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function saveWhitelist(charId, idx, steamId) {
+            api.sendCommand('update_whitelist', steamId, {
+                char_id: charId,
+                steam_id: steamId,
+                name: document.getElementById('wh_name_' + idx).value,
+                rpid: document.getElementById('wh_rpid_' + idx).value,
+                rank: document.getElementById('wh_rank_' + idx).value,
+                pripiski: document.getElementById('wh_pripiski_' + idx).value,
+            });
+            addToConsole(`[${ts()}] Вайтлист для char_id ${charId} сохранён`);
+        }
+
+        // ----- ПОИСК -----
+        document.getElementById('searchInput').addEventListener('input', () => {
+            api.updatePlayers(livePlayers);
         });
 
-        // Close modal when clicking outside
+        // ----- ГОРЯЧИЕ КЛАВИШИ -----
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModals();
+        });
+
         document.querySelectorAll('.modal').forEach(modal => {
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    closeModals();
+                if (e.target === modal) closeModals();
+            });
+        });
+
+        // ----- БЫСТРЫЕ КОМАНДЫ (САЙДБАР) -----
+        document.querySelectorAll('.command-list li').forEach((item, index) => {
+            item.addEventListener('click', () => {
+                if (index === 1) {
+                    document.getElementById('console').innerHTML = '';
+                    addToConsole(`[${ts()}] Консоль очищена`);
                 }
             });
         });
 
-        // Quick commands
-        document.querySelectorAll('.command-list li').forEach((item, index) => {
-            item.addEventListener('click', () => {
-                const commands = [
-                    'Забанены все игроки',
-                    'Звук отключен всем',
-                    'Консоль очищена',
-                    'Сервер перезагружается...',
-                    'Мир сохранен'
-                ];
-                addToConsole(`[${new Date().toLocaleTimeString()}] Команда: ${commands[index]}`);
-            });
-        });
-
-        // Initial render
-        renderPlayers();
-
-        // Update stats periodically
-        setInterval(() => {
-            const onlineCount = document.getElementById('onlineCount');
-            const current = parseInt(onlineCount.textContent);
-            const change = Math.floor(Math.random() * 3) - 1;
-            onlineCount.textContent = Math.max(0, current + change);
-            
-            addToConsole(`[${new Date().toLocaleTimeString()}] Статистика обновлена`);
-        }, 30000);
+        // Начальное состояние — пустая таблица, ждём данные от сервера
+        document.getElementById('onlineCount').textContent = '0';
+        document.getElementById('adminCount').textContent = '0';
+        document.getElementById('banCount').textContent = '0';
+        document.getElementById('uptime').textContent = '0:00';
+        document.getElementById('curonl').textContent = '0/64';
+        document.getElementById('playerCount').textContent = '0 игроков';
     </script>
 </body>
 </html>
