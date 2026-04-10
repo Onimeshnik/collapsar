@@ -688,7 +688,11 @@
                     addToConsole(`[${ts()}] ${icon} ${data.message || data.command}`);
                 }
                 if (data.type === 'whitelist_data') {
-                    renderWhitelistData(data);
+                    const modal = document.getElementById('whitelistModal');
+                    if (modal.classList.contains('active') && data.steamId === currentPlayerSteamId) {
+                        renderWhitelistData(data);
+                        addToConsole(`[${ts()}] Вайтлист ${data.steamId} обновлён`);
+                    }
                 }
             }
 
