@@ -81,9 +81,20 @@
             width: 12px;
             height: 12px;
             border-radius: 50%;
+            background: #ff6b6b;
+            box-shadow: 0 0 10px #ff6b6b;
+            animation: pulse 2s infinite;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        .status-dot.connected {
             background: #4ecdc4;
             box-shadow: 0 0 10px #4ecdc4;
-            animation: pulse 2s infinite;
+        }
+
+        .status-dot.reconnecting {
+            background: #ffbb33;
+            box-shadow: 0 0 10px #ffbb33;
         }
 
         .status-text {
@@ -451,8 +462,8 @@
             </div>
             <div class="server-status">
                 <div class="status-badge">
-                    <div class="status-dot"></div>
-                    <span class="status-text">Сервер работает</span>
+                    <div class="status-dot" id="connection-status-dot"></div>
+                    <span class="status-text" id="connection-status-text">Сервер работает</span>
                 </div>
                 <div class="server-info">
                     <i class="stat-value" id="curonl"></i>
@@ -655,7 +666,8 @@
                 
                 ws.onopen = () => {
                     console.log('Подключено к серверу GMod');
-                    addToConsole(`[${new Date().toLocaleTimeString()}] Подключение к серверу установлено`);
+                    addToConsole(`[${new Date().toLocaleTimeString()}] ✅ Подключение к серверу установлено`);
+                    setConnectionStatus('connected', 'Подключено');
                 };
 
                 ws.onmessage = (event) => {
@@ -663,9 +675,16 @@
                     this.updateUI(data);
                 };
 
+                ws.onerror = (err) => {
+                    console.error('Ошибка WebSocket:', err);
+                    addToConsole(`[${new Date().toLocaleTimeString()}] ❌ Ошибка соединения`);
+                    setConnectionStatus('disconnected', 'Ошибка');
+                };
+
                 ws.onclose = () => {
                     console.log('Отключено от сервера');
-                    addToConsole(`[${new Date().toLocaleTimeString()}] Потеряно соединение с сервером`);
+                    addToConsole(`[${new Date().toLocaleTimeString()}] ⚠️ Соединение потеряно. Переподключение через 5сек...`);
+                    setConnectionStatus('reconnecting', 'Переподключение...');
                     // Пытаемся переподключиться через 5 секунд
                     setTimeout(() => this.connectWebSocket(), 5000);
                 };
@@ -907,6 +926,15 @@
             line.textContent = message;
             console.appendChild(line);
             console.scrollTop = console.scrollHeight;
+        }
+
+        function setConnectionStatus(state, text) {
+            const dot = document.getElementById('connection-status-dot');
+            const label = document.getElementById('connection-status-text');
+            dot.className = 'status-dot';
+            if (state === 'connected') dot.classList.add('connected');
+            else if (state === 'reconnecting') dot.classList.add('reconnecting');
+            label.textContent = text;
         }
 
         // Close modal on escape key
