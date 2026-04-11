@@ -732,7 +732,7 @@
             document.getElementById('loginUser').value = '';
             document.getElementById('loginPass').value = '';
             // Убрать token из URL
-            if (window.history.replaceState) window.history.replaceState({}, '', '/');
+            if (window.history.replaceState) window.history.replaceState({}, '', window.location.pathname);
         }
 
         function applyRole(role) {
@@ -1081,10 +1081,10 @@
             const error = params.get('error');
             if (error) {
                 document.getElementById('loginError').textContent = 'Ошибка Discord авторизации. Попробуйте снова.';
-                window.history.replaceState({}, '', '/');
+                window.history.replaceState({}, '', window.location.pathname);
             }
             if (token) {
-                window.history.replaceState({}, '', '/');
+                window.history.replaceState({}, '', window.location.pathname);
                 api.connectWithToken(token);
             }
         })();
