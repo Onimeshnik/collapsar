@@ -1080,7 +1080,8 @@
             const token = params.get('token');
             const error = params.get('error');
             if (error) {
-                document.getElementById('loginError').textContent = 'Ошибка Discord авторизации. Попробуйте снова.';
+                const msgs = { no_access: 'У вас нет доступа к панели.', auth_failed: 'Ошибка авторизации. Попробуйте снова.', token_failed: 'Не удалось получить токен Discord.' };
+                document.getElementById('loginError').textContent = msgs[error] || 'Ошибка Discord авторизации.';
                 window.history.replaceState({}, '', window.location.pathname);
             }
             if (token) {
