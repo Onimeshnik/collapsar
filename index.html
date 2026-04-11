@@ -439,18 +439,64 @@
             100% { opacity: 1; }
         }
 
-        /* Responsive */
+        /* Login */
+        .login-screen {
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh; position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 9999;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        .login-screen.hidden { display: none; }
+        .login-box {
+            background: rgba(255,255,255,0.05); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 40px; width: 90%; max-width: 380px;
+            border: 1px solid rgba(255,255,255,0.1); text-align: center;
+        }
+        .login-box h2 { color: white; margin-bottom: 8px; }
+        .login-box .subtitle { color: rgba(255,255,255,0.5); font-size: 13px; margin-bottom: 25px; }
+        .login-box input {
+            width: 100%; padding: 12px 16px; margin-bottom: 14px;
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px; color: white; font-size: 14px; outline: none;
+        }
+        .login-box input:focus { border-color: #4ecdc4; }
+        .login-box button {
+            width: 100%; padding: 12px; background: #4ecdc4; color: #16213e;
+            border: none; border-radius: 10px; font-weight: 700; font-size: 15px;
+            cursor: pointer; transition: opacity 0.3s;
+        }
+        .login-box button:hover { opacity: 0.85; }
+        .login-error { color: #ff6b6b; font-size: 13px; margin-bottom: 12px; min-height: 18px; }
+        .role-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: 10px; }
+        .role-superadmin { background: rgba(255,107,107,0.3); color: #ff6b6b; }
+        .role-admin { background: rgba(255,187,51,0.3); color: #ffbb33; }
+        .role-moderator { background: rgba(78,205,196,0.3); color: #4ecdc4; }
+        .role-viewer { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
+        .hidden-by-role { display: none !important; }
+
         @media (max-width: 900px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
+            .main-content { grid-template-columns: 1fr; }
         }
     </style>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
+    <!-- LOGIN SCREEN -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <i class="fas fa-cubes" style="font-size:48px;color:#4ecdc4;margin-bottom:15px;"></i>
+            <h2>Collapsar Panel</h2>
+            <div class="subtitle">Вход в панель управления сервером</div>
+            <div class="login-error" id="loginError"></div>
+            <input type="text" placeholder="Логин" id="loginUser" autocomplete="off">
+            <input type="password" placeholder="Пароль" id="loginPass" autocomplete="off">
+            <button onclick="doLogin()">Войти</button>
+        </div>
+    </div>
+
+    <div class="container" id="mainApp" style="display:none;">
         <!-- Header -->
         <div class="header">
             <div class="logo">
@@ -464,10 +510,14 @@
                 <div class="status-badge">
                     <div class="status-dot" id="connection-status-dot"></div>
                     <span class="status-text" id="connection-status-text">Сервер работает</span>
+                    <span class="role-badge" id="roleBadge"></span>
                 </div>
                 <div class="server-info">
                     <i class="stat-value" id="curonl"></i>
                 </div>
+                <button onclick="doLogout()" style="background:rgba(255,107,107,0.2);color:#ff6b6b;border:1px solid rgba(255,107,107,0.3);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;">
+                    <i class="fas fa-sign-out-alt"></i> Выйти
+                </button>
             </div>
         </div>
 
@@ -601,10 +651,35 @@
         </div>
     </div>
 
+    <div class="modal" id="rankModal">
+        <div class="modal-content">
+            <h3><i class="fas fa-crown" style="color: #ffbb33;"></i> Изменить ранг</h3>
+            <p style="color: white; margin-bottom: 15px;">Игрок: <span id="rankPlayerName" style="color:#4ecdc4;"></span></p>
+            <p style="color: rgba(255,255,255,0.5); margin-bottom: 15px; font-size: 13px;" id="rankSteamId"></p>
+            <select id="rankSelect">
+                <option value="">Загрузка рангов...</option>
+            </select>
+            <select id="rankDuration">
+                <option value="0">Навсегда</option>
+                <option value="3600">1 час</option>
+                <option value="86400">1 день</option>
+                <option value="604800">1 неделя</option>
+                <option value="2592000">1 месяц</option>
+            </select>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeModals()">Отмена</button>
+                <button class="modal-btn confirm" onclick="setRank()">Установить</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let currentPlayer = null;
         let currentPlayerSteamId = null;
         let livePlayers = [];
+        let currentRole = null;
+        let jobsList = [];
+        let ranksList = [];
 
         // ----- УТИЛИТЫ -----
         function addToConsole(message) {
@@ -626,6 +701,35 @@
         }
 
         function ts() { return new Date().toLocaleTimeString(); }
+
+        // ----- АВТОРИЗАЦИЯ -----
+        const ROLE_LABELS = { superadmin: 'Super Admin', admin: 'Admin', moderator: 'Moderator', viewer: 'Viewer' };
+
+        function doLogin() {
+            const login = document.getElementById('loginUser').value.trim();
+            const pass = document.getElementById('loginPass').value;
+            if (!login || !pass) { document.getElementById('loginError').textContent = 'Введите логин и пароль'; return; }
+            document.getElementById('loginError').textContent = '';
+            api.connectAndAuth(login, pass);
+        }
+
+        function doLogout() {
+            currentRole = null;
+            if (api.socket) { try { api.socket.close(); } catch(e){} }
+            api.socket = null;
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('loginUser').value = '';
+            document.getElementById('loginPass').value = '';
+        }
+
+        function applyRole(role) {
+            currentRole = role;
+            const badge = document.getElementById('roleBadge');
+            badge.textContent = ROLE_LABELS[role] || role;
+            badge.className = 'role-badge role-' + role;
+        }
 
         // ----- API КЛАСС -----
         class GModServerAPI {
@@ -651,30 +755,35 @@
                 }
             }
 
-            connectWebSocket() {
+            connectAndAuth(login, password) {
+                if (this.socket) { try { this.socket.close(); } catch(e){} }
                 const ws = new WebSocket(this.websocketUrl);
                 this.socket = ws;
+                this._login = login;
+                this._password = password;
 
                 ws.onopen = () => {
-                    addToConsole(`[${ts()}] Подключение к серверу установлено`);
-                    setConnectionStatus('connected', 'Подключено');
+                    ws.send(JSON.stringify({ type: 'auth', login, password }));
                 };
 
                 ws.onmessage = (event) => {
-                    const data = JSON.parse(event.data);
+                    let data;
+                    try { data = JSON.parse(event.data); } catch(e) { return; }
                     this.handleMessage(data);
                 };
 
                 ws.onerror = () => {
-                    addToConsole(`[${ts()}] Ошибка соединения`);
+                    document.getElementById('loginError').textContent = 'Ошибка подключения';
                     setConnectionStatus('disconnected', 'Ошибка');
                 };
 
                 ws.onclose = () => {
                     this.socket = null;
-                    addToConsole(`[${ts()}] Соединение потеряно. Переподключение через 5сек...`);
-                    setConnectionStatus('reconnecting', 'Переподключение...');
-                    setTimeout(() => this.connectWebSocket(), 5000);
+                    if (currentRole) {
+                        addToConsole(`[${ts()}] Соединение потеряно. Переподключение...`);
+                        setConnectionStatus('reconnecting', 'Переподключение...');
+                        setTimeout(() => this.connectAndAuth(this._login, this._password), 5000);
+                    }
                 };
             }
 
@@ -687,12 +796,37 @@
                     const icon = data.success ? '✅' : '❌';
                     addToConsole(`[${ts()}] ${icon} ${data.message || data.command}`);
                 }
+                if (data.type === 'auth_result') {
+                    if (data.success) {
+                        document.getElementById('loginScreen').style.display = 'none';
+                        document.getElementById('mainApp').style.display = 'block';
+                        applyRole(data.role);
+                        setConnectionStatus('connected', 'Подключено');
+                        addToConsole(`[${ts()}] Авторизован как ${data.login} (${data.role})`);
+                        this.sendCommand('get_jobs', '');
+                        this.sendCommand('get_ranks', '');
+                    } else {
+                        document.getElementById('loginError').textContent = data.message || 'Ошибка авторизации';
+                        if (this.socket) { try { this.socket.close(); } catch(e){} }
+                    }
+                    return;
+                }
                 if (data.type === 'whitelist_data') {
                     const modal = document.getElementById('whitelistModal');
                     if (modal.classList.contains('active') && data.steamId === currentPlayerSteamId) {
                         renderWhitelistData(data);
                         addToConsole(`[${ts()}] Вайтлист ${data.steamId} обновлён`);
                     }
+                }
+                if (data.type === 'jobs_data') {
+                    jobsList = (data.jobs || []).sort((a,b) => (a.name||'').localeCompare(b.name||''));
+                    addToConsole(`[${ts()}] Получено ${jobsList.length} профессий`);
+                }
+                if (data.type === 'ranks_data') {
+                    ranksList = (data.ranks || []).sort((a,b) => (a.immun||0) - (b.immun||0));
+                    const sel = document.getElementById('rankSelect');
+                    sel.innerHTML = ranksList.map(r => `<option value="${r.key}">${r.name} (${r.key}) [${r.immun}]</option>`).join('');
+                    addToConsole(`[${ts()}] Получено ${ranksList.length} рангов`);
                 }
             }
 
@@ -706,9 +840,13 @@
                 const tbody = document.getElementById('playersList');
                 tbody.innerHTML = '';
 
+                const canKick = currentRole !== 'viewer';
+                const canBan = currentRole === 'admin' || currentRole === 'superadmin';
+                const canRank = canBan;
+
                 filtered.forEach(p => {
                     const initials = p.rpname ? p.rpname.substring(0,2) : p.name.substring(0,2);
-                    const escapedName = p.name.replace(/'/g, "\\'");
+                    const eName = p.name.replace(/'/g, "\\'");
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>
@@ -716,7 +854,7 @@
                                 <div class="player-avatar">${initials}</div>
                                 <div>
                                     <div>${p.rpname || p.name}</div>
-                                    <div style="font-size:11px;color:rgba(255,255,255,0.4)">${p.team || ''} ${p.rank || ''}</div>
+                                    <div style="font-size:11px;color:rgba(255,255,255,0.4)">${p.team || ''} ${p.rank || ''} <span style="color:rgba(78,205,196,0.6)">${p.usergroup || ''}</span></div>
                                 </div>
                             </div>
                         </td>
@@ -725,18 +863,11 @@
                         <td>${p.ping} ms</td>
                         <td>
                             <div class="player-actions">
-                                <button class="action-btn" onclick="openMessageModal('${escapedName}','${p.steamId}')" title="Сообщение">
-                                    <i class="fas fa-envelope"></i>
-                                </button>
-                                <button class="action-btn kick" onclick="openKickModal('${escapedName}','${p.steamId}')" title="Кикнуть">
-                                    <i class="fas fa-user-slash"></i>
-                                </button>
-                                <button class="action-btn ban" onclick="openBanModal('${escapedName}','${p.steamId}')" title="Забанить">
-                                    <i class="fas fa-ban"></i>
-                                </button>
-                                <button class="action-btn" onclick="openWhitelistModal('${escapedName}','${p.steamId}')" title="Вайтлист">
-                                    <i class="fas fa-id-card"></i>
-                                </button>
+                                ${canKick ? `<button class="action-btn" onclick="openMessageModal('${eName}','${p.steamId}')" title="Сообщение"><i class="fas fa-envelope"></i></button>` : ''}
+                                ${canKick ? `<button class="action-btn kick" onclick="openKickModal('${eName}','${p.steamId}')" title="Кикнуть"><i class="fas fa-user-slash"></i></button>` : ''}
+                                ${canBan ? `<button class="action-btn ban" onclick="openBanModal('${eName}','${p.steamId}')" title="Забанить"><i class="fas fa-ban"></i></button>` : ''}
+                                <button class="action-btn" onclick="openWhitelistModal('${eName}','${p.steamId}')" title="Вайтлист"><i class="fas fa-id-card"></i></button>
+                                ${canRank ? `<button class="action-btn" onclick="openRankModal('${eName}','${p.steamId}')" title="Ранг"><i class="fas fa-crown"></i></button>` : ''}
                             </div>
                         </td>
                     `;
@@ -756,7 +887,6 @@
         }
 
         const api = new GModServerAPI();
-        api.connectWebSocket();
 
         // ----- МОДАЛКИ -----
         function openKickModal(name, steamId) {
@@ -791,6 +921,16 @@
             document.getElementById('whitelistContent').innerHTML = '<p style="color:rgba(255,255,255,0.5)">Загрузка...</p>';
             document.getElementById('whitelistModal').classList.add('active');
             api.sendCommand('get_whitelist', steamId);
+            if (jobsList.length === 0) api.sendCommand('get_jobs', '');
+        }
+
+        function openRankModal(name, steamId) {
+            currentPlayer = name;
+            currentPlayerSteamId = steamId;
+            document.getElementById('rankPlayerName').textContent = name;
+            document.getElementById('rankSteamId').textContent = steamId;
+            document.getElementById('rankModal').classList.add('active');
+            if (ranksList.length === 0) api.sendCommand('get_ranks', '');
         }
 
         function closeModals() {
@@ -818,6 +958,14 @@
             closeModals();
         }
 
+        function setRank() {
+            const rank = document.getElementById('rankSelect').value;
+            const duration = document.getElementById('rankDuration').value;
+            if (!rank) return;
+            api.sendCommand('set_rank', currentPlayerSteamId, { rank, duration });
+            closeModals();
+        }
+
         // ----- ВАЙТЛИСТ РЕНДЕР -----
         function renderWhitelistData(data) {
             const container = document.getElementById('whitelistContent');
@@ -839,6 +987,10 @@
                     <input type="text" id="wh_rank_${idx}" value="${char.rank || ''}" style="width:100%;padding:8px;margin-bottom:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:white;">
                     <label style="color:rgba(255,255,255,0.6);font-size:12px;">Приписки</label>
                     <input type="text" id="wh_pripiski_${idx}" value="${char.pripiski || ''}" style="width:100%;padding:8px;margin-bottom:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:white;">
+                    <label style="color:rgba(255,255,255,0.6);font-size:12px;">Профессия</label>
+                    <select id="wh_job_${idx}" style="width:100%;padding:8px;margin-bottom:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:white;">
+                        ${jobsList.map(job => `<option value="${job.index}" ${String(job.index) === String(char.team_id) ? 'selected' : ''}>${job.name}</option>`).join('')}
+                    </select>
                     <div class="modal-buttons" style="margin-top:5px;">
                         <button class="modal-btn cancel" onclick="closeModals()">Закрыть</button>
                         <button class="modal-btn confirm" onclick="saveWhitelist(${char.char_id}, ${idx}, '${data.steamId}')">Сохранить</button>
@@ -856,6 +1008,7 @@
                 rpid: document.getElementById('wh_rpid_' + idx).value,
                 rank: document.getElementById('wh_rank_' + idx).value,
                 pripiski: document.getElementById('wh_pripiski_' + idx).value,
+                team_id: document.getElementById('wh_job_' + idx).value,
             });
             addToConsole(`[${ts()}] Вайтлист для char_id ${charId} сохранён`);
         }
@@ -868,6 +1021,7 @@
         // ----- ГОРЯЧИЕ КЛАВИШИ -----
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeModals();
+            if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') doLogin();
         });
 
         document.querySelectorAll('.modal').forEach(modal => {
