@@ -470,10 +470,44 @@
         .login-error { color: #ff6b6b; font-size: 13px; margin-bottom: 12px; min-height: 18px; }
         .role-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: 10px; }
         .role-superadmin { background: rgba(255,107,107,0.3); color: #ff6b6b; }
-        .role-admin { background: rgba(255,187,51,0.3); color: #ffbb33; }
-        .role-moderator { background: rgba(78,205,196,0.3); color: #4ecdc4; }
-        .role-viewer { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
-        .hidden-by-role { display: none !important; }
+
+        /* Tabs */
+        .tab-bar { display: flex; gap: 0; margin-bottom: 20px; border-bottom: 2px solid rgba(255,255,255,0.1); }
+        .tab-btn { padding: 10px 24px; background: none; border: none; color: rgba(255,255,255,0.5); font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+        .tab-btn:hover { color: rgba(255,255,255,0.8); }
+        .tab-btn.active { color: #4ecdc4; border-bottom-color: #4ecdc4; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+            /* Logs panel */
+            .logs-panel {
+                background: rgba(0,0,0,0.4); border-radius: 12px; padding: 20px;
+                border: 1px solid rgba(255,255,255,0.08); height: 65vh; display: flex; flex-direction: column;
+            }
+            .logs-list {
+                flex: 1; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 13px;
+            }
+            .log-line {
+                padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.03);
+                color: rgba(255,255,255,0.75); line-height: 1.5;
+            }
+            .log-line:hover { background: rgba(255,255,255,0.03); }
+            .log-line .log-time { color: rgba(78,205,196,0.6); margin-right: 8px; }
+            .log-line .log-action { color: #4ecdc4; }
+            .log-line .log-warn { color: #ffbb33; }
+            .log-line .log-deny { color: #ff6b6b; }
+            .logs-toolbar {
+                display: flex; gap: 10px; margin-bottom: 12px; align-items: center;
+            }
+            .logs-toolbar input {
+                flex: 1; padding: 8px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
+                border-radius: 8px; color: white; font-size: 13px;
+            }
+            .logs-toolbar button {
+                padding: 8px 16px; background: rgba(255,255,255,0.1); border: none; border-radius: 8px;
+                color: white; cursor: pointer; font-size: 13px; transition: background 0.3s;
+            }
+            .logs-toolbar button:hover { background: rgba(255,255,255,0.2); }
 
         @media (max-width: 900px) {
             .main-content { grid-template-columns: 1fr; }
@@ -530,80 +564,86 @@
             </div>
         </div>
 
-        <!-- Stats Cards -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-title">Игроки онлайн</div>
-                <div class="stat-value" id="onlineCount">54</div>
-                <!-- <div class="stat-sub">+3 за последний час</div> -->
-            </div>
-            <div class="stat-card">
-                <div class="stat-title">Администраторы</div>
-                <div class="stat-value" id="adminCount">4</div>
-                <div class="stat-sub">2 в игре</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-title">Блокировки</div>
-                <div class="stat-value" id="banCount">12</div>
-                <div class="stat-sub">Активных банов</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-title">Время работы</div>
-                <div class="stat-value" id="uptime">14:23</div>
-                <div class="stat-sub">Часов</div>
-            </div>
+        <!-- Tabs -->
+        <div class="tab-bar">
+            <button class="tab-btn active" onclick="switchTab('players')"><i class="fas fa-users"></i> Игроки</button>
+            <button class="tab-btn" onclick="switchTab('logs')"><i class="fas fa-clipboard-list"></i> Логи</button>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Players Section -->
-            <div class="players-section">
-                <div class="section-header">
-                    <h2>
-                        <i class="fas fa-users" style="color: #4ecdc4;"></i>
-                        Список игроков
-                    </h2>
-                    <span class="player-count" id="playerCount">24 игрока</span>
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Поиск игрока..." id="searchInput">
-                    </div>
+        <!-- Tab: Players -->
+        <div class="tab-content active" id="tab-players">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Игроки онлайн</div>
+                    <div class="stat-value" id="onlineCount">0</div>
                 </div>
-
-                <table class="players-table">
-                    <thead>
-                        <tr>
-                            <th>Игрок</th>
-                            <th>Steam ID</th>
-                            <th>Статус</th>
-                            <th>Пинг</th>
-                            <th>Действия</th>
-                        </tr>
-                    </thead>
-                    <tbody id="playersList">
-                        <!-- Players will be inserted here by JavaScript -->
-                    </tbody>
-                </table>
+                <div class="stat-card">
+                    <div class="stat-title">Администраторы</div>
+                    <div class="stat-value" id="adminCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Блокировки</div>
+                    <div class="stat-value" id="banCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Время работы</div>
+                    <div class="stat-value" id="uptime">0:00</div>
+                </div>
             </div>
 
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <div class="sidebar-card">
-                    <h3><i class="fas fa-bolt" style="color: #4ecdc4;"></i> Быстрые команды</h3>
-                    <ul class="command-list">
-                        <li><i class="fas fa-ban"></i> Кикнуть всех</li>
-                        <li><i class="fas fa-snowplow"></i> Очистить консоль</li>
-                        <li><i class="fas fa-sync"></i> Перезагрузить сервер</li>
-                    </ul>
+            <div class="main-content">
+                <div class="players-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-users" style="color: #4ecdc4;"></i> Список игроков</h2>
+                        <span class="player-count" id="playerCount">0 игроков</span>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Поиск игрока..." id="searchInput">
+                        </div>
+                    </div>
+                    <table class="players-table">
+                        <thead>
+                            <tr>
+                                <th>Игрок</th>
+                                <th>Steam ID</th>
+                                <th>Статус</th>
+                                <th>Пинг</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="playersList"></tbody>
+                    </table>
                 </div>
 
-                <div class="sidebar-card">
-                    <h3><i class="fas fa-terminal" style="color: #4ecdc4;"></i> Консоль сервера</h3>
-                    <div class="server-console" id="console">
+                <div class="sidebar">
+                    <div class="sidebar-card">
+                        <h3><i class="fas fa-bolt" style="color: #4ecdc4;"></i> Быстрые команды</h3>
+                        <ul class="command-list">
+                            <li><i class="fas fa-ban"></i> Кикнуть всех</li>
+                            <li><i class="fas fa-snowplow"></i> Очистить консоль</li>
+                            <li><i class="fas fa-sync"></i> Перезагрузить сервер</li>
+                        </ul>
+                    </div>
+                    <div class="sidebar-card">
+                        <h3><i class="fas fa-terminal" style="color: #4ecdc4;"></i> Консоль сервера</h3>
+                        <div class="server-console" id="console"></div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Tab: Logs -->
+        <div class="tab-content" id="tab-logs">
+            <div class="logs-panel">
+                <div class="logs-toolbar">
+                    <i class="fas fa-search" style="color:rgba(255,255,255,0.4);"></i>
+                    <input type="text" placeholder="Фильтр логов..." id="logsFilter" oninput="filterLogs()">
+                    <button onclick="clearLogs()"><i class="fas fa-trash"></i> Очистить</button>
+                </div>
+                <div class="logs-list" id="logsList"></div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Modals -->
@@ -854,6 +894,9 @@
                     sel.innerHTML = ranksList.map(r => `<option value="${r.key}">${r.name} (${r.key}) [${r.immun}]</option>`).join('');
                     addToConsole(`[${ts()}] Получено ${ranksList.length} рангов`);
                 }
+                if (data.type === 'panel_log') {
+                    addLogLine(data.message);
+                }
             }
 
             updatePlayers(players) {
@@ -1073,6 +1116,46 @@
         document.getElementById('uptime').textContent = '0:00';
         document.getElementById('curonl').textContent = '0/64';
         document.getElementById('playerCount').textContent = '0 игроков';
+
+        // ----- ТАБЫ -----
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // ----- ЛОГИ ПАНЕЛИ -----
+        const panelLogs = [];
+        function addLogLine(msg) {
+            panelLogs.push(msg);
+            if (panelLogs.length > 500) panelLogs.shift();
+            const list = document.getElementById('logsList');
+            const div = document.createElement('div');
+            div.className = 'log-line';
+            let html = msg;
+            const m = msg.match(/^\[([^\]]+)\]/);
+            if (m) html = `<span class="log-time">[${m[1]}]</span>` + msg.substring(m[0].length);
+            if (msg.includes('запрещён') || msg.includes('Неудачная')) html = html.replace(/<\/span>(.*)/, '</span><span class="log-deny">$1</span>');
+            else if (msg.includes('Вход') || msg.includes('OAuth')) html = html.replace(/<\/span>(.*)/, '</span><span class="log-action">$1</span>');
+            div.innerHTML = html;
+            const filter = document.getElementById('logsFilter').value.toLowerCase();
+            if (filter && !msg.toLowerCase().includes(filter)) div.style.display = 'none';
+            list.appendChild(div);
+            list.scrollTop = list.scrollHeight;
+        }
+
+        function filterLogs() {
+            const filter = document.getElementById('logsFilter').value.toLowerCase();
+            document.querySelectorAll('#logsList .log-line').forEach(el => {
+                el.style.display = el.textContent.toLowerCase().includes(filter) || !filter ? '' : 'none';
+            });
+        }
+
+        function clearLogs() {
+            document.getElementById('logsList').innerHTML = '';
+            panelLogs.length = 0;
+        }
 
         // ----- АВТО-ВХОД ПО DISCORD TOKEN ИЗ URL -----
         (function() {
