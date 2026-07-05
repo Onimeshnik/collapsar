@@ -567,7 +567,8 @@
         <!-- Tabs -->
         <div class="tab-bar">
             <button class="tab-btn active" onclick="switchTab('players')"><i class="fas fa-users"></i> Игроки</button>
-            <button class="tab-btn" onclick="switchTab('logs')"><i class="fas fa-clipboard-list"></i> Логи</button>
+            <button class="tab-btn" id="subordinatesTabBtn" onclick="switchTab('subordinates')" style="display:none;"><i class="fas fa-user-shield"></i> Подчинённые</button>
+            <button class="tab-btn" id="logsTabBtn" onclick="switchTab('logs')" style="display:none;"><i class="fas fa-clipboard-list"></i> Логи</button>
         </div>
 
         <!-- Tab: Players -->
@@ -629,6 +630,41 @@
                         <div class="server-console" id="console"></div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Tab: Subordinates -->
+        <div class="tab-content" id="tab-subordinates">
+            <div class="players-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-user-shield" style="color: #4ecdc4;"></i> Подчинённые</h2>
+                    <span class="player-count" id="subordinateCount">0 человек</span>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Поиск по имени или SteamID..." id="subordinateSearch">
+                    </div>
+                </div>
+                <div style="display:flex;gap:10px;margin-bottom:14px;align-items:center;">
+                    <select id="subordinateFormationFilter" style="max-width:240px;">
+                        <option value="">Все доступные формирования</option>
+                    </select>
+                    <button onclick="refreshSubordinates()" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(78,205,196,0.3);background:rgba(78,205,196,0.15);color:#4ecdc4;cursor:pointer;">
+                        <i class="fas fa-sync"></i> Обновить
+                    </button>
+                </div>
+                <table class="players-table">
+                    <thead>
+                        <tr>
+                            <th>Персонаж</th>
+                            <th>Steam ID</th>
+                            <th>Формирование</th>
+                            <th>Звание</th>
+                            <th>Последний вход</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subordinatesList"></tbody>
+                </table>
             </div>
         </div>
 
@@ -727,8 +763,13 @@
         let currentPlayerSteamId = null;
         let livePlayers = [];
         let currentRole = null;
+        let currentAccessRoles = [];
+        let currentUnits = [];
         let jobsList = [];
         let ranksList = [];
+        let subordinatesCache = [];
+        let currentWhitelistChars = [];
+        const SESSION_TOKEN_KEY = 'collapsar_panel_token';
 
         // ----- УТИЛИТЫ -----
         function addToConsole(message) {
@@ -752,7 +793,37 @@
         function ts() { return new Date().toLocaleTimeString(); }
 
         // ----- АВТОРИЗАЦИЯ -----
-        const ROLE_LABELS = { superadmin: 'Super Admin', admin: 'Admin', moderator: 'Moderator', viewer: 'Viewer' };
+        const ROLE_LABELS = { superadmin: 'Super Admin', admin: 'Admin', moderator: 'Moderator', viewer: 'Viewer', commander: 'Командир', depcom: 'Зам. командира', gcmd: 'Командование' };
+        const COMMAND_ROLES = ['commander', 'depcom', 'gcmd'];
+        const FORMATIONS = [
+            { id: 'frontline', name: 'Передовой полк' },
+            { id: 'cg', name: 'Корусантская Гвардия' },
+            { id: 'doom', name: 'Рота Дума' },
+            { id: 'sarlacc', name: 'Батальон Сарлакк' },
+            { id: '212', name: '212-й Батальон' },
+            { id: 'lavina', name: 'Рота Лавина' },
+        ];
+
+        function normalizeUnit(unit) { return String(unit || '').trim().toLowerCase(); }
+        function hasCommanderAccess() {
+            return ['admin', 'superadmin'].includes(currentRole)
+                || currentAccessRoles.some(role => ['admin', 'superadmin'].includes(role) || COMMAND_ROLES.includes(role));
+        }
+        function canSeePanelLogs() {
+            return currentRole === 'superadmin' || currentAccessRoles.includes('superadmin');
+        }
+        function getFormationName(id) {
+            const formation = FORMATIONS.find(f => f.id === normalizeUnit(id));
+            return formation ? formation.name : (id || 'Не указано');
+        }
+        function getCharData(char) {
+            if (!char) return {};
+            if (char.data && typeof char.data === 'object') return char.data;
+            try { return JSON.parse(char.data || '{}') || {}; } catch(e) { return {}; }
+        }
+        function getCharFormation(char) {
+            return normalizeUnit(char.formation || getCharData(char).formation);
+        }
 
         function doLogin() {
             const login = document.getElementById('loginUser').value.trim();
@@ -764,6 +835,10 @@
 
         function doLogout() {
             currentRole = null;
+            currentAccessRoles = [];
+            currentUnits = [];
+            localStorage.removeItem(SESSION_TOKEN_KEY);
+            if (api) api._token = null;
             if (api.socket) { try { api.socket.close(); } catch(e){} }
             api.socket = null;
             document.getElementById('mainApp').style.display = 'none';
@@ -775,11 +850,23 @@
             if (window.history.replaceState) window.history.replaceState({}, '', window.location.pathname);
         }
 
-        function applyRole(role) {
+        function applyRole(role, accessRoles = [], units = []) {
             currentRole = role;
+            currentAccessRoles = accessRoles.length ? accessRoles : [role];
+            currentUnits = units.map(normalizeUnit);
             const badge = document.getElementById('roleBadge');
-            badge.textContent = ROLE_LABELS[role] || role;
-            badge.className = 'role-badge role-' + role;
+            const displayRole = currentAccessRoles.find(r => COMMAND_ROLES.includes(r)) || role;
+            const unitText = currentUnits.length ? ` (${currentUnits.join(', ')})` : '';
+            badge.textContent = (ROLE_LABELS[displayRole] || displayRole) + unitText;
+            badge.className = 'role-badge role-' + displayRole;
+            const subBtn = document.getElementById('subordinatesTabBtn');
+            if (subBtn) subBtn.style.display = hasCommanderAccess() ? '' : 'none';
+            const logsBtn = document.getElementById('logsTabBtn');
+            if (logsBtn) logsBtn.style.display = canSeePanelLogs() ? '' : 'none';
+            if (!canSeePanelLogs() && document.getElementById('tab-logs')?.classList.contains('active')) {
+                switchTab('players');
+            }
+            setupSubordinateFilters();
         }
 
         // ----- API КЛАСС -----
@@ -864,15 +951,24 @@
                 }
                 if (data.type === 'auth_result') {
                     if (data.success) {
+                        if (data.token) {
+                            this._token = data.token;
+                            localStorage.setItem(SESSION_TOKEN_KEY, data.token);
+                        } else if (this._token) {
+                            localStorage.setItem(SESSION_TOKEN_KEY, this._token);
+                        }
                         document.getElementById('loginScreen').style.display = 'none';
                         document.getElementById('mainApp').style.display = 'block';
-                        applyRole(data.role);
+                        applyRole(data.role, data.accessRoles || [], data.units || []);
                         setConnectionStatus('connected', 'Подключено');
                         addToConsole(`[${ts()}] Авторизован как ${data.login} (${data.role})`);
                         this.sendCommand('get_jobs', '');
                         this.sendCommand('get_ranks', '');
+                        if (hasCommanderAccess()) this.sendCommand('get_subordinates', '', { formations: currentUnits });
                     } else {
                         document.getElementById('loginError').textContent = data.message || 'Ошибка авторизации';
+                        if (this._token) localStorage.removeItem(SESSION_TOKEN_KEY);
+                        this._token = null;
                         if (this.socket) { try { this.socket.close(); } catch(e){} }
                     }
                     return;
@@ -883,6 +979,11 @@
                         renderWhitelistData(data);
                         addToConsole(`[${ts()}] Вайтлист ${data.steamId} обновлён`);
                     }
+                }
+                if (data.type === 'subordinates_data') {
+                    subordinatesCache = data.chars || [];
+                    renderSubordinates();
+                    addToConsole(`[${ts()}] Получено подчинённых: ${subordinatesCache.length}`);
                 }
                 if (data.type === 'jobs_data') {
                     jobsList = (data.jobs || []).sort((a,b) => (a.name||'').localeCompare(b.name||''));
@@ -895,7 +996,12 @@
                     addToConsole(`[${ts()}] Получено ${ranksList.length} рангов`);
                 }
                 if (data.type === 'panel_log') {
+                    if (!canSeePanelLogs()) return;
                     addLogLine(data.message);
+                }
+                if (data.type === 'panel_logs') {
+                    if (!canSeePanelLogs()) return;
+                    setPanelLogs(data.logs || []);
                 }
             }
 
@@ -1035,16 +1141,93 @@
             closeModals();
         }
 
+        // ----- ПОДЧИНЁННЫЕ -----
+        function setupSubordinateFilters() {
+            const filter = document.getElementById('subordinateFormationFilter');
+            if (!filter) return;
+
+            const allowedUnits = ['admin', 'superadmin'].includes(currentRole)
+                ? FORMATIONS.map(f => f.id)
+                : currentUnits;
+
+            filter.innerHTML = '<option value="">Все доступные формирования</option>' +
+                FORMATIONS
+                    .filter(f => allowedUnits.includes(f.id))
+                    .map(f => `<option value="${f.id}">${f.name}</option>`)
+                    .join('');
+        }
+
+        function refreshSubordinates() {
+            if (!hasCommanderAccess()) return;
+            setupSubordinateFilters();
+            api.sendCommand('get_subordinates', '', { formations: currentUnits });
+        }
+
+        function renderSubordinates() {
+            const tbody = document.getElementById('subordinatesList');
+            if (!tbody) return;
+
+            const search = (document.getElementById('subordinateSearch')?.value || '').toLowerCase();
+            const formationFilter = normalizeUnit(document.getElementById('subordinateFormationFilter')?.value || '');
+
+            const rows = subordinatesCache.filter(char => {
+                const formation = getCharFormation(char);
+                if (formationFilter && formation !== formationFilter) return false;
+                if (!search) return true;
+
+                return String(char.name || '').toLowerCase().includes(search)
+                    || String(char.SteamID || char.steamId || '').toLowerCase().includes(search)
+                    || String(char.rpid || '').toLowerCase().includes(search);
+            });
+
+            tbody.innerHTML = '';
+            rows.forEach((char, idx) => {
+                const steamId = char.SteamID || char.steamId || '';
+                const formation = getCharFormation(char);
+                const lastSeen = char.ltime
+                    ? new Date(Number(char.ltime) * 1000).toLocaleString()
+                    : (char.lastSeen || '-');
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <div class="player-name">
+                            <div class="player-avatar">${String(char.name || '?').substring(0, 2)}</div>
+                            <div>
+                                <div>${char.name || 'Без имени'}</div>
+                                <div style="font-size:11px;color:rgba(255,255,255,0.4)">RPID: ${char.rpid || '-'}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${steamId}</td>
+                    <td>${getFormationName(formation)}</td>
+                    <td>${char.rank || '-'}</td>
+                    <td>${lastSeen}</td>
+                    <td>
+                        <div class="player-actions">
+                            <button class="action-btn" onclick="openWhitelistModal('${String(char.name || '').replace(/'/g, "\\'")}','${steamId}')" title="Вайтлист"><i class="fas fa-id-card"></i></button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('subordinateCount').textContent = rows.length + ' человек';
+        }
+
         // ----- ВАЙТЛИСТ РЕНДЕР -----
         function renderWhitelistData(data) {
             const container = document.getElementById('whitelistContent');
             if (!data.chars || data.chars.length === 0) {
+                currentWhitelistChars = [];
                 container.innerHTML = '<p style="color:#ff6b6b;">Персонажи не найдены для этого SteamID.</p>';
                 return;
             }
+            currentWhitelistChars = data.chars;
 
             let html = '';
             data.chars.forEach((char, idx) => {
+                const charData = getCharData(char);
+                const selectedFormation = normalizeUnit(charData.formation || char.formation);
                 html += `
                 <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:15px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.05);">
                     <div style="color:#ffbb33;font-size:13px;margin-bottom:10px;">Персонаж #${char.char_id}</div>
@@ -1056,6 +1239,10 @@
                     <input type="text" id="wh_rank_${idx}" value="${char.rank || ''}" style="width:100%;padding:8px;margin-bottom:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:white;">
                     <label style="color:rgba(255,255,255,0.6);font-size:12px;">Приписки</label>
                     <input type="text" id="wh_pripiski_${idx}" value="${char.pripiski || ''}" style="width:100%;padding:8px;margin-bottom:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:white;">
+                    <label style="color:rgba(255,255,255,0.6);font-size:12px;">Формирование</label>
+                    <select id="wh_formation_${idx}" style="width:100%;padding:8px;margin-bottom:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:white;">
+                        ${FORMATIONS.map(formation => `<option value="${formation.id}" ${formation.id === selectedFormation ? 'selected' : ''}>${formation.name}</option>`).join('')}
+                    </select>
                     <label style="color:rgba(255,255,255,0.6);font-size:12px;">Профессия</label>
                     <select id="wh_job_${idx}" style="width:100%;padding:8px;margin-bottom:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:white;">
                         ${jobsList.map(job => `<option value="${job.index}" ${String(job.index) === String(char.team_id) ? 'selected' : ''}>${job.name}</option>`).join('')}
@@ -1070,6 +1257,7 @@
         }
 
         function saveWhitelist(charId, idx, steamId) {
+            const existingData = getCharData(currentWhitelistChars[idx]);
             api.sendCommand('update_whitelist', steamId, {
                 char_id: charId,
                 steam_id: steamId,
@@ -1078,6 +1266,10 @@
                 rank: document.getElementById('wh_rank_' + idx).value,
                 pripiski: document.getElementById('wh_pripiski_' + idx).value,
                 team_id: document.getElementById('wh_job_' + idx).value,
+                data: {
+                    ...existingData,
+                    formation: document.getElementById('wh_formation_' + idx).value,
+                },
             });
             addToConsole(`[${ts()}] Вайтлист для char_id ${charId} сохранён`);
         }
@@ -1086,6 +1278,8 @@
         document.getElementById('searchInput').addEventListener('input', () => {
             api.updatePlayers(livePlayers);
         });
+        document.getElementById('subordinateSearch')?.addEventListener('input', renderSubordinates);
+        document.getElementById('subordinateFormationFilter')?.addEventListener('change', renderSubordinates);
 
         // ----- ГОРЯЧИЕ КЛАВИШИ -----
         document.addEventListener('keydown', (e) => {
@@ -1119,14 +1313,24 @@
 
         // ----- ТАБЫ -----
         function switchTab(tab) {
+            if (tab === 'logs' && !canSeePanelLogs()) return;
+            if (tab === 'subordinates' && !hasCommanderAccess()) return;
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-' + tab).classList.add('active');
-            event.currentTarget.classList.add('active');
+            const btn = document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`);
+            if (btn) btn.classList.add('active');
+            if (tab === 'subordinates') refreshSubordinates();
         }
 
         // ----- ЛОГИ ПАНЕЛИ -----
         const panelLogs = [];
+        function setPanelLogs(logs) {
+            panelLogs.length = 0;
+            document.getElementById('logsList').innerHTML = '';
+            (logs || []).forEach(addLogLine);
+        }
+
         function addLogLine(msg) {
             panelLogs.push(msg);
             if (panelLogs.length > 500) panelLogs.shift();
@@ -1169,7 +1373,14 @@
             }
             if (token) {
                 window.history.replaceState({}, '', window.location.pathname);
+                localStorage.setItem(SESSION_TOKEN_KEY, token);
                 api.connectWithToken(token);
+                return;
+            }
+
+            const savedToken = localStorage.getItem(SESSION_TOKEN_KEY);
+            if (savedToken && !error) {
+                api.connectWithToken(savedToken);
             }
         })();
     </script>
