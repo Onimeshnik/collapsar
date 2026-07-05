@@ -235,6 +235,21 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
+        .donate-form input,
+        .donate-form select {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            outline: none;
+        }
+
+        .donate-form input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
         .player-name {
             display: flex;
             align-items: center;
@@ -568,6 +583,7 @@
         <div class="tab-bar">
             <button class="tab-btn active" onclick="switchTab('players')"><i class="fas fa-users"></i> Игроки</button>
             <button class="tab-btn" id="subordinatesTabBtn" onclick="switchTab('subordinates')" style="display:none;"><i class="fas fa-user-shield"></i> Подчинённые</button>
+            <button class="tab-btn" id="donateTabBtn" onclick="switchTab('donate')" style="display:none;"><i class="fas fa-gem"></i> Донат</button>
             <button class="tab-btn" id="logsTabBtn" onclick="switchTab('logs')" style="display:none;"><i class="fas fa-clipboard-list"></i> Логи</button>
         </div>
 
@@ -665,6 +681,27 @@
                     </thead>
                     <tbody id="subordinatesList"></tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- Tab: Donate -->
+        <div class="tab-content" id="tab-donate">
+            <div class="players-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-gem" style="color: #ffbb33;"></i> Донат персонаж</h2>
+                </div>
+                <div class="donate-form" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
+                    <input type="text" placeholder="SteamID" id="donateSteamId">
+                    <input type="text" placeholder="Имя персонажа" id="donateName">
+                    <input type="number" placeholder="RP ID" id="donateRpid">
+                    <input type="text" placeholder="Звание" id="donateRank">
+                    <input type="text" placeholder="Приписки" id="donatePripiski">
+                    <select id="donateFormation"></select>
+                    <select id="donateJob"></select>
+                </div>
+                <div class="modal-buttons" style="justify-content:flex-start;margin-top:16px;">
+                    <button class="modal-btn confirm" onclick="issueDonateChar()"><i class="fas fa-plus"></i> Выдать персонажа</button>
+                </div>
             </div>
         </div>
 
@@ -812,6 +849,9 @@
         function canSeePanelLogs() {
             return currentRole === 'superadmin' || currentAccessRoles.includes('superadmin');
         }
+        function canUseDonate() {
+            return currentRole === 'superadmin' || currentAccessRoles.includes('superadmin');
+        }
         function getFormationName(id) {
             const formation = FORMATIONS.find(f => f.id === normalizeUnit(id));
             return formation ? formation.name : (id || 'Не указано');
@@ -863,10 +903,16 @@
             if (subBtn) subBtn.style.display = hasCommanderAccess() ? '' : 'none';
             const logsBtn = document.getElementById('logsTabBtn');
             if (logsBtn) logsBtn.style.display = canSeePanelLogs() ? '' : 'none';
+            const donateBtn = document.getElementById('donateTabBtn');
+            if (donateBtn) donateBtn.style.display = canUseDonate() ? '' : 'none';
             if (!canSeePanelLogs() && document.getElementById('tab-logs')?.classList.contains('active')) {
                 switchTab('players');
             }
+            if (!canUseDonate() && document.getElementById('tab-donate')?.classList.contains('active')) {
+                switchTab('players');
+            }
             setupSubordinateFilters();
+            setupDonateForm();
         }
 
         // ----- API КЛАСС -----
@@ -987,6 +1033,7 @@
                 }
                 if (data.type === 'jobs_data') {
                     jobsList = (data.jobs || []).sort((a,b) => (a.name||'').localeCompare(b.name||''));
+                    setupDonateForm();
                     addToConsole(`[${ts()}] Получено ${jobsList.length} профессий`);
                 }
                 if (data.type === 'ranks_data') {
@@ -1099,6 +1146,15 @@
             if (jobsList.length === 0) api.sendCommand('get_jobs', '');
         }
 
+        function openDonateForSteamId(steamId) {
+            if (!canUseDonate()) return;
+            closeModals();
+            switchTab('donate');
+            document.getElementById('donateSteamId').value = steamId || '';
+            if (jobsList.length === 0) api.sendCommand('get_jobs', '');
+            setupDonateForm();
+        }
+
         function openRankModal(name, steamId) {
             currentPlayer = name;
             currentPlayerSteamId = steamId;
@@ -1139,6 +1195,48 @@
             if (!rank) return;
             api.sendCommand('set_rank', currentPlayerSteamId, { rank, duration });
             closeModals();
+        }
+
+        function setupDonateForm() {
+            const formationSelect = document.getElementById('donateFormation');
+            const jobSelect = document.getElementById('donateJob');
+            if (!formationSelect || !jobSelect) return;
+
+            const selectedFormation = formationSelect.value || 'frontline';
+            formationSelect.innerHTML = FORMATIONS
+                .map(formation => `<option value="${formation.id}" ${formation.id === selectedFormation ? 'selected' : ''}>${formation.name}</option>`)
+                .join('');
+
+            const selectedJob = jobSelect.value;
+            jobSelect.innerHTML = jobsList.length
+                ? jobsList.map(job => `<option value="${job.index}" ${String(job.index) === String(selectedJob) ? 'selected' : ''}>${job.name}</option>`).join('')
+                : '<option value="1">Загрузка профессий...</option>';
+        }
+
+        function issueDonateChar() {
+            if (!canUseDonate()) return;
+
+            const steamId = document.getElementById('donateSteamId').value.trim();
+            const name = document.getElementById('donateName').value.trim() || 'Донат персонаж';
+            const formation = document.getElementById('donateFormation').value;
+            const job = document.getElementById('donateJob').value || '1';
+
+            if (!steamId) {
+                addToConsole(`[${ts()}] Укажите SteamID для донат персонажа`);
+                return;
+            }
+
+            api.sendCommand('add_donate_char', steamId, {
+                steam_id: steamId,
+                name,
+                rpid: document.getElementById('donateRpid').value || 0,
+                rank: document.getElementById('donateRank').value || '',
+                pripiski: document.getElementById('donatePripiski').value || '',
+                team_id: job,
+                data: { formation },
+            });
+            currentPlayerSteamId = steamId;
+            addToConsole(`[${ts()}] Выдаю донат персонажа для ${steamId}`);
         }
 
         // ----- ПОДЧИНЁННЫЕ -----
@@ -1217,14 +1315,17 @@
         // ----- ВАЙТЛИСТ РЕНДЕР -----
         function renderWhitelistData(data) {
             const container = document.getElementById('whitelistContent');
+            const addButton = canUseDonate()
+                ? `<button class="modal-btn confirm" style="margin-bottom:10px;" onclick="openDonateForSteamId('${data.steamId}')"><i class="fas fa-plus"></i> Добавить персонажа</button>`
+                : '';
             if (!data.chars || data.chars.length === 0) {
                 currentWhitelistChars = [];
-                container.innerHTML = '<p style="color:#ff6b6b;">Персонажи не найдены для этого SteamID.</p>';
+                container.innerHTML = addButton + '<p style="color:#ff6b6b;">Персонажи не найдены для этого SteamID.</p>';
                 return;
             }
             currentWhitelistChars = data.chars;
 
-            let html = '';
+            let html = addButton;
             data.chars.forEach((char, idx) => {
                 const charData = getCharData(char);
                 const selectedFormation = normalizeUnit(charData.formation || char.formation);
@@ -1315,12 +1416,17 @@
         function switchTab(tab) {
             if (tab === 'logs' && !canSeePanelLogs()) return;
             if (tab === 'subordinates' && !hasCommanderAccess()) return;
+            if (tab === 'donate' && !canUseDonate()) return;
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-' + tab).classList.add('active');
             const btn = document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`);
             if (btn) btn.classList.add('active');
             if (tab === 'subordinates') refreshSubordinates();
+            if (tab === 'donate') {
+                setupDonateForm();
+                if (jobsList.length === 0) api.sendCommand('get_jobs', '');
+            }
         }
 
         // ----- ЛОГИ ПАНЕЛИ -----
