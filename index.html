@@ -869,6 +869,7 @@
         let currentRole = null;
         let currentAccessRoles = [];
         let currentUnits = [];
+        let currentPermissions = [];
         let currentIsOwner = false;
         let jobsList = [];
         let ranksList = [];
@@ -912,6 +913,17 @@
         // ----- АВТОРИЗАЦИЯ -----
         const ROLE_LABELS = { superadmin: 'Super Admin', admin: 'Admin', moderator: 'Moderator', viewer: 'Viewer', commander: 'Командир', depcom: 'Зам. командира', gcmd: 'Командование' };
         const COMMAND_ROLES = ['commander', 'depcom', 'gcmd'];
+        const PERMISSION_LABELS = {
+            logs: 'Логи',
+            bans: 'Баны',
+            kick: 'Кик',
+            message: 'Сообщения',
+            rank: 'Ранги',
+            whitelist: 'Вайтлист',
+            subordinates: 'Подчинённые',
+            donate: 'Донат',
+            jobs: 'Профессии',
+        };
         const FORMATIONS = [
             { id: 'frontline', name: 'Передовой полк' },
             { id: 'cg', name: 'Корусантская Гвардия' },
@@ -922,18 +934,20 @@
         ];
 
         function normalizeUnit(unit) { return String(unit || '').trim().toLowerCase(); }
+        function hasPanelPermission(permission) {
+            return currentIsOwner || currentPermissions.includes(permission);
+        }
         function hasCommanderAccess() {
-            return ['admin', 'superadmin'].includes(currentRole)
-                || currentAccessRoles.some(role => ['admin', 'superadmin'].includes(role) || COMMAND_ROLES.includes(role));
+            return hasPanelPermission('subordinates');
         }
         function canSeePanelLogs() {
-            return currentRole === 'superadmin' || currentAccessRoles.includes('superadmin');
+            return hasPanelPermission('logs');
         }
         function canUseDonate() {
-            return currentRole === 'superadmin' || currentAccessRoles.includes('superadmin');
+            return hasPanelPermission('donate');
         }
         function canManageBans() {
-            return currentRole === 'admin' || currentRole === 'superadmin' || currentAccessRoles.includes('admin') || currentAccessRoles.includes('superadmin');
+            return hasPanelPermission('bans');
         }
         function canUseSettings() {
             return !!currentIsOwner;
@@ -963,6 +977,7 @@
             currentRole = null;
             currentAccessRoles = [];
             currentUnits = [];
+            currentPermissions = [];
             currentIsOwner = false;
             localStorage.removeItem(SESSION_TOKEN_KEY);
             if (api) api._token = null;
@@ -977,10 +992,11 @@
             if (window.history.replaceState) window.history.replaceState({}, '', window.location.pathname);
         }
 
-        function applyRole(role, accessRoles = [], units = []) {
+        function applyRole(role, accessRoles = [], units = [], permissions = []) {
             currentRole = role;
             currentAccessRoles = accessRoles.length ? accessRoles : [role];
             currentUnits = units.map(normalizeUnit);
+            currentPermissions = permissions || [];
             const badge = document.getElementById('roleBadge');
             const displayRole = currentAccessRoles.find(r => COMMAND_ROLES.includes(r)) || role;
             const unitText = currentUnits.length ? ` (${currentUnits.join(', ')})` : '';
@@ -1103,12 +1119,12 @@
                         document.getElementById('loginScreen').style.display = 'none';
                         document.getElementById('mainApp').style.display = 'block';
                         currentIsOwner = !!data.isOwner;
-                        applyRole(data.role, data.accessRoles || [], data.units || []);
+                        applyRole(data.role, data.accessRoles || [], data.units || [], data.permissions || []);
                         setConnectionStatus('connected', 'Подключено');
                         addToConsole(`[${ts()}] Авторизован как ${data.login} (${data.role})`);
-                        this.sendCommand('get_jobs', '');
-                        this.sendCommand('get_ranks', '');
-                        if (hasCommanderAccess()) this.sendCommand('get_subordinates', '', { formations: currentUnits });
+                        if (hasPanelPermission('jobs') || hasPanelPermission('donate')) this.sendCommand('get_jobs', '');
+                        if (hasPanelPermission('rank')) this.sendCommand('get_ranks', '');
+                        if (hasPanelPermission('subordinates')) this.sendCommand('get_subordinates', '', { formations: currentUnits });
                         if (canManageBans()) this.sendCommand('get_bans', '');
                         if (canUseSettings()) this.sendCommand('get_settings', '');
                     } else {
@@ -1178,9 +1194,11 @@
                 const tbody = document.getElementById('playersList');
                 tbody.innerHTML = '';
 
-                const canKick = currentRole !== 'viewer';
-                const canBan = currentRole === 'admin' || currentRole === 'superadmin';
-                const canRank = canBan;
+                const canKick = hasPanelPermission('kick');
+                const canMessage = hasPanelPermission('message');
+                const canBan = hasPanelPermission('bans');
+                const canRank = hasPanelPermission('rank');
+                const canWhitelist = hasPanelPermission('whitelist');
 
                 filtered.forEach(p => {
                     const initials = p.rpname ? p.rpname.substring(0,2) : p.name.substring(0,2);
@@ -1201,10 +1219,10 @@
                         <td>${p.ping} ms</td>
                         <td>
                             <div class="player-actions">
-                                ${canKick ? `<button class="action-btn" onclick="openMessageModal('${eName}','${p.steamId}')" title="Сообщение"><i class="fas fa-envelope"></i></button>` : ''}
+                                ${canMessage ? `<button class="action-btn" onclick="openMessageModal('${eName}','${p.steamId}')" title="Сообщение"><i class="fas fa-envelope"></i></button>` : ''}
                                 ${canKick ? `<button class="action-btn kick" onclick="openKickModal('${eName}','${p.steamId}')" title="Кикнуть"><i class="fas fa-user-slash"></i></button>` : ''}
                                 ${canBan ? `<button class="action-btn ban" onclick="openBanModal('${eName}','${p.steamId}')" title="Забанить"><i class="fas fa-ban"></i></button>` : ''}
-                                <button class="action-btn" onclick="openWhitelistModal('${eName}','${p.steamId}')" title="Вайтлист"><i class="fas fa-id-card"></i></button>
+                                ${canWhitelist ? `<button class="action-btn" onclick="openWhitelistModal('${eName}','${p.steamId}')" title="Вайтлист"><i class="fas fa-id-card"></i></button>` : ''}
                                 ${canRank ? `<button class="action-btn" onclick="openRankModal('${eName}','${p.steamId}')" title="Ранг"><i class="fas fa-crown"></i></button>` : ''}
                             </div>
                         </td>
@@ -1228,6 +1246,7 @@
 
         // ----- МОДАЛКИ -----
         function openKickModal(name, steamId) {
+            if (!hasPanelPermission('kick')) return;
             currentPlayer = name;
             currentPlayerSteamId = steamId;
             document.getElementById('kickPlayerName').textContent = name;
@@ -1236,6 +1255,7 @@
         }
 
         function openBanModal(name, steamId) {
+            if (!hasPanelPermission('bans')) return;
             currentPlayer = name;
             currentPlayerSteamId = steamId;
             document.getElementById('banPlayerName').textContent = name;
@@ -1244,6 +1264,7 @@
         }
 
         function openMessageModal(name, steamId) {
+            if (!hasPanelPermission('message')) return;
             currentPlayer = name;
             currentPlayerSteamId = steamId;
             document.getElementById('messagePlayerName').textContent = name;
@@ -1252,6 +1273,7 @@
         }
 
         function openWhitelistModal(name, steamId) {
+            if (!hasPanelPermission('whitelist')) return;
             currentPlayer = name;
             currentPlayerSteamId = steamId;
             document.getElementById('whPlayerName').textContent = name;
@@ -1272,6 +1294,7 @@
         }
 
         function openRankModal(name, steamId) {
+            if (!hasPanelPermission('rank')) return;
             currentPlayer = name;
             currentPlayerSteamId = steamId;
             document.getElementById('rankPlayerName').textContent = name;
@@ -1286,12 +1309,14 @@
 
         // ----- ДЕЙСТВИЯ -----
         function kickPlayer() {
+            if (!hasPanelPermission('kick')) return;
             const reason = document.getElementById('kickReason').value || 'Без причины';
             api.sendCommand('kick', currentPlayerSteamId || currentPlayer, { reason });
             closeModals();
         }
 
         function banPlayer() {
+            if (!hasPanelPermission('bans')) return;
             const duration = document.getElementById('banDuration').value;
             const reason = document.getElementById('banReason').value || 'Без причины';
             api.sendCommand('ban', currentPlayerSteamId || currentPlayer, { reason, duration });
@@ -1300,6 +1325,7 @@
         }
 
         function sendMessage() {
+            if (!hasPanelPermission('message')) return;
             const message = document.getElementById('messageText').value;
             if (!message) return;
             api.sendCommand('message', currentPlayerSteamId || currentPlayer, { message });
@@ -1307,6 +1333,7 @@
         }
 
         function setRank() {
+            if (!hasPanelPermission('rank')) return;
             const rank = document.getElementById('rankSelect').value;
             const duration = document.getElementById('rankDuration').value;
             if (!rank) return;
@@ -1433,6 +1460,12 @@
                 .join('');
         }
 
+        function permissionCheckboxes(selectedPermissions = [], attr = 'data-permission') {
+            return Object.entries(PERMISSION_LABELS)
+                .map(([permission, label]) => `<label style="display:inline-flex;gap:5px;align-items:center;margin:4px 10px 4px 0;color:rgba(255,255,255,0.8);font-size:12px;"><input type="checkbox" ${attr}="${permission}" ${selectedPermissions.includes(permission) ? 'checked' : ''}> ${label}</label>`)
+                .join('');
+        }
+
         function unitCheckboxes(selectedUnits = []) {
             return FORMATIONS
                 .map(f => `<label style="display:inline-flex;gap:5px;align-items:center;margin:4px 10px 4px 0;color:rgba(255,255,255,0.8);font-size:12px;"><input type="checkbox" data-unit="${f.id}" ${selectedUnits.includes(f.id) ? 'checked' : ''}> ${f.name}</label>`)
@@ -1453,6 +1486,9 @@
             if (kind === 'unit') {
                 return `<select class="discord-rule-value">${FORMATIONS.map(f => `<option value="${f.id}" ${f.id === value ? 'selected' : ''}>${f.name}</option>`).join('')}</select>`;
             }
+            if (kind === 'permissions') {
+                return `<div class="discord-rule-permissions">${permissionCheckboxes(Array.isArray(value) ? value : [], 'data-rule-permission')}</div>`;
+            }
             if (kind === 'command') {
                 return `<select class="discord-rule-value">${['commander','depcom','gcmd'].map(r => `<option value="${r}" ${r === value ? 'selected' : ''}>${ROLE_LABELS[r] || r}</option>`).join('')}</select>`;
             }
@@ -1461,7 +1497,7 @@
 
         function renderSettingsRuleValue(select) {
             const row = select.closest('.settings-discord-rule');
-            const nextValue = select.value === 'unit' ? FORMATIONS[0].id : (select.value === 'command' ? 'commander' : 'moderator');
+            const nextValue = select.value === 'unit' ? FORMATIONS[0].id : (select.value === 'command' ? 'commander' : (select.value === 'permissions' ? [] : 'moderator'));
             row.querySelector('.discord-rule-value-wrap').innerHTML = settingsRuleValueHtml(select.value, nextValue);
         }
 
@@ -1482,6 +1518,7 @@
                         <button class="modal-btn cancel" onclick="removeSettingsBlock(this, '.settings-account')"><i class="fas fa-trash"></i></button>
                     </div>
                     <div style="margin-top:8px;">${accessCheckboxes(acc.accessRoles || [acc.role])}</div>
+                    <div style="margin-top:8px;">${permissionCheckboxes(acc.permissions || [])}</div>
                     <div style="margin-top:4px;">${unitCheckboxes(acc.units || [])}</div>
                 </div>`).join('');
 
@@ -1491,6 +1528,9 @@
             for (const [unit, roleIds] of Object.entries(panelSettingsCache.discordUnitRoleMap || {})) {
                 (roleIds || []).forEach(roleId => rules.push({ roleId, kind: 'unit', value: unit }));
             }
+            for (const [roleId, permissions] of Object.entries(panelSettingsCache.discordPermissionRoleMap || {})) {
+                rules.push({ roleId, kind: 'permissions', value: permissions });
+            }
 
             document.getElementById('settingsDiscordRoles').innerHTML = rules.map(rule => `
                 <div class="settings-discord-rule" style="display:grid;grid-template-columns:minmax(180px,1.4fr) minmax(140px,.8fr) minmax(160px,1fr) auto;gap:10px;margin-bottom:10px;align-items:center;">
@@ -1499,6 +1539,7 @@
                         <option value="access" ${rule.kind === 'access' ? 'selected' : ''}>Доступ панели</option>
                         <option value="command" ${rule.kind === 'command' ? 'selected' : ''}>Командование</option>
                         <option value="unit" ${rule.kind === 'unit' ? 'selected' : ''}>Формирование</option>
+                        <option value="permissions" ${rule.kind === 'permissions' ? 'selected' : ''}>Права</option>
                     </select>
                     <span class="discord-rule-value-wrap">${settingsRuleValueHtml(rule.kind, rule.value)}</span>
                     <button class="modal-btn cancel" onclick="removeSettingsBlock(this, '.settings-discord-rule')"><i class="fas fa-trash"></i></button>
@@ -1509,7 +1550,7 @@
             panelSettingsCache = panelSettingsCache ? collectSettings() : { accounts: {}, discordRoleMap: {}, discordCommandRoleMap: {}, discordUnitRoleMap: {} };
             let index = 1;
             while (panelSettingsCache.accounts['account' + index]) index++;
-            panelSettingsCache.accounts['account' + index] = { password: '', role: 'moderator', accessRoles: ['moderator'], units: [], note: '' };
+            panelSettingsCache.accounts['account' + index] = { password: '', role: 'moderator', accessRoles: ['moderator'], permissions: ['kick', 'message'], units: [], note: '' };
             renderSettings();
         }
 
@@ -1522,6 +1563,7 @@
                         <option value="access">Доступ панели</option>
                         <option value="command">Командование</option>
                         <option value="unit">Формирование</option>
+                        <option value="permissions">Права</option>
                     </select>
                     <span class="discord-rule-value-wrap">${settingsRuleValueHtml('access', 'moderator')}</span>
                     <button class="modal-btn cancel" onclick="removeSettingsBlock(this, '.settings-discord-rule')"><i class="fas fa-trash"></i></button>
@@ -1544,6 +1586,7 @@
                     password: card.querySelector('.account-password').value,
                     role,
                     accessRoles,
+                    permissions: [...card.querySelectorAll('[data-permission]:checked')].map(el => el.dataset.permission),
                     units: [...card.querySelectorAll('[data-unit]:checked')].map(el => el.dataset.unit),
                     note: card.querySelector('.account-note').value.trim(),
                 };
@@ -1552,11 +1595,17 @@
             const discordRoleMap = {};
             const discordCommandRoleMap = {};
             const discordUnitRoleMap = {};
+            const discordPermissionRoleMap = {};
             document.querySelectorAll('.settings-discord-rule').forEach(row => {
                 const roleId = row.querySelector('.discord-role-id').value.trim();
                 const kind = row.querySelector('.discord-rule-kind').value;
-                const value = row.querySelector('.discord-rule-value').value;
                 if (!roleId) return;
+                if (kind === 'permissions') {
+                    const permissions = [...row.querySelectorAll('[data-rule-permission]:checked')].map(el => el.dataset.rulePermission);
+                    if (permissions.length > 0) discordPermissionRoleMap[roleId] = permissions;
+                    return;
+                }
+                const value = row.querySelector('.discord-rule-value').value;
                 if (kind === 'access') discordRoleMap[roleId] = value;
                 else if (kind === 'command') discordCommandRoleMap[roleId] = value;
                 else {
@@ -1565,7 +1614,7 @@
                 }
             });
 
-            return { accounts, discordRoleMap, discordCommandRoleMap, discordUnitRoleMap };
+            return { accounts, discordRoleMap, discordCommandRoleMap, discordUnitRoleMap, discordPermissionRoleMap };
         }
 
         function refreshSettings() {
