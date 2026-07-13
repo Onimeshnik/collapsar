@@ -924,16 +924,53 @@
             donate: 'Донат',
             jobs: 'Профессии',
         };
-        const FORMATIONS = [
-            { id: 'frontline', name: 'Передовой полк' },
+        let FORMATIONS = [
+            { id: 'recruits', name: 'Рекрутская' },
+            { id: 'gar', name: 'Великая Армия Республики' },
+            { id: 'jedi', name: 'Орден Джедаев' },
+            { id: 'support', name: 'Бойцы поддержки' },
+            { id: 'frontline', name: 'Передовой Полк' },
+            { id: 'lavina', name: 'Рота «Лавина»' },
+            { id: 'sarlacc', name: 'Батальон «Сарлакк»' },
             { id: 'cg', name: 'Корусантская Гвардия' },
+            { id: 'senate', name: 'Сенатские Коммандос' },
+            { id: 'arc', name: 'Взвод ARC' },
+            { id: 'bso', name: 'Бригада Специальных Операций' },
+            { id: 'separatists', name: 'Сепаратисты' },
+            { id: 'citizens', name: 'Жители' },
+            { id: 'deathwatch', name: 'Дозор Смерти' },
+            { id: 'pirates', name: 'Пираты' },
+            { id: 'administration', name: 'Администрация' },
             { id: 'doom', name: 'Рота Дума' },
-            { id: 'sarlacc', name: 'Батальон Сарлакк' },
             { id: '212', name: '212-й Батальон' },
-            { id: 'lavina', name: 'Рота Лавина' },
         ];
 
         function normalizeUnit(unit) { return String(unit || '').trim().toLowerCase(); }
+        function applyFormationList(formations) {
+            if (!Array.isArray(formations) || formations.length === 0) return;
+
+            const unique = new Map();
+            formations
+                .slice()
+                .sort((a, b) => (Number(a.position) || 999999) - (Number(b.position) || 999999))
+                .forEach(formation => {
+                    const id = normalizeUnit(formation && formation.id);
+                    if (!id || unique.has(id)) return;
+                    unique.set(id, { id, name: String(formation.name || id) });
+                });
+
+            if (unique.size === 0) return;
+            FORMATIONS = [...unique.values()];
+            setupDonateForm();
+            setupSubordinateFilters();
+            renderSubordinates();
+
+            const modal = document.getElementById('whitelistModal');
+            if (modal && modal.classList.contains('active') && currentWhitelistChars.length > 0) {
+                renderWhitelistData({ steamId: currentPlayerSteamId, chars: currentWhitelistChars });
+            }
+        }
+
         function hasPanelPermission(permission) {
             return currentIsOwner || currentPermissions.includes(permission);
         }
@@ -1137,6 +1174,7 @@
                         applyRole(data.role, data.accessRoles || [], data.units || [], data.permissions || []);
                         setConnectionStatus('connected', 'Подключено');
                         addToConsole(`[${ts()}] Авторизован как ${data.login} (${data.role})`);
+                        if (hasPanelPermission('jobs') || hasPanelPermission('whitelist') || hasPanelPermission('subordinates') || hasPanelPermission('donate')) this.sendCommand('get_formations', '');
                         if (hasPanelPermission('jobs') || hasPanelPermission('donate')) this.sendCommand('get_jobs', '');
                         if (hasPanelPermission('rank')) this.sendCommand('get_ranks', '');
                         if (hasPanelPermission('subordinates')) this.sendCommand('get_subordinates', '', { formations: currentUnits });
@@ -1152,7 +1190,12 @@
                     }
                     return;
                 }
+                if (data.type === 'formations_data') {
+                    applyFormationList(data.formations);
+                    addToConsole(`[${ts()}] Получено формирований: ${FORMATIONS.length}`);
+                }
                 if (data.type === 'whitelist_data') {
+                    applyFormationList(data.formations);
                     const modal = document.getElementById('whitelistModal');
                     if (modal.classList.contains('active') && data.steamId === currentPlayerSteamId) {
                         renderWhitelistData(data);
@@ -1165,6 +1208,7 @@
                     addToConsole(`[${ts()}] Получено подчинённых: ${subordinatesCache.length}`);
                 }
                 if (data.type === 'jobs_data') {
+                    applyFormationList(data.formations);
                     jobsList = (data.jobs || []).sort((a,b) => (a.name||'').localeCompare(b.name||''));
                     setupDonateForm();
                     addToConsole(`[${ts()}] Получено ${jobsList.length} профессий`);
