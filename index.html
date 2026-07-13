@@ -981,7 +981,8 @@
             currentIsOwner = false;
             localStorage.removeItem(SESSION_TOKEN_KEY);
             if (api) api._token = null;
-            if (api.socket) { try { api.socket.close(); } catch(e){} }
+            if (api.reconnectTimer) { clearTimeout(api.reconnectTimer); api.reconnectTimer = null; }
+            if (api.socket) { try { api.socket._intentionalClose = true; api.socket.close(); } catch(e){} }
             api.socket = null;
             document.getElementById('mainApp').style.display = 'none';
             document.getElementById('loginScreen').style.display = 'flex';
@@ -1033,6 +1034,7 @@
             constructor() {
                 this.websocketUrl = 'wss://gmod-admin-panel-production.up.railway.app';
                 this.socket = null;
+                this.reconnectTimer = null;
             }
 
             sendCommand(command, target, data = {}) {
@@ -1067,7 +1069,16 @@
             }
 
             _connectWs(authPayloadFn) {
-                if (this.socket) { try { this.socket.close(); } catch(e){} }
+                if (this.reconnectTimer) {
+                    clearTimeout(this.reconnectTimer);
+                    this.reconnectTimer = null;
+                }
+                if (this.socket) {
+                    try {
+                        this.socket._intentionalClose = true;
+                        this.socket.close();
+                    } catch(e){}
+                }
                 const ws = new WebSocket(this.websocketUrl);
                 this.socket = ws;
 
@@ -1087,11 +1098,15 @@
                 };
 
                 ws.onclose = () => {
-                    this.socket = null;
-                    if (currentRole) {
+                    const wasIntentional = !!ws._intentionalClose;
+                    if (this.socket === ws) this.socket = null;
+                    if (wasIntentional || this.socket !== null || !currentRole) return;
+
+                    if (!this.reconnectTimer) {
                         addToConsole(`[${ts()}] Соединение потеряно. Переподключение...`);
                         setConnectionStatus('reconnecting', 'Переподключение...');
-                        setTimeout(() => {
+                        this.reconnectTimer = setTimeout(() => {
+                            this.reconnectTimer = null;
                             if (this._token) this.connectWithToken(this._token);
                             else this.connectAndAuth(this._login, this._password);
                         }, 5000);
@@ -1131,7 +1146,9 @@
                         document.getElementById('loginError').textContent = data.message || 'Ошибка авторизации';
                         if (this._token) localStorage.removeItem(SESSION_TOKEN_KEY);
                         this._token = null;
-                        if (this.socket) { try { this.socket.close(); } catch(e){} }
+                        currentRole = null;
+                        if (this.reconnectTimer) { clearTimeout(this.reconnectTimer); this.reconnectTimer = null; }
+                        if (this.socket) { try { this.socket._intentionalClose = true; this.socket.close(); } catch(e){} }
                     }
                     return;
                 }
@@ -1882,6 +1899,10 @@
             }
 
             const savedToken = localStorage.getItem(SESSION_TOKEN_KEY);
+            if (savedToken && ['null', 'undefined', ''].includes(String(savedToken).trim().toLowerCase())) {
+                localStorage.removeItem(SESSION_TOKEN_KEY);
+                return;
+            }
             if (savedToken && !error) {
                 api.connectWithToken(savedToken);
             }
