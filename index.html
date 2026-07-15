@@ -920,6 +920,7 @@
             message: 'Сообщения',
             rank: 'Ранги',
             whitelist: 'Вайтлист',
+            delete_characters: 'Удаление персонажей',
             subordinates: 'Подчинённые',
             donate: 'Донат',
             jobs: 'Профессии',
@@ -982,6 +983,9 @@
         }
         function canUseDonate() {
             return hasPanelPermission('donate');
+        }
+        function canDeleteCharacters() {
+            return hasPanelPermission('delete_characters');
         }
         function canManageBans() {
             return hasPanelPermission('bans');
@@ -1782,6 +1786,9 @@
             data.chars.forEach((char, idx) => {
                 const charData = getCharData(char);
                 const selectedFormation = normalizeUnit(charData.formation || char.formation);
+                const deleteButton = canDeleteCharacters()
+                    ? `<button class="modal-btn cancel" style="background:#9f2d36;border-color:#d9535f;" onclick="deleteCharacter(${Number(char.char_id)}, ${idx}, '${data.steamId}')"><i class="fas fa-trash"></i> Удалить</button>`
+                    : '';
                 html += `
                 <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:15px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.05);">
                     <div style="color:#ffbb33;font-size:13px;margin-bottom:10px;">Персонаж #${char.char_id}</div>
@@ -1802,12 +1809,28 @@
                         ${jobsList.map(job => `<option value="${job.index}" ${String(job.index) === String(char.team_id) ? 'selected' : ''}>${job.name}</option>`).join('')}
                     </select>
                     <div class="modal-buttons" style="margin-top:5px;">
+                        ${deleteButton}
                         <button class="modal-btn cancel" onclick="closeModals()">Закрыть</button>
                         <button class="modal-btn confirm" onclick="saveWhitelist(${char.char_id}, ${idx}, '${data.steamId}')">Сохранить</button>
                     </div>
                 </div>`;
             });
             container.innerHTML = html;
+        }
+
+        function deleteCharacter(charId, idx, steamId) {
+            if (!canDeleteCharacters()) return;
+
+            const char = currentWhitelistChars[idx];
+            if (!char || Number(char.char_id) !== Number(charId)) return;
+
+            const name = char.name || ('Персонаж #' + charId);
+            const confirmed = window.confirm(
+                `Безвозвратно удалить персонажа "${name}" (#${charId})?\n\nЭто действие нельзя отменить.`
+            );
+            if (!confirmed) return;
+
+            api.sendCommand('delete_character', steamId, { char_id: charId });
         }
 
         function saveWhitelist(charId, idx, steamId) {
