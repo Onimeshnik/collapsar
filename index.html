@@ -870,6 +870,7 @@
         let currentAccessRoles = [];
         let currentUnits = [];
         let currentPermissions = [];
+        let currentAllowedRanks = ['user'];
         let currentIsOwner = false;
         let jobsList = [];
         let ranksList = [];
@@ -1019,6 +1020,7 @@
             currentAccessRoles = [];
             currentUnits = [];
             currentPermissions = [];
+            currentAllowedRanks = ['user'];
             currentIsOwner = false;
             localStorage.removeItem(SESSION_TOKEN_KEY);
             if (api) api._token = null;
@@ -1034,11 +1036,12 @@
             if (window.history.replaceState) window.history.replaceState({}, '', window.location.pathname);
         }
 
-        function applyRole(role, accessRoles = [], units = [], permissions = []) {
+        function applyRole(role, accessRoles = [], units = [], permissions = [], allowedRanks = ['user']) {
             currentRole = role;
             currentAccessRoles = accessRoles.length ? accessRoles : [role];
             currentUnits = units.map(normalizeUnit);
             currentPermissions = permissions || [];
+            currentAllowedRanks = Array.isArray(allowedRanks) && allowedRanks.length ? allowedRanks : ['user'];
             const badge = document.getElementById('roleBadge');
             const displayRole = currentAccessRoles.find(r => COMMAND_ROLES.includes(r)) || role;
             const unitText = currentUnits.length ? ` (${currentUnits.join(', ')})` : '';
@@ -1175,7 +1178,7 @@
                         document.getElementById('loginScreen').style.display = 'none';
                         document.getElementById('mainApp').style.display = 'block';
                         currentIsOwner = !!data.isOwner;
-                        applyRole(data.role, data.accessRoles || [], data.units || [], data.permissions || []);
+                        applyRole(data.role, data.accessRoles || [], data.units || [], data.permissions || [], data.allowedRanks || ['user']);
                         setConnectionStatus('connected', 'Подключено');
                         addToConsole(`[${ts()}] Авторизован как ${data.login} (${data.role})`);
                         if (hasPanelPermission('jobs') || hasPanelPermission('whitelist') || hasPanelPermission('subordinates') || hasPanelPermission('donate')) this.sendCommand('get_formations', '');
@@ -1220,7 +1223,13 @@
                 if (data.type === 'ranks_data') {
                     ranksList = (data.ranks || []).sort((a,b) => (a.immun||0) - (b.immun||0));
                     const sel = document.getElementById('rankSelect');
-                    sel.innerHTML = ranksList.map(r => `<option value="${r.key}">${r.name} (${r.key}) [${r.immun}]</option>`).join('');
+                    const grantableRanks = currentAllowedRanks.includes('*')
+                        ? ranksList
+                        : ranksList.filter(r => currentAllowedRanks.includes(r.key));
+                    sel.innerHTML = grantableRanks.length
+                        ? grantableRanks.map(r => `<option value="${r.key}">${r.name} (${r.key}) [${r.immun}]</option>`).join('')
+                        : '<option value="">Нет доступных рангов</option>';
+                    if (panelSettingsCache) renderSettings();
                     addToConsole(`[${ts()}] Получено ${ranksList.length} рангов`);
                 }
                 if (data.type === 'bans_data') {
@@ -1531,6 +1540,13 @@
                 .join('');
         }
 
+        function rankCheckboxes(selectedRanks = [], attr = 'data-rank') {
+            const ranks = [{ key: '*', name: 'Все привилегии' }, ...ranksList];
+            return ranks
+                .map(rank => `<label style="display:inline-flex;gap:5px;align-items:center;margin:4px 10px 4px 0;color:rgba(255,255,255,0.8);font-size:12px;"><input type="checkbox" ${attr}="${rank.key}" ${selectedRanks.includes(rank.key) ? 'checked' : ''}> ${rank.name} (${rank.key})</label>`)
+                .join('');
+        }
+
         function unitCheckboxes(selectedUnits = []) {
             return FORMATIONS
                 .map(f => `<label style="display:inline-flex;gap:5px;align-items:center;margin:4px 10px 4px 0;color:rgba(255,255,255,0.8);font-size:12px;"><input type="checkbox" data-unit="${f.id}" ${selectedUnits.includes(f.id) ? 'checked' : ''}> ${f.name}</label>`)
@@ -1554,6 +1570,9 @@
             if (kind === 'permissions') {
                 return `<div class="discord-rule-permissions">${permissionCheckboxes(Array.isArray(value) ? value : [], 'data-rule-permission')}</div>`;
             }
+            if (kind === 'ranks') {
+                return `<div class="discord-rule-ranks">${rankCheckboxes(Array.isArray(value) ? value : ['user'], 'data-rule-rank')}</div>`;
+            }
             if (kind === 'command') {
                 return `<select class="discord-rule-value">${['commander','depcom','gcmd'].map(r => `<option value="${r}" ${r === value ? 'selected' : ''}>${ROLE_LABELS[r] || r}</option>`).join('')}</select>`;
             }
@@ -1562,7 +1581,11 @@
 
         function renderSettingsRuleValue(select) {
             const row = select.closest('.settings-discord-rule');
-            const nextValue = select.value === 'unit' ? FORMATIONS[0].id : (select.value === 'command' ? 'commander' : (select.value === 'permissions' ? [] : 'moderator'));
+            const nextValue = select.value === 'unit'
+                ? FORMATIONS[0].id
+                : (select.value === 'command'
+                    ? 'commander'
+                    : (select.value === 'permissions' ? [] : (select.value === 'ranks' ? ['user'] : 'moderator')));
             row.querySelector('.discord-rule-value-wrap').innerHTML = settingsRuleValueHtml(select.value, nextValue);
         }
 
@@ -1583,7 +1606,8 @@
                         <button class="modal-btn cancel" onclick="removeSettingsBlock(this, '.settings-account')"><i class="fas fa-trash"></i></button>
                     </div>
                     <div style="margin-top:8px;">${accessCheckboxes(acc.accessRoles || [acc.role])}</div>
-                    <div style="margin-top:8px;">${permissionCheckboxes(acc.permissions || [])}</div>
+                    <div style="margin-top:8px;"><div style="color:#ffbb33;font-size:12px;margin-bottom:3px;">Права панели</div>${permissionCheckboxes(acc.permissions || [])}</div>
+                    <div style="margin-top:8px;"><div style="color:#ffbb33;font-size:12px;margin-bottom:3px;">Какие привилегии может выдавать</div>${rankCheckboxes(acc.allowedRanks || ['user'])}</div>
                     <div style="margin-top:4px;">${unitCheckboxes(acc.units || [])}</div>
                 </div>`).join('');
 
@@ -1596,6 +1620,9 @@
             for (const [roleId, permissions] of Object.entries(panelSettingsCache.discordPermissionRoleMap || {})) {
                 rules.push({ roleId, kind: 'permissions', value: permissions });
             }
+            for (const [roleId, ranks] of Object.entries(panelSettingsCache.discordRankRoleMap || {})) {
+                rules.push({ roleId, kind: 'ranks', value: ranks });
+            }
 
             document.getElementById('settingsDiscordRoles').innerHTML = rules.map(rule => `
                 <div class="settings-discord-rule" style="display:grid;grid-template-columns:minmax(180px,1.4fr) minmax(140px,.8fr) minmax(160px,1fr) auto;gap:10px;margin-bottom:10px;align-items:center;">
@@ -1605,6 +1632,7 @@
                         <option value="command" ${rule.kind === 'command' ? 'selected' : ''}>Командование</option>
                         <option value="unit" ${rule.kind === 'unit' ? 'selected' : ''}>Формирование</option>
                         <option value="permissions" ${rule.kind === 'permissions' ? 'selected' : ''}>Права</option>
+                        <option value="ranks" ${rule.kind === 'ranks' ? 'selected' : ''}>Выдаваемые привилегии</option>
                     </select>
                     <span class="discord-rule-value-wrap">${settingsRuleValueHtml(rule.kind, rule.value)}</span>
                     <button class="modal-btn cancel" onclick="removeSettingsBlock(this, '.settings-discord-rule')"><i class="fas fa-trash"></i></button>
@@ -1615,7 +1643,7 @@
             panelSettingsCache = panelSettingsCache ? collectSettings() : { accounts: {}, discordRoleMap: {}, discordCommandRoleMap: {}, discordUnitRoleMap: {} };
             let index = 1;
             while (panelSettingsCache.accounts['account' + index]) index++;
-            panelSettingsCache.accounts['account' + index] = { password: '', role: 'moderator', accessRoles: ['moderator'], permissions: ['kick', 'message'], units: [], note: '' };
+            panelSettingsCache.accounts['account' + index] = { password: '', role: 'moderator', accessRoles: ['moderator'], permissions: ['kick', 'message'], allowedRanks: ['user'], units: [], note: '' };
             renderSettings();
         }
 
@@ -1629,6 +1657,7 @@
                         <option value="command">Командование</option>
                         <option value="unit">Формирование</option>
                         <option value="permissions">Права</option>
+                        <option value="ranks">Выдаваемые привилегии</option>
                     </select>
                     <span class="discord-rule-value-wrap">${settingsRuleValueHtml('access', 'moderator')}</span>
                     <button class="modal-btn cancel" onclick="removeSettingsBlock(this, '.settings-discord-rule')"><i class="fas fa-trash"></i></button>
@@ -1652,6 +1681,7 @@
                     role,
                     accessRoles,
                     permissions: [...card.querySelectorAll('[data-permission]:checked')].map(el => el.dataset.permission),
+                    allowedRanks: [...card.querySelectorAll('[data-rank]:checked')].map(el => el.dataset.rank),
                     units: [...card.querySelectorAll('[data-unit]:checked')].map(el => el.dataset.unit),
                     note: card.querySelector('.account-note').value.trim(),
                 };
@@ -1661,6 +1691,7 @@
             const discordCommandRoleMap = {};
             const discordUnitRoleMap = {};
             const discordPermissionRoleMap = {};
+            const discordRankRoleMap = {};
             document.querySelectorAll('.settings-discord-rule').forEach(row => {
                 const roleId = row.querySelector('.discord-role-id').value.trim();
                 const kind = row.querySelector('.discord-rule-kind').value;
@@ -1668,6 +1699,11 @@
                 if (kind === 'permissions') {
                     const permissions = [...row.querySelectorAll('[data-rule-permission]:checked')].map(el => el.dataset.rulePermission);
                     if (permissions.length > 0) discordPermissionRoleMap[roleId] = permissions;
+                    return;
+                }
+                if (kind === 'ranks') {
+                    const ranks = [...row.querySelectorAll('[data-rule-rank]:checked')].map(el => el.dataset.ruleRank);
+                    if (ranks.length > 0) discordRankRoleMap[roleId] = ranks;
                     return;
                 }
                 const value = row.querySelector('.discord-rule-value').value;
@@ -1679,7 +1715,7 @@
                 }
             });
 
-            return { accounts, discordRoleMap, discordCommandRoleMap, discordUnitRoleMap, discordPermissionRoleMap };
+            return { accounts, discordRoleMap, discordCommandRoleMap, discordUnitRoleMap, discordPermissionRoleMap, discordRankRoleMap };
         }
 
         function refreshSettings() {
