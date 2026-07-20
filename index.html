@@ -582,6 +582,7 @@
         <!-- Tabs -->
         <div class="tab-bar">
             <button class="tab-btn active" onclick="switchTab('players')"><i class="fas fa-users"></i> Игроки</button>
+            <button class="tab-btn" id="accessesTabBtn" onclick="switchTab('accesses')" style="display:none;"><i class="fas fa-user-lock"></i> Доступы</button>
             <button class="tab-btn" id="subordinatesTabBtn" onclick="switchTab('subordinates')" style="display:none;"><i class="fas fa-user-shield"></i> Подчинённые</button>
             <button class="tab-btn" id="donateTabBtn" onclick="switchTab('donate')" style="display:none;"><i class="fas fa-gem"></i> Донат</button>
             <button class="tab-btn" id="bansTabBtn" onclick="switchTab('bans')" style="display:none;"><i class="fas fa-ban"></i> Баны</button>
@@ -648,6 +649,37 @@
                         <div class="server-console" id="console"></div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Tab: Accesses -->
+        <div class="tab-content" id="tab-accesses">
+            <div class="players-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-user-lock" style="color:#ffbb33;"></i> Пользователи с привилегиями</h2>
+                    <span class="player-count" id="accessesCount">0 пользователей</span>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Поиск по имени, SteamID или рангу..." id="accessesSearch" oninput="renderPrivilegedUsers()">
+                    </div>
+                </div>
+                <div style="display:flex;gap:10px;margin-bottom:14px;align-items:center;">
+                    <button class="modal-btn cancel" onclick="refreshPrivilegedUsers()"><i class="fas fa-sync"></i> Обновить</button>
+                </div>
+                <table class="players-table">
+                    <thead>
+                        <tr>
+                            <th>Пользователь</th>
+                            <th>SteamID</th>
+                            <th>Привилегия</th>
+                            <th>Срок</th>
+                            <th>Последний вход</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="accessesList"></tbody>
+                </table>
             </div>
         </div>
 
@@ -874,6 +906,7 @@
         let currentIsOwner = false;
         let jobsList = [];
         let ranksList = [];
+        let privilegedUsersCache = [];
         let subordinatesCache = [];
         let bansCache = [];
         let panelSettingsCache = null;
@@ -1049,6 +1082,8 @@
             badge.className = 'role-badge role-' + displayRole;
             const subBtn = document.getElementById('subordinatesTabBtn');
             if (subBtn) subBtn.style.display = hasCommanderAccess() ? '' : 'none';
+            const accessesBtn = document.getElementById('accessesTabBtn');
+            if (accessesBtn) accessesBtn.style.display = hasPanelPermission('rank') ? '' : 'none';
             const logsBtn = document.getElementById('logsTabBtn');
             if (logsBtn) logsBtn.style.display = canSeePanelLogs() ? '' : 'none';
             const donateBtn = document.getElementById('donateTabBtn');
@@ -1067,6 +1102,9 @@
                 switchTab('players');
             }
             if (!canUseSettings() && document.getElementById('tab-settings')?.classList.contains('active')) {
+                switchTab('players');
+            }
+            if (!hasPanelPermission('rank') && document.getElementById('tab-accesses')?.classList.contains('active')) {
                 switchTab('players');
             }
             setupSubordinateFilters();
@@ -1183,7 +1221,10 @@
                         addToConsole(`[${ts()}] Авторизован как ${data.login} (${data.role})`);
                         if (hasPanelPermission('jobs') || hasPanelPermission('whitelist') || hasPanelPermission('subordinates') || hasPanelPermission('donate')) this.sendCommand('get_formations', '');
                         if (hasPanelPermission('jobs') || hasPanelPermission('donate')) this.sendCommand('get_jobs', '');
-                        if (hasPanelPermission('rank')) this.sendCommand('get_ranks', '');
+                        if (hasPanelPermission('rank')) {
+                            this.sendCommand('get_ranks', '');
+                            this.sendCommand('get_privileged_users', '');
+                        }
                         if (hasPanelPermission('subordinates')) this.sendCommand('get_subordinates', '', { formations: currentUnits });
                         if (canManageBans()) this.sendCommand('get_bans', '');
                         if (canUseSettings()) this.sendCommand('get_settings', '');
@@ -1231,6 +1272,11 @@
                         : '<option value="">Нет доступных рангов</option>';
                     if (panelSettingsCache) renderSettings();
                     addToConsole(`[${ts()}] Получено ${ranksList.length} рангов`);
+                }
+                if (data.type === 'privileged_users_data') {
+                    privilegedUsersCache = Array.isArray(data.users) ? data.users : [];
+                    renderPrivilegedUsers();
+                    addToConsole(`[${ts()}] Получено пользователей с привилегиями: ${privilegedUsersCache.length}`);
                 }
                 if (data.type === 'bans_data') {
                     bansCache = data.bans || [];
@@ -1413,6 +1459,62 @@
             if (!rank) return;
             api.sendCommand('set_rank', currentPlayerSteamId, { rank, duration });
             closeModals();
+            setTimeout(refreshPrivilegedUsers, 600);
+        }
+
+        // ----- ДОСТУПЫ / ПРИВИЛЕГИИ -----
+        function formatAccessDate(timestamp, permanentText = '-') {
+            const value = Number(timestamp) || 0;
+            if (value <= 0) return permanentText;
+            return new Date(value * 1000).toLocaleString('ru-RU');
+        }
+
+        function refreshPrivilegedUsers() {
+            if (!hasPanelPermission('rank')) return;
+            api.sendCommand('get_privileged_users', '');
+        }
+
+        function renderPrivilegedUsers() {
+            const tbody = document.getElementById('accessesList');
+            if (!tbody) return;
+
+            const search = (document.getElementById('accessesSearch')?.value || '').trim().toLowerCase();
+            const rows = privilegedUsersCache.filter(user => {
+                if (!search) return true;
+                return String(user.name || '').toLowerCase().includes(search)
+                    || String(user.steamId || '').toLowerCase().includes(search)
+                    || String(user.rank || '').toLowerCase().includes(search)
+                    || String(user.rankName || '').toLowerCase().includes(search);
+            });
+
+            tbody.innerHTML = '';
+            rows.forEach(user => {
+                const canModify = currentAllowedRanks.includes('*') || currentAllowedRanks.includes(String(user.rank || '').toLowerCase());
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${escapeHtml(user.name || 'Без имени')}</td>
+                    <td>${escapeHtml(user.steamId || '-')}</td>
+                    <td><span style="color:#ffbb33;font-weight:600;">${escapeHtml(user.rankName || user.rank || '-')}</span><div style="font-size:11px;color:rgba(255,255,255,.4);">${escapeHtml(user.rank || '-')} · иммунитет ${Number(user.immun) || 0}</div></td>
+                    <td>${escapeHtml(formatAccessDate(user.expires, 'Навсегда'))}</td>
+                    <td>${escapeHtml(formatAccessDate(user.lastSeen, '-'))}</td>
+                    <td><span class="player-status ${user.online ? 'status-active' : 'status-idle'}">${user.online ? 'В игре' : 'Офлайн'}</span></td>
+                    <td>${canModify
+                        ? '<button class="action-btn access-rank-btn" title="Изменить привилегию"><i class="fas fa-crown"></i></button>'
+                        : '<span title="Нет права изменять эту привилегию" style="color:rgba(255,255,255,.3);"><i class="fas fa-lock"></i></span>'}</td>
+                `;
+                if (canModify) {
+                    row.querySelector('.access-rank-btn')?.addEventListener('click', () => {
+                        openRankModal(user.name || user.steamId, user.steamId);
+                        const rankSelect = document.getElementById('rankSelect');
+                        if (rankSelect && [...rankSelect.options].some(option => option.value === user.rank)) {
+                            rankSelect.value = user.rank;
+                        }
+                    });
+                }
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('accessesCount').textContent = `${rows.length} пользователей`;
         }
 
         function setupDonateForm() {
@@ -1931,6 +2033,7 @@
             if (tab === 'subordinates' && !hasCommanderAccess()) return;
             if (tab === 'donate' && !canUseDonate()) return;
             if (tab === 'bans' && !canManageBans()) return;
+            if (tab === 'accesses' && !hasPanelPermission('rank')) return;
             if (tab === 'settings' && !canUseSettings()) return;
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -1939,6 +2042,7 @@
             if (btn) btn.classList.add('active');
             if (tab === 'subordinates') refreshSubordinates();
             if (tab === 'bans') refreshBans();
+            if (tab === 'accesses') refreshPrivilegedUsers();
             if (tab === 'settings') refreshSettings();
             if (tab === 'donate') {
                 setupDonateForm();
