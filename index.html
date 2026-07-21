@@ -266,6 +266,17 @@
             justify-content: center;
             font-weight: 600;
             font-size: 14px;
+            position: relative;
+            overflow: hidden;
+            flex: 0 0 32px;
+        }
+
+        .player-avatar img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .player-status {
@@ -912,6 +923,8 @@
         let panelSettingsCache = null;
         let discordRolesCache = [];
         let currentWhitelistChars = [];
+        const steamAvatarCache = new Map();
+        const pendingSteamAvatars = new Set();
         const SESSION_TOKEN_KEY = 'collapsar_panel_token';
 
         // ----- УТИЛИТЫ -----
@@ -942,6 +955,27 @@
                 '"': '&quot;',
                 "'": '&#39;',
             }[ch]));
+        }
+
+        function steamAvatarMarkup(steamId, fallback = '?') {
+            const safeFallback = escapeHtml(String(fallback || '?').substring(0, 2));
+            const info = steamAvatarCache.get(String(steamId || ''));
+            const image = info && info.avatar
+                ? `<img src="${escapeHtml(info.avatar)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`
+                : '';
+            return `<div class="player-avatar"><span>${safeFallback}</span>${image}</div>`;
+        }
+
+        function requestSteamAvatars(steamIds) {
+            const ids = [...new Set((steamIds || []).map(value => String(value || '').trim()).filter(Boolean))]
+                .filter(steamId => !steamAvatarCache.has(steamId) && !pendingSteamAvatars.has(steamId));
+            if (!ids.length || !api || !api.socket || api.socket.readyState !== WebSocket.OPEN) return;
+
+            for (let offset = 0; offset < ids.length; offset += 100) {
+                const batch = ids.slice(offset, offset + 100);
+                batch.forEach(steamId => pendingSteamAvatars.add(steamId));
+                api.sendCommand('get_steam_avatars', '', { steam_ids: batch }, true);
+            }
         }
 
         // ----- АВТОРИЗАЦИЯ -----
@@ -1119,7 +1153,7 @@
                 this.reconnectTimer = null;
             }
 
-            sendCommand(command, target, data = {}) {
+            sendCommand(command, target, data = {}, silent = false) {
                 const payload = {
                     command: command,
                     target: target,
@@ -1130,7 +1164,7 @@
 
                 if (this.socket && this.socket.readyState === WebSocket.OPEN) {
                     this.socket.send(JSON.stringify(payload));
-                    addToConsole(`[${ts()}] Команда: ${command} → ${target}`);
+                    if (!silent) addToConsole(`[${ts()}] Команда: ${command} → ${target}`);
                 } else {
                     addToConsole(`[${ts()}] Нет соединения с сервером!`);
                 }
@@ -1278,6 +1312,21 @@
                     renderPrivilegedUsers();
                     addToConsole(`[${ts()}] Получено пользователей с привилегиями: ${privilegedUsersCache.length}`);
                 }
+                if (data.type === 'steam_avatars_data') {
+                    (data.requestedIds || []).forEach(steamId => {
+                        pendingSteamAvatars.delete(String(steamId));
+                        steamAvatarCache.set(String(steamId), null);
+                    });
+                    Object.entries(data.avatars || {}).forEach(([steamId, info]) => {
+                        steamAvatarCache.set(String(steamId), info || null);
+                    });
+                    if (!data.success && data.message) {
+                        addToConsole(`[${ts()}] Steam API: ${data.message}`);
+                    }
+                    this.updatePlayers(livePlayers);
+                    renderPrivilegedUsers();
+                    renderSubordinates();
+                }
                 if (data.type === 'bans_data') {
                     bansCache = data.bans || [];
                     renderBans();
@@ -1306,6 +1355,7 @@
 
             updatePlayers(players) {
                 livePlayers = players;
+                requestSteamAvatars(players.map(player => player.steamId));
                 const searchVal = document.getElementById('searchInput').value.toLowerCase();
                 const filtered = searchVal
                     ? players.filter(p => p.name.toLowerCase().includes(searchVal) || p.steamId.includes(searchVal))
@@ -1327,7 +1377,7 @@
                     row.innerHTML = `
                         <td>
                             <div class="player-name">
-                                <div class="player-avatar">${initials}</div>
+                                ${steamAvatarMarkup(p.steamId, initials)}
                                 <div>
                                     <div>${p.rpname || p.name}</div>
                                     <div style="font-size:11px;color:rgba(255,255,255,0.4)">${p.team || ''} ${p.rank || ''} <span style="color:rgba(78,205,196,0.6)">${p.usergroup || ''}</span></div>
@@ -1478,6 +1528,8 @@
             const tbody = document.getElementById('accessesList');
             if (!tbody) return;
 
+            requestSteamAvatars(privilegedUsersCache.map(user => user.steamId));
+
             const search = (document.getElementById('accessesSearch')?.value || '').trim().toLowerCase();
             const rows = privilegedUsersCache.filter(user => {
                 if (!search) return true;
@@ -1492,7 +1544,7 @@
                 const canModify = currentAllowedRanks.includes('*') || currentAllowedRanks.includes(String(user.rank || '').toLowerCase());
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${escapeHtml(user.name || 'Без имени')}</td>
+                    <td><div class="player-name">${steamAvatarMarkup(user.steamId, user.name || '?')}<span>${escapeHtml(user.name || 'Без имени')}</span></div></td>
                     <td>${escapeHtml(user.steamId || '-')}</td>
                     <td><span style="color:#ffbb33;font-weight:600;">${escapeHtml(user.rankName || user.rank || '-')}</span><div style="font-size:11px;color:rgba(255,255,255,.4);">${escapeHtml(user.rank || '-')} · иммунитет ${Number(user.immun) || 0}</div></td>
                     <td>${escapeHtml(formatAccessDate(user.expires, 'Навсегда'))}</td>
@@ -1860,6 +1912,8 @@
             const tbody = document.getElementById('subordinatesList');
             if (!tbody) return;
 
+            requestSteamAvatars(subordinatesCache.map(char => char.SteamID || char.steamId));
+
             const search = (document.getElementById('subordinateSearch')?.value || '').toLowerCase();
             const formationFilter = normalizeUnit(document.getElementById('subordinateFormationFilter')?.value || '');
 
@@ -1884,7 +1938,7 @@
                 row.innerHTML = `
                     <td>
                         <div class="player-name">
-                            <div class="player-avatar">${String(char.name || '?').substring(0, 2)}</div>
+                            ${steamAvatarMarkup(steamId, char.name || '?')}
                             <div>
                                 <div>${char.name || 'Без имени'}</div>
                                 <div style="font-size:11px;color:rgba(255,255,255,0.4)">RPID: ${char.rpid || '-'}</div>
