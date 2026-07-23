@@ -574,34 +574,34 @@
             min-height: 100vh;
             margin: 0;
             padding: 84px 24px 28px 244px;
+            transition: padding-left .25s ease;
         }
         .header {
             position: fixed;
             top: 0;
             left: 220px;
             right: 0;
-            z-index: 300;
+            z-index: 3000;
             height: 60px;
             margin: 0;
             padding: 0 24px;
             border: 0;
             border-bottom: 1px solid var(--line);
             border-radius: 0;
-            background: rgba(13,18,30,.88);
+            background: rgba(17,24,39,.96);
             backdrop-filter: blur(18px);
             box-shadow: none;
+            transition: left .25s ease;
         }
-        .logo { gap: 10px; }
-        .logo i { font-size: 17px; color: var(--purple); }
-        .logo h1 { font-size: 17px; font-weight: 700; }
-        .logo span {
-            padding: 2px 7px;
-            color: #a78bfa;
-            background: rgba(139,92,246,.1);
-            border: 1px solid rgba(139,92,246,.18);
-            border-radius: 5px;
-            font-size: 10px;
+        .topbar-left { display: flex; align-items: center; gap: 15px; }
+        .sidebar-toggle {
+            display: grid; place-items: center;
+            width: 30px; height: 30px;
+            color: #64748b; border: 0; background: transparent;
+            border-radius: 7px; cursor: pointer;
         }
+        .sidebar-toggle:hover { color: #cbd5e1; background: rgba(255,255,255,.04); }
+        .topbar-title { margin: 0; color: #e2e8f0; font-size: 17px; font-weight: 700; }
         .server-status { gap: 10px; }
         .status-badge, .server-info {
             min-height: 34px;
@@ -614,6 +614,45 @@
         .status-text { color: #94a3b8; font-size: 11px; }
         .server-info .stat-value { color: #a78bfa; font-size: 12px; }
         .role-badge { border-radius: 5px; font-size: 10px; }
+        .topbar-icon-btn {
+            position: relative;
+            display: grid; place-items: center;
+            width: 34px; height: 34px;
+            padding: 0;
+            color: #64748b;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #1c2235;
+            cursor: pointer;
+        }
+        .topbar-icon-btn:hover { color: #cbd5e1; border-color: rgba(139,92,246,.25); }
+        .notification-wrap { position: relative; z-index: 5001; }
+        .notification-dot {
+            position: absolute; top: 6px; right: 6px;
+            width: 7px; height: 7px;
+            border: 2px solid #111827; border-radius: 50%; background: #ef4444;
+        }
+        .notification-panel {
+            display: none;
+            position: absolute;
+            top: calc(100% + 10px); right: 0;
+            z-index: 5002;
+            width: 310px;
+            overflow: hidden;
+            border: 1px solid rgba(139,92,246,.25);
+            border-radius: 12px;
+            background: #151925;
+            box-shadow: 0 18px 50px rgba(0,0,0,.62);
+        }
+        .notification-panel.active { display: block; }
+        .notification-head, .notification-item { padding: 12px 15px; border-bottom: 1px solid var(--line); }
+        .notification-head { color: #e2e8f0; font-size: 12px; font-weight: 700; }
+        .notification-item { display: flex; gap: 10px; color: #cbd5e1; font-size: 11px; }
+        .notification-item i { margin-top: 2px; color: #8b5cf6; }
+        .notification-item small { display: block; margin-top: 3px; color: #526078; }
+        .topbar-search { position: relative; width: 200px; }
+        .topbar-search i { position: absolute; left: 11px; top: 10px; color: #526078; font-size: 12px; }
+        .topbar-search input { width: 100%; min-height: 34px; padding: 8px 10px 8px 32px; margin: 0; font-size: 11px; }
 
         .tab-bar {
             position: fixed;
@@ -624,32 +663,57 @@
             flex-direction: column;
             gap: 3px;
             margin: 0;
-            padding: 82px 9px 18px;
+            padding: 80px 8px 72px;
             border: 0;
             border-right: 1px solid var(--line);
             background: linear-gradient(180deg, rgba(17,24,39,.99), rgba(9,13,23,.99));
             box-shadow: 18px 0 60px rgba(0,0,0,.22);
+            transition: width .25s ease;
         }
-        .tab-bar::before {
-            content: "COLLAPSAR";
+        .sidebar-brand {
             position: absolute;
-            top: 21px;
-            left: 20px;
-            color: #f1f5f9;
-            font-size: 15px;
-            font-weight: 800;
-            letter-spacing: .04em;
+            inset: 0 0 auto 0;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--line);
         }
-        .tab-bar::after {
-            content: "ADMIN PANEL";
+        .brand-mark {
+            flex: 0 0 34px;
+            width: 34px; height: 34px;
+            display: grid; place-items: center;
+            color: white;
+            border-radius: 10px;
+            background: linear-gradient(135deg,#8b5cf6,#2dd4bf);
+            box-shadow: 0 0 24px rgba(139,92,246,.22);
+        }
+        .brand-copy strong { display: block; color: #e2e8f0; font-size: 15px; letter-spacing: .02em; }
+        .brand-copy small { display: block; margin-top: 2px; color: #526078; font-size: 9px; letter-spacing: .14em; }
+        .sidebar-profile {
             position: absolute;
-            top: 40px;
-            left: 20px;
-            color: #526078;
-            font-size: 9px;
-            font-weight: 600;
-            letter-spacing: .16em;
+            inset: auto 0 0;
+            min-height: 64px;
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px 14px;
+            border-top: 1px solid var(--line);
+            background: rgba(17,24,39,.96);
         }
+        .sidebar-avatar {
+            flex: 0 0 34px;
+            width: 34px; height: 34px;
+            display: grid; place-items: center;
+            color: white; font-size: 12px; font-weight: 800;
+            border: 1px solid rgba(45,212,191,.28);
+            border-radius: 50%;
+            background: linear-gradient(135deg,#8b5cf6,#26334c);
+        }
+        .sidebar-user { min-width: 0; flex: 1; }
+        .sidebar-user strong { display: block; overflow: hidden; color: #e2e8f0; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+        .sidebar-user span { display: block; margin-top: 3px; color: #a78bfa; font-size: 9px; }
+        .sidebar-logout { color: #526078; border: 0; background: none; cursor: pointer; }
+        .sidebar-logout:hover { color: #ef4444; }
         .tab-btn {
             width: 100%;
             margin: 0;
@@ -670,6 +734,16 @@
             background: linear-gradient(90deg, rgba(139,92,246,.17), rgba(139,92,246,.035));
             box-shadow: inset 0 0 24px rgba(139,92,246,.035);
         }
+        .container.sidebar-collapsed { padding-left: 88px; }
+        .container.sidebar-collapsed .header { left: 64px; }
+        .container.sidebar-collapsed .tab-bar { width: 64px; }
+        .container.sidebar-collapsed .sidebar-brand { justify-content: center; padding: 0; }
+        .container.sidebar-collapsed .brand-copy,
+        .container.sidebar-collapsed .sidebar-user,
+        .container.sidebar-collapsed .sidebar-logout { display: none; }
+        .container.sidebar-collapsed .sidebar-profile { justify-content: center; padding-inline: 0; }
+        .container.sidebar-collapsed .tab-btn { padding-inline: 0; font-size: 0; text-align: center; }
+        .container.sidebar-collapsed .tab-btn i { width: auto; font-size: 14px; }
 
         .stats-grid {
             grid-template-columns: repeat(4,minmax(0,1fr));
@@ -685,13 +759,21 @@
         }
         .stat-card { padding: 18px; }
         .stat-card:hover { transform: none; border-color: rgba(139,92,246,.2); background: #1e2539; }
+        .stat-card-head { display: flex; align-items: center; justify-content: space-between; }
+        .stat-card-head i { font-size: 15px; opacity: .85; }
+        .stat-card:nth-child(1) .stat-card-head i { color: #2dd4bf; }
+        .stat-card:nth-child(2) .stat-card-head i { color: #8b5cf6; }
+        .stat-card:nth-child(3) .stat-card-head i { color: #ef4444; }
+        .stat-card:nth-child(4) .stat-card-head i { color: #38bdf8; }
         .stat-title { margin-bottom: 10px; color: #64748b; font-size: 10px; font-weight: 600; letter-spacing: .09em; }
         .stat-value { margin: 0; color: #f1f5f9; font-size: 27px; }
+        .stat-subtitle { margin-top: 7px; color: #526078; font-size: 10px; }
         .stat-card:nth-child(1) { border-top-color: rgba(45,212,191,.35); }
         .stat-card:nth-child(2) { border-top-color: rgba(139,92,246,.35); }
         .stat-card:nth-child(3) { border-top-color: rgba(239,68,68,.35); }
         .stat-card:nth-child(4) { border-top-color: rgba(56,189,248,.35); }
-        .main-content { grid-template-columns: minmax(0,1fr) 280px; gap: 18px; }
+        .main-content { grid-template-columns: minmax(0,1fr); gap: 18px; }
+        .main-content > .sidebar { display: none; }
         .players-section { padding: 20px; overflow: hidden; }
         .section-header { gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
         .section-header h2 { font-size: 14px; }
@@ -945,8 +1027,9 @@
             .container { padding-left: 84px; padding-right: 14px; }
             .header { left: 64px; }
             .tab-bar { width: 64px; padding: 74px 7px 14px; }
-            .tab-bar::before { content: "C"; left: 22px; }
-            .tab-bar::after { display: none; }
+            .sidebar-brand { justify-content: center; padding: 0; }
+            .brand-copy, .sidebar-user, .sidebar-logout { display: none; }
+            .sidebar-profile { justify-content: center; padding-inline: 0; }
             .tab-btn { padding: 11px 0; font-size: 0; text-align: center; }
             .tab-btn i { width: auto; font-size: 14px; }
             .main-content { grid-template-columns: 1fr; }
@@ -960,7 +1043,7 @@
             .whitelist-character-button { min-width: 150px; }
         }
         @media (max-width: 600px) {
-            .header .logo { display: none; }
+            .topbar-title, .topbar-search, .topbar-icon-btn { display: none; }
             .server-status { width: 100%; justify-content: flex-end; }
             .server-info { display: none; }
             .stats-grid, .donate-form, .settings-access-grid, .whitelist-form-grid { grid-template-columns: 1fr; }
@@ -970,6 +1053,9 @@
             .search-box input { width: 100%; }
         }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -999,30 +1085,41 @@
     <div class="container" id="mainApp" style="display:none;">
         <!-- Header -->
         <div class="header">
-            <div class="logo">
-                <i class="fas fa-cubes"></i>
-                <div>
-                    <h1>Управление сервером</h1>
-                    <span>Collapsar</span>
-                </div>
+            <div class="topbar-left">
+                <button class="sidebar-toggle" onclick="toggleSidebar()" title="Свернуть меню"><i class="fas fa-bars"></i></button>
+                <h1 class="topbar-title" id="topbarTitle">Игроки</h1>
             </div>
             <div class="server-status">
                 <div class="status-badge">
+                    <i class="fas fa-wifi" style="color:#2dd4bf;font-size:11px;"></i>
                     <div class="status-dot" id="connection-status-dot"></div>
                     <span class="status-text" id="connection-status-text">Сервер работает</span>
-                    <span class="role-badge" id="roleBadge"></span>
                 </div>
                 <div class="server-info">
+                    <i class="fas fa-users" style="color:#8b5cf6;font-size:11px;"></i>
                     <i class="stat-value" id="curonl"></i>
                 </div>
-                <button onclick="doLogout()" style="background:rgba(255,107,107,0.2);color:#ff6b6b;border:1px solid rgba(255,107,107,0.3);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;">
-                    <i class="fas fa-sign-out-alt"></i> Выйти
-                </button>
+                <button class="topbar-icon-btn" onclick="refreshCurrentTab()" title="Обновить"><i class="fas fa-sync-alt"></i></button>
+                <div class="notification-wrap">
+                    <button class="topbar-icon-btn" onclick="toggleNotifications(event)" title="Уведомления">
+                        <i class="fas fa-bell"></i><span class="notification-dot"></span>
+                    </button>
+                    <div class="notification-panel" id="notificationPanel">
+                        <div class="notification-head">Уведомления</div>
+                        <div class="notification-item"><i class="fas fa-shield-alt"></i><div>Панель подключена к серверу<small>Текущая сессия</small></div></div>
+                        <div class="notification-item"><i class="fas fa-info-circle"></i><div>Действия администрации записываются в логи<small>Системное сообщение</small></div></div>
+                    </div>
+                </div>
+                <label class="topbar-search"><i class="fas fa-search"></i><input id="topbarSearch" type="text" placeholder="Поиск..." oninput="handleTopbarSearch(this.value)"></label>
             </div>
         </div>
 
         <!-- Tabs -->
         <div class="tab-bar">
+            <div class="sidebar-brand">
+                <div class="brand-mark"><i class="fas fa-bolt"></i></div>
+                <div class="brand-copy"><strong>COLLAPSAR</strong><small>ADMIN PANEL</small></div>
+            </div>
             <button class="tab-btn active" onclick="switchTab('players')"><i class="fas fa-users"></i> Игроки</button>
             <button class="tab-btn" id="accessesTabBtn" onclick="switchTab('accesses')" style="display:none;"><i class="fas fa-user-lock"></i> Доступы</button>
             <button class="tab-btn" id="subordinatesTabBtn" onclick="switchTab('subordinates')" style="display:none;"><i class="fas fa-user-shield"></i> Подчинённые</button>
@@ -1030,33 +1127,45 @@
             <button class="tab-btn" id="bansTabBtn" onclick="switchTab('bans')" style="display:none;"><i class="fas fa-ban"></i> Баны</button>
             <button class="tab-btn" id="logsTabBtn" onclick="switchTab('logs')" style="display:none;"><i class="fas fa-clipboard-list"></i> Логи</button>
             <button class="tab-btn" id="settingsTabBtn" onclick="switchTab('settings')" style="display:none;"><i class="fas fa-cog"></i> Настройки</button>
+            <div class="sidebar-profile">
+                <div class="sidebar-avatar" id="sidebarAvatar">A</div>
+                <div class="sidebar-user">
+                    <strong id="sidebarUsername">Администратор</strong>
+                    <span class="role-badge" id="roleBadge"></span>
+                </div>
+                <button class="sidebar-logout" onclick="doLogout()" title="Выйти"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
         </div>
 
         <!-- Tab: Players -->
         <div class="tab-content active" id="tab-players">
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-title">Игроки онлайн</div>
+                    <div class="stat-card-head"><div class="stat-title">ОНЛАЙН</div><i class="fas fa-users"></i></div>
                     <div class="stat-value" id="onlineCount">0</div>
+                    <div class="stat-subtitle">из 64 слотов</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-title">Администраторы</div>
+                    <div class="stat-card-head"><div class="stat-title">АДМИНИСТРАТОРЫ</div><i class="fas fa-shield-alt"></i></div>
                     <div class="stat-value" id="adminCount">0</div>
+                    <div class="stat-subtitle">активны сейчас</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-title">Блокировки</div>
+                    <div class="stat-card-head"><div class="stat-title">АКТИВНЫХ БАНОВ</div><i class="fas fa-ban"></i></div>
                     <div class="stat-value" id="banCount">0</div>
+                    <div class="stat-subtitle">по данным сервера</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-title">Время работы</div>
+                    <div class="stat-card-head"><div class="stat-title">АПТАЙМ</div><i class="fas fa-chart-line"></i></div>
                     <div class="stat-value" id="uptime">0:00</div>
+                    <div class="stat-subtitle">с последнего рестарта</div>
                 </div>
             </div>
 
             <div class="main-content">
                 <div class="players-section">
                     <div class="section-header">
-                        <h2><i class="fas fa-users" style="color: #4ecdc4;"></i> Список игроков</h2>
+                        <h2><i class="fas fa-users" style="color: #8b5cf6;"></i> Игроки на сервере</h2>
                         <span class="player-count" id="playerCount">0 игроков</span>
                         <div class="search-box">
                             <i class="fas fa-search"></i>
@@ -1713,6 +1822,10 @@
                         document.getElementById('mainApp').style.display = 'block';
                         currentIsOwner = !!data.isOwner;
                         applyRole(data.role, data.accessRoles || [], data.units || [], data.permissions || [], data.allowedRanks || ['user']);
+                        const sidebarUsername = document.getElementById('sidebarUsername');
+                        const sidebarAvatar = document.getElementById('sidebarAvatar');
+                        if (sidebarUsername) sidebarUsername.textContent = data.login || 'Администратор';
+                        if (sidebarAvatar) sidebarAvatar.textContent = String(data.login || 'A').charAt(0).toUpperCase();
                         setConnectionStatus('connected', 'Подключено');
                         addToConsole(`[${ts()}] Авторизован как ${data.login} (${data.role})`);
                         if (hasPanelPermission('jobs') || hasPanelPermission('whitelist') || hasPanelPermission('subordinates') || hasPanelPermission('donate')) this.sendCommand('get_formations', '');
@@ -2604,6 +2717,55 @@
         document.getElementById('playerCount').textContent = '0 игроков';
 
         // ----- ТАБЫ -----
+        const TAB_TITLES = {
+            players: 'Игроки',
+            accesses: 'Доступы',
+            bans: 'Баны',
+            subordinates: 'Подчинённые',
+            donate: 'Донат',
+            logs: 'Логи',
+            settings: 'Настройки доступа',
+        };
+
+        function toggleSidebar() {
+            document.getElementById('mainApp')?.classList.toggle('sidebar-collapsed');
+        }
+
+        function toggleNotifications(event) {
+            event?.stopPropagation();
+            document.getElementById('notificationPanel')?.classList.toggle('active');
+        }
+
+        document.addEventListener('click', event => {
+            const panel = document.getElementById('notificationPanel');
+            if (panel && !event.target.closest('.notification-wrap')) panel.classList.remove('active');
+        });
+
+        function handleTopbarSearch(value) {
+            const activeTab = document.querySelector('.tab-content.active')?.id?.replace('tab-', '') || 'players';
+            const inputIds = {
+                players: 'searchInput',
+                accesses: 'accessesSearch',
+                bans: 'bansSearch',
+                subordinates: 'subordinateSearch',
+                logs: 'logsFilter',
+            };
+            const input = document.getElementById(inputIds[activeTab]);
+            if (!input) return;
+            input.value = value;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        function refreshCurrentTab() {
+            const activeTab = document.querySelector('.tab-content.active')?.id?.replace('tab-', '') || 'players';
+            if (activeTab === 'subordinates') refreshSubordinates();
+            else if (activeTab === 'bans') refreshBans();
+            else if (activeTab === 'accesses') refreshPrivilegedUsers();
+            else if (activeTab === 'settings') refreshSettings();
+            else if (activeTab === 'logs' && api) api.sendCommand('get_logs', '');
+            else if (api?.socket?.readyState !== WebSocket.OPEN) api?.connect?.();
+        }
+
         function switchTab(tab) {
             if (tab === 'logs' && !canSeePanelLogs()) return;
             if (tab === 'subordinates' && !hasCommanderAccess()) return;
@@ -2616,6 +2778,13 @@
             document.getElementById('tab-' + tab).classList.add('active');
             const btn = document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`);
             if (btn) btn.classList.add('active');
+            const title = document.getElementById('topbarTitle');
+            if (title) title.textContent = TAB_TITLES[tab] || 'Collapsar';
+            const topbarSearch = document.getElementById('topbarSearch');
+            if (topbarSearch) {
+                topbarSearch.value = '';
+                topbarSearch.style.display = ['donate', 'settings'].includes(tab) ? 'none' : '';
+            }
             if (tab === 'subordinates') refreshSubordinates();
             if (tab === 'bans') refreshBans();
             if (tab === 'accesses') refreshPrivilegedUsers();
