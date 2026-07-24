@@ -909,6 +909,96 @@
             background: #0d1117;
         }
         .logs-panel { border-radius: 12px; }
+        .server-logs-controls {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 16px;
+            padding: 18px 20px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: #1c2235;
+        }
+        .server-logs-eyebrow { color: #8b5cf6; font-size: 9px; font-weight: 700; letter-spacing: .13em; }
+        .server-logs-controls h2 { margin: 5px 0 3px; color: #e2e8f0; font-size: 16px; }
+        .server-logs-controls p { margin: 0; color: #64748b; font-size: 10px; }
+        .server-logs-actions { display: flex; align-items: flex-end; gap: 9px; }
+        .server-logs-actions label span { display: block; margin-bottom: 5px; color: #64748b; font-size: 9px; }
+        .server-logs-actions input { width: 155px; min-height: 35px; margin: 0; padding: 8px 10px; }
+        .server-logs-actions button { min-width: 110px; min-height: 35px; padding: 8px 12px; }
+        .server-logs-filter {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 10px;
+            padding: 9px 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #151925;
+        }
+        .server-logs-filter > i { color: #526078; }
+        .server-logs-filter input { flex: 1; min-height: auto; margin: 0; padding: 0; border: 0; background: transparent; }
+        .server-logs-filter span { color: #526078; font-size: 9px; white-space: nowrap; }
+        .server-logs-terminal {
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: #0d1117;
+            font-family: "JetBrains Mono", monospace;
+        }
+        .server-logs-terminal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 46px;
+            padding: 0 18px;
+            border-bottom: 1px solid var(--line);
+            background: #111827;
+        }
+        .server-logs-terminal-head div { display: flex; align-items: center; gap: 9px; }
+        .server-logs-terminal-head i { color: #2dd4bf; }
+        .server-logs-terminal-head strong { color: #e2e8f0; font: 600 11px Inter, sans-serif; }
+        .server-logs-terminal-head span { color: #526078; font-size: 9px; }
+        .server-logs-list { max-height: calc(100vh - 300px); min-height: 300px; overflow-y: auto; padding: 7px 0; }
+        .server-log-row {
+            display: grid;
+            grid-template-columns: 62px 105px minmax(160px, .8fr) minmax(220px, 1.8fr) 26px;
+            align-items: start;
+            gap: 12px;
+            padding: 8px 18px;
+            border-bottom: 1px solid rgba(255,255,255,.025);
+            color: #64748b;
+            font-size: 10px;
+        }
+        .server-log-row:hover { background: rgba(139,92,246,.035); }
+        .server-log-time { color: #374151; }
+        .server-log-action {
+            width: fit-content;
+            padding: 2px 6px;
+            color: #a78bfa;
+            border: 1px solid rgba(139,92,246,.25);
+            border-radius: 3px;
+            background: rgba(139,92,246,.08);
+            font-size: 9px;
+            font-weight: 700;
+        }
+        .server-log-action[data-kind^="SPAWN"], .server-log-action[data-kind="TOOL_USE"] { color:#38bdf8; border-color:rgba(56,189,248,.25); background:rgba(56,189,248,.08); }
+        .server-log-action[data-kind="BAN"], .server-log-action[data-kind="KICK"], .server-log-action[data-kind="DELETE_CHARACTER"] { color:#f87171; border-color:rgba(239,68,68,.25); background:rgba(239,68,68,.08); }
+        .server-log-action[data-kind="SETRANK"], .server-log-action[data-kind="SET_RANK"], .server-log-action[data-kind="SET_FORMATION"] { color:#2dd4bf; border-color:rgba(45,212,191,.25); background:rgba(45,212,191,.08); }
+        .server-log-actor { color: #94a3b8; overflow-wrap: anywhere; }
+        .server-log-details { color: #64748b; overflow-wrap: anywhere; }
+        .server-log-details strong { color: #cbd5e1; font-weight: 500; }
+        .server-log-copy { color: #374151; border: 0; background: none; cursor: pointer; }
+        .server-log-copy:hover { color: #2dd4bf; }
+        .server-logs-empty { padding: 70px 20px; color: #374151; font-size: 10px; text-align: center; }
+        @media (max-width: 760px) {
+            .server-logs-controls { align-items: stretch; flex-direction: column; }
+            .server-logs-actions { align-items: stretch; flex-direction: column; }
+            .server-logs-actions input { width: 100%; }
+            .server-log-row { grid-template-columns: 55px 90px 1fr 26px; }
+            .server-log-details { grid-column: 2 / 4; }
+        }
 
         input, select, textarea,
         .modal-content input, .modal-content select,
@@ -1208,7 +1298,8 @@
             <button class="tab-btn" id="bansTabBtn" onclick="switchTab('bans')" style="display:none;"><i class="fas fa-ban"></i> Баны</button>
             <button class="tab-btn" id="subordinatesTabBtn" onclick="switchTab('subordinates')" style="display:none;"><i class="fas fa-user-shield"></i> Подчинённые</button>
             <button class="tab-btn" id="donateTabBtn" onclick="switchTab('donate')" style="display:none;"><i class="fas fa-gem"></i> Донат</button>
-            <button class="tab-btn" id="logsTabBtn" onclick="switchTab('logs')" style="display:none;"><i class="fas fa-clipboard-list"></i> Логи</button>
+            <button class="tab-btn" id="serverLogsTabBtn" onclick="switchTab('server-logs')" style="display:none;"><i class="fas fa-terminal"></i> Логи сервера</button>
+            <button class="tab-btn" id="logsTabBtn" onclick="switchTab('logs')" style="display:none;"><i class="fas fa-clipboard-list"></i> Логи панели</button>
             <button class="tab-btn" id="settingsTabBtn" onclick="switchTab('settings')" style="display:none;"><i class="fas fa-cog"></i> Настройки</button>
             <div class="sidebar-profile">
                 <div class="sidebar-avatar" id="sidebarAvatar"><span id="sidebarAvatarFallback">A</span><img id="sidebarAvatarImage" alt=""></div>
@@ -1469,6 +1560,35 @@
             </div>
         </div>
 
+        <!-- Tab: Server Logs -->
+        <div class="tab-content" id="tab-server-logs">
+            <div class="server-logs-controls">
+                <div>
+                    <span class="server-logs-eyebrow">ИГРОВОЙ СЕРВЕР</span>
+                    <h2>Логи за выбранный день</h2>
+                    <p>Данные загружаются только по запросу и не обновляются в фоне.</p>
+                </div>
+                <div class="server-logs-actions">
+                    <label><span>Дата</span><input type="date" id="serverLogsDate"></label>
+                    <button class="modal-btn confirm" id="serverLogsRefreshBtn" onclick="requestServerLogs()"><i class="fas fa-sync-alt"></i> Обновить</button>
+                </div>
+            </div>
+            <div class="server-logs-filter">
+                <i class="fas fa-search"></i>
+                <input type="text" id="serverLogsFilter" placeholder="Поиск по игроку, SteamID, действию или объекту..." oninput="renderServerLogs()">
+                <span id="serverLogsStatus">Выберите дату и нажмите «Обновить»</span>
+            </div>
+            <div class="server-logs-terminal">
+                <div class="server-logs-terminal-head">
+                    <div><i class="fas fa-terminal"></i><strong>Журнал игровых событий</strong></div>
+                    <span id="serverLogsCount">0 записей</span>
+                </div>
+                <div class="server-logs-list" id="serverLogsList">
+                    <div class="server-logs-empty">Логи ещё не загружались</div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Modals -->
@@ -1562,6 +1682,9 @@
         let privilegedUsersCache = [];
         let subordinatesCache = [];
         let bansCache = [];
+        let serverLogsCache = [];
+        let serverLogsLoadedDate = '';
+        let serverLogsTruncated = false;
         let panelSettingsCache = null;
         let discordRolesCache = [];
         let currentWhitelistChars = [];
@@ -1665,7 +1788,7 @@
         const ROLE_LABELS = { superadmin: 'Super Admin', admin: 'Admin', moderator: 'Moderator', viewer: 'Viewer', commander: 'Командир', depcom: 'Зам. командира', gcmd: 'Командование' };
         const COMMAND_ROLES = ['commander', 'depcom', 'gcmd'];
         const PERMISSION_LABELS = {
-            logs: 'Логи',
+            logs: 'Логи панели и игрового сервера',
             bans: 'Баны',
             kick: 'Кик',
             message: 'Сообщения',
@@ -1819,6 +1942,8 @@
             if (accessesBtn) accessesBtn.style.display = hasPanelPermission('rank') ? '' : 'none';
             const logsBtn = document.getElementById('logsTabBtn');
             if (logsBtn) logsBtn.style.display = canSeePanelLogs() ? '' : 'none';
+            const serverLogsBtn = document.getElementById('serverLogsTabBtn');
+            if (serverLogsBtn) serverLogsBtn.style.display = canSeePanelLogs() ? '' : 'none';
             const donateBtn = document.getElementById('donateTabBtn');
             if (donateBtn) donateBtn.style.display = canUseDonate() ? '' : 'none';
             const bansBtn = document.getElementById('bansTabBtn');
@@ -1826,6 +1951,9 @@
             const settingsBtn = document.getElementById('settingsTabBtn');
             if (settingsBtn) settingsBtn.style.display = canUseSettings() ? '' : 'none';
             if (!canSeePanelLogs() && document.getElementById('tab-logs')?.classList.contains('active')) {
+                switchTab('players');
+            }
+            if (!canSeePanelLogs() && document.getElementById('tab-server-logs')?.classList.contains('active')) {
                 switchTab('players');
             }
             if (!canUseDonate() && document.getElementById('tab-donate')?.classList.contains('active')) {
@@ -2048,6 +2176,20 @@
                     bansCache = data.bans || [];
                     renderBans();
                     addToConsole(`[${ts()}] Получено активных банов: ${bansCache.length}`);
+                }
+                if (data.type === 'server_logs_data') {
+                    serverLogsCache = Array.isArray(data.lines) ? data.lines.map(String) : [];
+                    serverLogsLoadedDate = String(data.date || '');
+                    serverLogsTruncated = !!data.truncated;
+                    const refreshButton = document.getElementById('serverLogsRefreshBtn');
+                    if (refreshButton) refreshButton.disabled = false;
+                    const status = document.getElementById('serverLogsStatus');
+                    if (status) {
+                        status.textContent = data.error
+                            ? String(data.error)
+                            : `Загружено: ${new Date().toLocaleTimeString('ru-RU')}${serverLogsTruncated ? ' · показаны последние записи' : ''}`;
+                    }
+                    renderServerLogs();
                 }
                 if (data.type === 'settings_data') {
                     panelSettingsCache = data.settings || null;
@@ -2873,7 +3015,8 @@
             bans: 'Баны',
             subordinates: 'Подчинённые',
             donate: 'Донат',
-            logs: 'Логи',
+            'server-logs': 'Логи сервера',
+            logs: 'Логи панели',
             settings: 'Настройки доступа',
         };
 
@@ -2898,6 +3041,7 @@
                 accesses: 'accessesSearch',
                 bans: 'bansSearch',
                 subordinates: 'subordinateSearch',
+                'server-logs': 'serverLogsFilter',
                 logs: 'logsFilter',
             };
             const input = document.getElementById(inputIds[activeTab]);
@@ -2912,12 +3056,14 @@
             else if (activeTab === 'bans') refreshBans();
             else if (activeTab === 'accesses') refreshPrivilegedUsers();
             else if (activeTab === 'settings') refreshSettings();
+            else if (activeTab === 'server-logs') requestServerLogs();
             else if (activeTab === 'logs' && api) api.sendCommand('get_logs', '');
             else if (api?.socket?.readyState !== WebSocket.OPEN) api?.connect?.();
         }
 
         function switchTab(tab) {
             if (tab === 'logs' && !canSeePanelLogs()) return;
+            if (tab === 'server-logs' && !canSeePanelLogs()) return;
             if (tab === 'subordinates' && !hasCommanderAccess()) return;
             if (tab === 'donate' && !canUseDonate()) return;
             if (tab === 'bans' && !canManageBans()) return;
@@ -2939,10 +3085,98 @@
             if (tab === 'bans') refreshBans();
             if (tab === 'accesses') refreshPrivilegedUsers();
             if (tab === 'settings') refreshSettings();
+            if (tab === 'server-logs') requestServerLogs();
             if (tab === 'donate') {
                 setupDonateForm();
                 if (jobsList.length === 0) api.sendCommand('get_jobs', '');
             }
+        }
+
+        // ----- ЛОГИ ИГРОВОГО СЕРВЕРА (ТОЛЬКО ПО ЗАПРОСУ) -----
+        function localDateValue(date = new Date()) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function requestServerLogs() {
+            if (!canSeePanelLogs()) return;
+            const dateInput = document.getElementById('serverLogsDate');
+            if (!dateInput) return;
+            if (!dateInput.value) dateInput.value = localDateValue();
+
+            const selectedDate = dateInput.value;
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(selectedDate)) return;
+
+            const refreshButton = document.getElementById('serverLogsRefreshBtn');
+            const status = document.getElementById('serverLogsStatus');
+            if (!api?.socket || api.socket.readyState !== WebSocket.OPEN) {
+                if (refreshButton) refreshButton.disabled = false;
+                if (status) status.textContent = 'Нет соединения с Railway';
+                return;
+            }
+            if (refreshButton) refreshButton.disabled = true;
+            if (status) status.textContent = `Загрузка логов за ${selectedDate}...`;
+            document.getElementById('serverLogsList').innerHTML = '<div class="server-logs-empty"><i class="fas fa-circle-notch fa-spin"></i> Запрашиваю данные у игрового сервера...</div>';
+            api.sendCommand('get_server_logs', '', { date: selectedDate }, true);
+        }
+
+        function parseServerLogLine(line) {
+            const match = String(line || '').match(/^\[([^\]]+)\]\s+(.+?)\s+\((STEAM_[^)]+|CONSOLE)\)\s+\|\s*([^|]*)\s*\|\s*([^|]*)\s*\|\s*(.*)$/i);
+            if (!match) return null;
+            return {
+                time: match[1].trim(),
+                actor: match[2].trim(),
+                steamId: match[3].trim(),
+                action: match[4].trim() || 'EVENT',
+                target: match[5].trim(),
+                details: match[6].trim(),
+            };
+        }
+
+        function renderServerLogs() {
+            const list = document.getElementById('serverLogsList');
+            const count = document.getElementById('serverLogsCount');
+            if (!list || !count) return;
+
+            const filter = (document.getElementById('serverLogsFilter')?.value || '').trim().toLowerCase();
+            const rows = serverLogsCache
+                .map((line, index) => ({ line, index, parsed: parseServerLogLine(line) }))
+                .filter(item => !filter || item.line.toLowerCase().includes(filter));
+
+            count.textContent = `${rows.length} ${rows.length === 1 ? 'запись' : 'записей'}${serverLogsLoadedDate ? ` · ${serverLogsLoadedDate}` : ''}`;
+            if (rows.length === 0) {
+                list.innerHTML = `<div class="server-logs-empty">${serverLogsCache.length ? 'По фильтру ничего не найдено' : 'За выбранный день записей нет'}</div>`;
+                return;
+            }
+
+            list.innerHTML = rows.map(item => {
+                if (!item.parsed) {
+                    return `<div class="server-log-row"><span class="server-log-time">—</span><span class="server-log-action" data-kind="EVENT">EVENT</span><span class="server-log-actor">—</span><span class="server-log-details">${escapeHtml(item.line)}</span><button class="server-log-copy" onclick="copyServerLog(${item.index}, this)" title="Копировать"><i class="far fa-copy"></i></button></div>`;
+                }
+                const log = item.parsed;
+                const actor = log.steamId === 'CONSOLE'
+                    ? escapeHtml(log.actor)
+                    : steamProfileLink(log.steamId, `${escapeHtml(log.actor)} <small>${escapeHtml(log.steamId)}</small>`);
+                const details = `${log.target ? `<strong>${escapeHtml(log.target)}</strong>` : ''}${log.details ? `${log.target ? ' — ' : ''}${escapeHtml(log.details)}` : ''}`;
+                return `<div class="server-log-row">
+                    <span class="server-log-time">${escapeHtml(log.time)}</span>
+                    <span class="server-log-action" data-kind="${escapeHtml(log.action.toUpperCase())}">${escapeHtml(log.action.toUpperCase())}</span>
+                    <span class="server-log-actor">${actor}</span>
+                    <span class="server-log-details">${details || '—'}</span>
+                    <button class="server-log-copy" onclick="copyServerLog(${item.index}, this)" title="Копировать"><i class="far fa-copy"></i></button>
+                </div>`;
+            }).join('');
+        }
+
+        function copyServerLog(index, button) {
+            const line = serverLogsCache[Number(index)] || '';
+            if (!line || !navigator.clipboard) return;
+            navigator.clipboard.writeText(line).then(() => {
+                button.innerHTML = '<i class="fas fa-check"></i>';
+                setTimeout(() => { button.innerHTML = '<i class="far fa-copy"></i>'; }, 1200);
+            }).catch(() => {});
         }
 
         // ----- ЛОГИ ПАНЕЛИ -----
