@@ -255,6 +255,20 @@
             align-items: center;
             gap: 10px;
         }
+        .steam-profile-link {
+            color: inherit;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color .15s ease, opacity .15s ease;
+        }
+        .steam-profile-link:hover { color: #38bdf8; }
+        .steam-profile-link:hover .player-avatar { box-shadow: 0 0 0 2px rgba(56,189,248,.28); }
+        .steam-id-link {
+            color: inherit;
+            text-decoration: none;
+            border-bottom: 1px dashed rgba(56,189,248,.22);
+        }
+        .steam-id-link:hover { color: #38bdf8; border-bottom-color: #38bdf8; }
 
         .player-avatar {
             width: 32px;
@@ -1594,6 +1608,47 @@
             return `<div class="player-avatar"><span>${safeFallback}</span>${image}</div>`;
         }
 
+        function steamId64From(value) {
+            const steamId = String(value || '').trim();
+            if (/^7656119\d{10}$/.test(steamId)) return steamId;
+
+            const steam2 = steamId.match(/^STEAM_[0-5]:([01]):(\d+)$/i);
+            if (steam2) {
+                return (76561197960265728n + BigInt(steam2[2]) * 2n + BigInt(steam2[1])).toString();
+            }
+
+            const steam3 = steamId.match(/^\[U:1:(\d+)\]$/i);
+            if (steam3) {
+                return (76561197960265728n + BigInt(steam3[1])).toString();
+            }
+            return null;
+        }
+
+        function steamProfileUrl(steamId) {
+            const steamId64 = steamId64From(steamId);
+            return steamId64 ? `https://steamcommunity.com/profiles/${steamId64}` : '';
+        }
+
+        function steamProfileLink(steamId, innerHtml, className = '') {
+            const url = steamProfileUrl(steamId);
+            if (!url) return `<span class="${className}">${innerHtml}</span>`;
+            return `<a class="steam-profile-link ${className}" href="${url}" target="_blank" rel="noopener noreferrer" title="Открыть профиль Steam">${innerHtml}</a>`;
+        }
+
+        function steamIdLink(steamId) {
+            const safeSteamId = escapeHtml(steamId || '-');
+            const url = steamProfileUrl(steamId);
+            return url
+                ? `<a class="steam-id-link" href="${url}" target="_blank" rel="noopener noreferrer" title="Открыть профиль Steam">${safeSteamId}</a>`
+                : safeSteamId;
+        }
+
+        function setPlayerProfileLabel(elementId, name, steamId) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            element.innerHTML = steamProfileLink(steamId, escapeHtml(name || steamId || 'Игрок'));
+        }
+
         function requestSteamAvatars(steamIds) {
             const ids = [...new Set((steamIds || []).map(value => String(value || '').trim()).filter(Boolean))]
                 .filter(steamId => !steamAvatarCache.has(steamId) && !pendingSteamAvatars.has(steamId));
@@ -1987,6 +2042,7 @@
                     this.updatePlayers(livePlayers);
                     renderPrivilegedUsers();
                     renderSubordinates();
+                    renderBans();
                 }
                 if (data.type === 'bans_data') {
                     bansCache = data.bans || [];
@@ -2041,13 +2097,13 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>
-                            <div class="player-name">
+                            ${steamProfileLink(p.steamId, `
                                 ${steamAvatarMarkup(p.steamId, initials)}
                                 <div class="player-steam-name">${escapeHtml(p.name || 'Без имени')}</div>
-                            </div>
+                            `, 'player-name')}
                         </td>
                         <td><span class="player-rp-name">${escapeHtml(p.rpname || p.name || '—')}</span></td>
-                        <td><span class="player-steamid">${escapeHtml(p.steamId)}</span></td>
+                        <td><span class="player-steamid">${steamIdLink(p.steamId)}</span></td>
                         <td><span class="player-formation">${escapeHtml(formationName)}</span></td>
                         <td><span class="player-job">${escapeHtml(p.team || '—')}${p.rank ? ` · ${escapeHtml(p.rank)}` : ''}</span></td>
                         <td><span class="privilege-chip ${p.isAdmin ? 'is-admin' : ''}">${escapeHtml(privilege)}</span></td>
@@ -2087,7 +2143,7 @@
             if (!hasPanelPermission('kick')) return;
             currentPlayer = name;
             currentPlayerSteamId = steamId;
-            document.getElementById('kickPlayerName').textContent = name;
+            setPlayerProfileLabel('kickPlayerName', name, steamId);
             document.getElementById('kickReason').value = '';
             document.getElementById('kickModal').classList.add('active');
         }
@@ -2096,7 +2152,7 @@
             if (!hasPanelPermission('bans')) return;
             currentPlayer = name;
             currentPlayerSteamId = steamId;
-            document.getElementById('banPlayerName').textContent = name;
+            setPlayerProfileLabel('banPlayerName', name, steamId);
             document.getElementById('banReason').value = '';
             document.getElementById('banModal').classList.add('active');
         }
@@ -2105,7 +2161,7 @@
             if (!hasPanelPermission('message')) return;
             currentPlayer = name;
             currentPlayerSteamId = steamId;
-            document.getElementById('messagePlayerName').textContent = name;
+            setPlayerProfileLabel('messagePlayerName', name, steamId);
             document.getElementById('messageText').value = '';
             document.getElementById('messageModal').classList.add('active');
         }
@@ -2114,8 +2170,8 @@
             if (!hasPanelPermission('whitelist')) return;
             currentPlayer = name;
             currentPlayerSteamId = steamId;
-            document.getElementById('whPlayerName').textContent = name;
-            document.getElementById('whSteamId').textContent = steamId;
+            setPlayerProfileLabel('whPlayerName', name, steamId);
+            document.getElementById('whSteamId').innerHTML = steamIdLink(steamId);
             document.getElementById('whitelistContent').innerHTML = '<p style="color:rgba(255,255,255,0.5)">Загрузка...</p>';
             document.getElementById('whitelistModal').classList.add('active');
             api.sendCommand('get_whitelist', steamId);
@@ -2135,8 +2191,8 @@
             if (!hasPanelPermission('rank')) return;
             currentPlayer = name;
             currentPlayerSteamId = steamId;
-            document.getElementById('rankPlayerName').textContent = name;
-            document.getElementById('rankSteamId').textContent = steamId;
+            setPlayerProfileLabel('rankPlayerName', name, steamId);
+            document.getElementById('rankSteamId').innerHTML = steamIdLink(steamId);
             document.getElementById('rankModal').classList.add('active');
             if (ranksList.length === 0) api.sendCommand('get_ranks', '');
         }
@@ -2212,8 +2268,8 @@
                 const canModify = currentAllowedRanks.includes('*') || currentAllowedRanks.includes(String(user.rank || '').toLowerCase());
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td><div class="player-name">${steamAvatarMarkup(user.steamId, user.name || '?')}<span>${escapeHtml(user.name || 'Без имени')}</span></div></td>
-                    <td>${escapeHtml(user.steamId || '-')}</td>
+                    <td>${steamProfileLink(user.steamId, `${steamAvatarMarkup(user.steamId, user.name || '?')}<span>${escapeHtml(user.name || 'Без имени')}</span>`, 'player-name')}</td>
+                    <td>${steamIdLink(user.steamId)}</td>
                     <td><span style="color:#ffbb33;font-weight:600;">${escapeHtml(user.rankName || user.rank || '-')}</span><div style="font-size:11px;color:rgba(255,255,255,.4);">${escapeHtml(user.rank || '-')} · иммунитет ${Number(user.immun) || 0}</div></td>
                     <td>${escapeHtml(formatAccessDate(user.expires, 'Навсегда'))}</td>
                     <td>${escapeHtml(formatAccessDate(user.lastSeen, '-'))}</td>
@@ -2295,6 +2351,7 @@
         function renderBans() {
             const tbody = document.getElementById('bansList');
             if (!tbody) return;
+            requestSteamAvatars(bansCache.map(ban => ban.steamid || ban.steamid64));
             const search = (document.getElementById('bansSearch')?.value || '').toLowerCase();
             const rows = bansCache.filter(b => {
                 if (!search) return true;
@@ -2310,8 +2367,8 @@
                 const steamId = ban.steamid || ban.steamid64 || '';
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${escapeHtml(ban.name || '-')}</td>
-                    <td>${escapeHtml(steamId)}</td>
+                    <td>${steamProfileLink(steamId, `${steamAvatarMarkup(steamId, ban.name || '?')}<span>${escapeHtml(ban.name || '-')}</span>`, 'player-name')}</td>
+                    <td>${steamIdLink(steamId)}</td>
                     <td>${escapeHtml(ban.reason || '-')}</td>
                     <td>${escapeHtml(ban.admin || '-')}</td>
                     <td>${escapeHtml(formatBanUntil(ban))}</td>
@@ -2651,18 +2708,18 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>
-                        <div class="player-name">
+                        ${steamProfileLink(steamId, `
                             ${steamAvatarMarkup(steamId, char.name || '?')}
                             <div>
-                                <div>${char.name || 'Без имени'}</div>
-                                <div style="font-size:11px;color:rgba(255,255,255,0.4)">RPID: ${char.rpid || '-'}</div>
+                                <div>${escapeHtml(char.name || 'Без имени')}</div>
+                                <div style="font-size:11px;color:rgba(255,255,255,0.4)">RPID: ${escapeHtml(char.rpid || '-')}</div>
                             </div>
-                        </div>
+                        `, 'player-name')}
                     </td>
-                    <td>${steamId}</td>
-                    <td>${getFormationName(formation)}</td>
-                    <td>${char.rank || '-'}</td>
-                    <td>${lastSeen}</td>
+                    <td>${steamIdLink(steamId)}</td>
+                    <td>${escapeHtml(getFormationName(formation))}</td>
+                    <td>${escapeHtml(char.rank || '-')}</td>
+                    <td>${escapeHtml(lastSeen)}</td>
                     <td>
                         <div class="player-actions">
                             <button class="action-btn" onclick="openWhitelistModal('${String(char.name || '').replace(/'/g, "\\'")}','${steamId}')" title="Вайтлист"><i class="fas fa-id-card"></i></button>
