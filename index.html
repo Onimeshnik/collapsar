@@ -1788,7 +1788,8 @@
         const ROLE_LABELS = { superadmin: 'Super Admin', admin: 'Admin', moderator: 'Moderator', viewer: 'Viewer', commander: 'Командир', depcom: 'Зам. командира', gcmd: 'Командование' };
         const COMMAND_ROLES = ['commander', 'depcom', 'gcmd'];
         const PERMISSION_LABELS = {
-            logs: 'Логи панели и игрового сервера',
+            logs: 'Логи веб-панели',
+            server_logs: 'Логи игрового сервера',
             bans: 'Баны',
             kick: 'Кик',
             message: 'Сообщения',
@@ -1802,7 +1803,7 @@
         const DEFAULT_PANEL_ROLE_PERMISSIONS = {
             viewer: [],
             moderator: ['kick', 'message', 'whitelist', 'jobs'],
-            admin: ['logs', 'bans', 'kick', 'message', 'rank', 'whitelist', 'subordinates', 'jobs'],
+            admin: ['logs', 'server_logs', 'bans', 'kick', 'message', 'rank', 'whitelist', 'subordinates', 'jobs'],
             superadmin: Object.keys(PERMISSION_LABELS),
             commander: ['whitelist', 'subordinates', 'jobs'],
             depcom: ['whitelist', 'subordinates', 'jobs'],
@@ -1870,6 +1871,9 @@
         }
         function canSeePanelLogs() {
             return hasPanelPermission('logs');
+        }
+        function canSeeServerLogs() {
+            return hasPanelPermission('server_logs');
         }
         function canUseDonate() {
             return hasPanelPermission('donate');
@@ -1943,7 +1947,7 @@
             const logsBtn = document.getElementById('logsTabBtn');
             if (logsBtn) logsBtn.style.display = canSeePanelLogs() ? '' : 'none';
             const serverLogsBtn = document.getElementById('serverLogsTabBtn');
-            if (serverLogsBtn) serverLogsBtn.style.display = canSeePanelLogs() ? '' : 'none';
+            if (serverLogsBtn) serverLogsBtn.style.display = canSeeServerLogs() ? '' : 'none';
             const donateBtn = document.getElementById('donateTabBtn');
             if (donateBtn) donateBtn.style.display = canUseDonate() ? '' : 'none';
             const bansBtn = document.getElementById('bansTabBtn');
@@ -1953,7 +1957,7 @@
             if (!canSeePanelLogs() && document.getElementById('tab-logs')?.classList.contains('active')) {
                 switchTab('players');
             }
-            if (!canSeePanelLogs() && document.getElementById('tab-server-logs')?.classList.contains('active')) {
+            if (!canSeeServerLogs() && document.getElementById('tab-server-logs')?.classList.contains('active')) {
                 switchTab('players');
             }
             if (!canUseDonate() && document.getElementById('tab-donate')?.classList.contains('active')) {
@@ -3063,7 +3067,7 @@
 
         function switchTab(tab) {
             if (tab === 'logs' && !canSeePanelLogs()) return;
-            if (tab === 'server-logs' && !canSeePanelLogs()) return;
+            if (tab === 'server-logs' && !canSeeServerLogs()) return;
             if (tab === 'subordinates' && !hasCommanderAccess()) return;
             if (tab === 'donate' && !canUseDonate()) return;
             if (tab === 'bans' && !canManageBans()) return;
@@ -3101,7 +3105,7 @@
         }
 
         function requestServerLogs() {
-            if (!canSeePanelLogs()) return;
+            if (!canSeeServerLogs()) return;
             const dateInput = document.getElementById('serverLogsDate');
             if (!dateInput) return;
             if (!dateInput.value) dateInput.value = localDateValue();
