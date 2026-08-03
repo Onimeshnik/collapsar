@@ -1546,6 +1546,23 @@
                     <button class="modal-btn confirm" onclick="issueDonateChar()"><i class="fas fa-plus"></i> Выдать персонажа</button>
                 </div>
             </div>
+            <div class="players-section donate-panel" style="margin-top:20px;">
+                <div class="section-header">
+                    <div>
+                        <h2><i class="fas fa-crown" style="color: #ffbb33;"></i> Выдать донат-привилегию</h2>
+                        <p class="section-description">Выдача донатных и административных рангов по SteamID</p>
+                    </div>
+                </div>
+                <div class="donate-form">
+                    <label class="form-field form-span-2"><span>SteamID получателя *</span><input type="text" placeholder="STEAM_0:1:12345678" id="donatePrivilegeSteamId"></label>
+                    <label class="form-field"><span>Привилегия *</span><select id="donatePrivilegeRank"></select></label>
+                    <label class="form-field"><span>Срок</span><select id="donatePrivilegeDuration"><option value="0">Навсегда</option><option value="86400">1 день</option><option value="604800">7 дней</option><option value="2592000">30 дней</option></select></label>
+                </div>
+                <div class="donate-notice"><i class="fas fa-info-circle"></i><span>Доступны только привилегии, разрешённые для вашего аккаунта.</span></div>
+                <div class="modal-buttons donate-actions">
+                    <button class="modal-btn confirm" onclick="issueDonatePrivilege()"><i class="fas fa-crown"></i> Выдать привилегию</button>
+                </div>
+            </div>
         </div>
 
         <!-- Tab: Logs -->
@@ -2105,6 +2122,10 @@
                         if (hasPanelPermission('jobs') || hasPanelPermission('donate')) this.sendCommand('get_jobs', '');
                         if (hasPanelPermission('rank')) {
                             this.sendCommand('get_ranks', '');
+                        } else if (hasPanelPermission('donate')) {
+                            this.sendCommand('get_donate_ranks', '');
+                        }
+                        if (hasPanelPermission('rank')) {
                             this.sendCommand('get_privileged_users', '');
                         }
                         if (hasPanelPermission('subordinates')) this.sendCommand('get_subordinates', '', { formations: currentUnits });
@@ -2442,6 +2463,16 @@
         function setupDonateForm() {
             const formationSelect = document.getElementById('donateFormation');
             const jobSelect = document.getElementById('donateJob');
+            const privilegeRankSelect = document.getElementById('donatePrivilegeRank');
+            if (privilegeRankSelect) {
+                const selectedRank = privilegeRankSelect.value;
+                const grantableRanks = currentAllowedRanks.includes('*')
+                    ? ranksList
+                    : ranksList.filter(rank => currentAllowedRanks.includes(rank.key));
+                privilegeRankSelect.innerHTML = grantableRanks.length
+                    ? grantableRanks.map(rank => `<option value="${rank.key}" ${rank.key === selectedRank ? 'selected' : ''}>${rank.name} (${rank.key})</option>`).join('')
+                    : '<option value="">Нет доступных привилегий</option>';
+            }
             if (!formationSelect || !jobSelect) return;
 
             const selectedFormation = formationSelect.value || 'frontline';
@@ -2450,8 +2481,13 @@
                 .join('');
 
             const selectedJob = jobSelect.value;
-            jobSelect.innerHTML = jobsList.length
-                ? jobsList.map(job => `<option value="${job.index}" ${String(job.index) === String(selectedJob) ? 'selected' : ''}>${job.name}</option>`).join('')
+            // If donation positions are tagged in the jobs list, do not expose
+            // regular positions in the donation form.  Older configurations
+            // without a donation category retain the complete list.
+            const donateJobs = jobsList.filter(job => /donat|донат/i.test(`${job.cat || ''} ${job.category_name || ''} ${job.name || ''}`));
+            const selectableJobs = donateJobs.length ? donateJobs : jobsList;
+            jobSelect.innerHTML = selectableJobs.length
+                ? selectableJobs.map(job => `<option value="${job.index}" ${String(job.index) === String(selectedJob) ? 'selected' : ''}>${job.category_name ? '[' + job.category_name + '] ' : ''}${job.name}</option>`).join('')
                 : '<option value="1">Загрузка профессий...</option>';
         }
 
@@ -2483,6 +2519,21 @@
         }
 
         // ----- БАНЫ -----
+        function issueDonatePrivilege() {
+            if (!canUseDonate()) return;
+
+            const steamId = document.getElementById('donatePrivilegeSteamId').value.trim();
+            const rank = document.getElementById('donatePrivilegeRank').value;
+            const duration = document.getElementById('donatePrivilegeDuration').value;
+            if (!steamId || !rank) {
+                addToConsole(`[${ts()}] Укажите SteamID и привилегию`);
+                return;
+            }
+
+            api.sendCommand('set_donate_rank', steamId, { rank, duration });
+            addToConsole(`[${ts()}] Выдаю донат-привилегию ${rank} для ${steamId}`);
+        }
+
         function refreshBans() {
             if (!canManageBans()) return;
             api.sendCommand('get_bans', '');
