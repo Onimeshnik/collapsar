@@ -2227,6 +2227,9 @@
                     if (status) status.textContent = data.ok ? `Загружено ролей Discord: ${discordRolesCache.length}` : (data.message || 'Не удалось загрузить роли Discord');
                     renderSettings();
                 }
+                if (data.type === 'discord_links_data') {
+                    renderDiscordLinks(Array.isArray(data.links) ? data.links : []);
+                }
                 if (data.type === 'panel_log') {
                     if (!canSeePanelLogs()) return;
                     addLogLine(data.message);
@@ -2756,6 +2759,57 @@
                     </div>`);
             });
             workspace.innerHTML = `<aside class="settings-role-list">${roleButtons.join('')}</aside><div>${roleDetails.join('')}</div>`;
+            const formationMap = panelSettingsCache.discordFormationRoleMap || {};
+            const formationOptions = FORMATIONS.map(formation => `<option value="${formation.id}">${escapeHtml(formation.name)} (${formation.id})</option>`).join('');
+            const mappedRows = Object.entries(formationMap).map(([formationId, roleId]) => `
+                <div class="formation-role-map" style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin:6px 0;">
+                    <select class="formation-role-formation">${formationOptions.replace(`value="${formationId}"`, `value="${formationId}" selected`)}</select>
+                    ${discordRoleSelect(roleId)}
+                    <button class="modal-btn cancel" onclick="this.closest('.formation-role-map').remove()"><i class="fas fa-trash"></i></button>
+                </div>`).join('');
+            workspace.insertAdjacentHTML('beforeend', `<section style="grid-column:1/-1;margin-top:16px;padding:14px;border:1px solid rgba(114,137,218,.35);border-radius:8px;">
+                <h4 style="margin:0 0 8px;">Discord-роли по формированиям</h4>
+                <p style="margin:0 0 10px;color:rgba(255,255,255,.65);font-size:12px;">Этими ролями управляет синхронизация персонажей: лишняя роль снимается автоматически.</p>
+                <div id="formationRoleMappings">${mappedRows}</div>
+                <button class="modal-btn" type="button" onclick="addFormationRoleMapping()">Добавить соответствие</button>
+            </section>`);
+            workspace.insertAdjacentHTML('beforeend', `<section style="grid-column:1/-1;margin-top:12px;padding:14px;border:1px solid rgba(255,255,255,.12);border-radius:8px;">
+                <h4 style="margin:0 0 8px;">Привязанные Discord-аккаунты</h4>
+                <button class="modal-btn" type="button" onclick="loadDiscordLinks()">Обновить список</button>
+                <div id="discordLinksList" style="margin-top:10px;color:rgba(255,255,255,.75);font-size:12px;">Нажмите «Обновить список».</div>
+            </section>`);
+        }
+
+        function addFormationRoleMapping() {
+            const box = document.getElementById('formationRoleMappings');
+            if (!box) return;
+            const firstFormation = FORMATIONS[0] || { id: '' };
+            box.insertAdjacentHTML('beforeend', `<div class="formation-role-map" style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin:6px 0;">
+                <select class="formation-role-formation">${FORMATIONS.map(f => `<option value="${f.id}" ${f.id === firstFormation.id ? 'selected' : ''}>${escapeHtml(f.name)} (${f.id})</option>`).join('')}</select>
+                ${discordRoleSelect('')}
+                <button class="modal-btn cancel" type="button" onclick="this.closest('.formation-role-map').remove()"><i class="fas fa-trash"></i></button>
+            </div>`);
+        }
+
+        function loadDiscordLinks() {
+            if (canUseSettings()) api.sendCommand('get_discord_links', '');
+        }
+
+        function renderDiscordLinks(links) {
+            const box = document.getElementById('discordLinksList');
+            if (!box) return;
+            if (!links.length) { box.textContent = 'Нет активных привязок.'; return; }
+            box.innerHTML = links.map(link => `<div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.08);">
+                <span>${escapeHtml(link.steamId64)}</span><span>${escapeHtml(link.discordId)}</span>
+                <span title="${escapeHtml(link.lastError || '')}">${escapeHtml(link.lastError ? 'Ошибка синхронизации' : (link.lastSyncAt || 'Ещё не синхронизирован'))}</span>
+                <button class="modal-btn cancel" type="button" onclick="unlinkDiscord('${escapeHtml(link.steamId64)}')">Отвязать</button>
+            </div>`).join('');
+        }
+
+        function unlinkDiscord(steamId64) {
+            if (!canUseSettings() || !confirm(`Отвязать Discord от ${steamId64}? Управляемые роли будут сняты.`)) return;
+            api.sendCommand('unlink_discord', '', { steamId64 });
+            setTimeout(loadDiscordLinks, 700);
         }
 
         function selectSettingsDiscordRole(roleId) {
@@ -2816,6 +2870,7 @@
             const discordUnitRoleMap = {};
             const discordPermissionRoleMap = {};
             const discordRankRoleMap = {};
+            const discordFormationRoleMap = {};
             document.querySelectorAll('.settings-role-detail').forEach(card => {
                 const roleId = String(card.dataset.settingsRoleId || '').trim();
                 if (!roleId) return;
@@ -2837,7 +2892,13 @@
                 });
             });
 
-            return { accounts, discordRoleMap, discordCommandRoleMap, discordUnitRoleMap, discordPermissionRoleMap, discordRankRoleMap };
+            document.querySelectorAll('.formation-role-map').forEach(row => {
+                const formation = row.querySelector('.formation-role-formation')?.value || '';
+                const roleId = row.querySelector('.discord-role-id')?.value?.trim() || '';
+                if (formation && roleId) discordFormationRoleMap[formation] = roleId;
+            });
+
+            return { accounts, discordRoleMap, discordCommandRoleMap, discordUnitRoleMap, discordPermissionRoleMap, discordRankRoleMap, discordFormationRoleMap };
         }
 
         function refreshSettings() {
