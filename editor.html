@@ -4444,6 +4444,13 @@ async function loadData() {
     updateServerIndicator(false);
   }
 
+  // 3. Запрос свежих живых данных через родительское окно веб-панели (WebSocket мост)
+  if (window.parent && window.parent !== window) {
+    try {
+      window.parent.postMessage({ type: 'REQUEST_SERVER_CONFIG' }, '*');
+    } catch(e) {}
+  }
+
   gatherSuggestions();
   updateStats();
   populateFilters();
@@ -4459,6 +4466,35 @@ async function loadData() {
     showToast('Автономный режим: загружено ' + state.jobs.length + ' профессий!', 'success');
   }
 }
+
+// Приём живых данных от родительской веб-панели через WebSocket
+window.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SERVER_CONFIG_DATA') {
+    const payload = event.data.data;
+    if (payload && Array.isArray(payload.jobs) && payload.jobs.length > 0) {
+      state.jobs = payload.jobs;
+      if (Array.isArray(payload.categories) && payload.categories.length > 0) {
+        state.categories = payload.categories;
+      }
+      if (Array.isArray(payload.formations)) {
+        state.formations = payload.formations;
+      }
+      if (Array.isArray(payload.weapons) && payload.weapons.length > 0) {
+        window.AUTOCOMPLETE_SUGGESTIONS = window.AUTOCOMPLETE_SUGGESTIONS || {};
+        window.AUTOCOMPLETE_SUGGESTIONS.weapons = payload.weapons;
+      }
+      updateServerIndicator(true);
+      gatherSuggestions();
+      updateStats();
+      populateFilters();
+      populateDatalists();
+      runDiagnostics();
+      renderJobs();
+      clearUnsaved();
+      showToast('Живая синхронизация: подгружено ' + state.jobs.length + ' профессий прямо с сервера Garry\'s Mod!', 'success', 5000);
+    }
+  }
+});
 
 function gatherSuggestions() {
   const wepSet = new Set();
@@ -6018,6 +6054,17 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch(err) {
         console.warn('Сервер не ответил на сохранение, скачиваем файл через браузер:', err);
       }
+    }
+
+    // Если находимся во фрейме веб-панели — отправляем на живой сервер через WebSocket
+    if (window.parent && window.parent !== window) {
+      try {
+        window.parent.postMessage({
+          type: 'SAVE_SERVER_CONFIG',
+          lua: generatedLua
+        }, '*');
+        showToast('Отправка на игровой сервер через WebSocket в реальном времени...', 'info', 5000);
+      } catch(e) {}
     }
 
     // Автономный режим или fallback
