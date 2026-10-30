@@ -697,7 +697,7 @@ select:focus, input:focus {
   overflow-x: auto;
 }
 
-.tab-btn {
+#job-modal .tab-btn, #tab-config-editor .categories-tabs .tab-btn {
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
@@ -710,11 +710,11 @@ select:focus, input:focus {
   transition: all 0.2s;
 }
 
-.tab-btn:hover {
+#job-modal .tab-btn:hover, #tab-config-editor .categories-tabs .tab-btn:hover {
   color: var(--text-primary);
 }
 
-.tab-btn.active {
+#job-modal .tab-btn.active, #tab-config-editor .categories-tabs .tab-btn.active {
   color: var(--accent-cyan);
   border-bottom-color: var(--accent-cyan);
 }
@@ -733,11 +733,11 @@ select:focus, input:focus {
   border-bottom-right-radius: var(--radius-lg);
 }
 
-.tab-pane {
+#job-modal .tab-pane {
   display: none;
 }
 
-.tab-pane.active {
+#job-modal .tab-pane.active {
   display: block;
 }
 

@@ -3241,6 +3241,9 @@
         function canUseSettings() {
             return !!currentIsOwner;
         }
+        function canUseConfigEditor() {
+            return canUseSettings() || hasCommanderAccess() || ['superadmin', 'admin', 'commander', 'head_admin'].includes(currentRole) || hasPanelPermission('jobs');
+        }
         function getFormationName(id) {
             const formation = FORMATIONS.find(f => f.id === normalizeUnit(id));
             return formation ? formation.name : (id || 'Не указано');
@@ -3309,7 +3312,7 @@
             const settingsBtn = document.getElementById('settingsTabBtn');
             if (settingsBtn) settingsBtn.style.display = canUseSettings() ? '' : 'none';
             const configEditorBtn = document.getElementById('configEditorTabBtn');
-            if (configEditorBtn) configEditorBtn.style.display = canUseSettings() ? '' : 'none';
+            if (configEditorBtn) configEditorBtn.style.display = canUseConfigEditor() ? '' : 'none';
             if (!canSeePanelLogs() && document.getElementById('tab-logs')?.classList.contains('active')) {
                 switchTab('players');
             }
@@ -3322,7 +3325,10 @@
             if (!canManageBans() && document.getElementById('tab-bans')?.classList.contains('active')) {
                 switchTab('players');
             }
-            if (!canUseSettings() && (document.getElementById('tab-settings')?.classList.contains('active') || document.getElementById('tab-config-editor')?.classList.contains('active'))) {
+            if (!canUseSettings() && document.getElementById('tab-settings')?.classList.contains('active')) {
+                switchTab('players');
+            }
+            if (!canUseConfigEditor() && document.getElementById('tab-config-editor')?.classList.contains('active')) {
                 switchTab('players');
             }
             if (!hasPanelPermission('rank') && document.getElementById('tab-accesses')?.classList.contains('active')) {
@@ -4535,7 +4541,7 @@
             if (tab === 'bans' && !canManageBans()) return;
             if (tab === 'accesses' && !hasPanelPermission('rank')) return;
             if (tab === 'settings' && !canUseSettings()) return;
-            if (tab === 'config-editor' && !canUseSettings()) return;
+            if (tab === 'config-editor' && !canUseConfigEditor()) return;
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-' + tab).classList.add('active');
@@ -4558,6 +4564,7 @@
                 if (jobsList.length === 0) api.sendCommand('get_jobs', '');
             }
             if (tab === 'config-editor') {
+                if (window.refreshConfigEditorView) window.refreshConfigEditorView();
                 if (api && api.socket && api.socket.readyState === WebSocket.OPEN) {
                     api.sendCommand('get_editor_data', '');
                 }
