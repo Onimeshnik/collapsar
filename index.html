@@ -1227,6 +1227,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="editor_bundle.css">
 </head>
 <body>
     <!-- LOGIN SCREEN -->
@@ -1608,9 +1609,1333 @@
         </div>
 
         <!-- Tab: Config Editor -->
-        <div class="tab-content" id="tab-config-editor" style="padding: 0;">
-            <iframe id="configEditorFrame" src="editor.html" style="width: 100%; height: calc(100vh - 120px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; background: #0a0d14;" allow="clipboard-read; clipboard-write"></iframe>
+        <div class="tab-content" id="tab-config-editor">
+
+  <div id="app">
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+      
+
+      
+      <div class="module-switcher">
+        <button class="mod-tab active" id="tab-nav-jobs" type="button" title="Перейти в Редактор Профессий">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          <span>ПРОФЕССИИ</span>
+          <span class="mod-badge" id="mod-jobs-count">138</span>
+        </button>
+        <button class="mod-tab" id="tab-nav-arsenal" type="button" title="Перейти в Редактор Арсенала">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+          <span>АРСЕНАЛ</span>
+          <span class="mod-badge" id="mod-arsenal-count">59</span>
+        </button>
+        <button class="mod-tab" id="tab-nav-inventory" type="button" title="Перейти в Редактор Спецоборудования & Инвентаря">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          <span>СПЕЦОБОРУДОВАНИЕ</span>
+          <span class="mod-badge" id="mod-inventory-count">21</span>
+        </button>
+      </div>
+
+      <div class="nav-stats" id="jobs-nav-stats">
+        <div class="stat-pill" title="Всего профессий в конфиге">
+          <span class="stat-num" id="stat-total-jobs">0</span>
+          <span class="stat-lbl">ПРОФЕССИЙ</span>
         </div>
+        <div class="stat-pill" title="Категорий в nn.cats">
+          <span class="stat-num" id="stat-total-cats">0</span>
+          <span class="stat-lbl">КАТЕГОРИЙ</span>
+        </div>
+        <div class="stat-pill" title="Уникальных SWEP-оружий">
+          <span class="stat-num" id="stat-total-weps">0</span>
+          <span class="stat-lbl">ОРУЖИЙ</span>
+        </div>
+        <div class="stat-pill" id="stat-backups-pill" title="Сохранённых резервных копий">
+          <span class="stat-num" id="stat-total-backups">0</span>
+          <span class="stat-lbl">БЭКАПОВ</span>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <button class="btn btn-primary" id="btn-create-job">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Новая профа
+        </button>
+        <button class="btn btn-secondary" id="btn-open-cats">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Категории
+        </button>
+        <button class="btn btn-secondary" id="btn-open-diagnostics" title="Диагностика типичных ошибок">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Диагностика
+          <span class="diag-badge-pill" id="diag-badge" style="display: none;">0</span>
+        </button>
+        <button class="btn btn-secondary" id="btn-open-backups" title="История локальных снимков">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Бэкапы (<span id="btn-backups-count">0</span>)
+        </button>
+        <label class="btn btn-secondary btn-open-file" title="Открыть другой .lua файл с диска">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Открыть .lua
+          <input type="file" id="file-input" accept=".lua,.txt">
+        </label>
+        <button class="btn btn-save" id="btn-download-config" title="Сохранить файл (напрямую на сервер или скачать)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          <span id="btn-save-label">Сохранить</span>
+          <span class="unsaved-badge" id="unsaved-indicator" style="display:none;">*</span>
+        </button>
+        <button class="btn btn-secondary" id="btn-download-lua-file" title="Скачать файл sh_jobs_config.lua на компьютер">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Скачать .lua</span>
+        </button>
+</div>
+    </header>
+
+    <div id="jobs-view-section">
+    <!-- Toolbar Filters -->
+    <section class="toolbar">
+      <div class="search-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="search-input" placeholder="Поиск по имени, TEAM_, ID, оружию или модели...">
+        <button id="search-clear" class="btn-clear" style="display: none;">&times;</button>
+      </div>
+
+      <div class="filters-row">
+        <div class="filter-group">
+          <label>Категория:</label>
+          <select id="filter-cat">
+            <option value="">Все категории</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Формирование:</label>
+          <select id="filter-group">
+            <option value="">Все группы</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Спавн-группа:</label>
+          <select id="filter-spawn">
+            <option value="">Все спавны</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Проверка:</label>
+          <select id="filter-status">
+            <option value="">Все статусы</option>
+            <option value="errors">Только с ошибками</option>
+            <option value="warnings">С предупреждениями</option>
+            <option value="clean">Без замечаний</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Сортировка:</label>
+          <select id="sort-select">
+            <option value="default">По умолчанию</option>
+            <option value="name-asc">По имени (А-Я)</option>
+            <option value="name-desc">По имени (Я-А)</option>
+            <option value="cat">По категории</option>
+            <option value="group">По группе</option>
+          </select>
+        </div>
+
+        <div class="view-toggle">
+          <button class="view-btn active" id="view-grid-btn" title="Сетка карточек">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+          </button>
+          <button class="view-btn" id="view-table-btn" title="Таблица">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="content-container">
+      <div class="results-header">
+        <span id="results-count">Показано: 0 профессий</span>
+        <div id="active-filters" class="active-filters"></div>
+      </div>
+
+      <!-- Grid View -->
+      <div id="jobs-grid" class="jobs-grid"></div>
+
+      <!-- Table View -->
+      <div id="jobs-table-container" class="table-container" style="display: none;">
+        <table class="jobs-table">
+          <thead>
+            <tr>
+              <th>TEAM_ Переменная</th>
+              <th>Название</th>
+              <th>Категория</th>
+              <th>Группа</th>
+              <th>Спавн</th>
+              <th>Ранг / Спец</th>
+              <th>Модель</th>
+              <th>Оружие</th>
+              <th>Броня / ХП</th>
+              <th class="th-actions">Действия</th>
+            </tr>
+          </thead>
+          <tbody id="jobs-table-body"></tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state" style="display: none;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <h3>Ничего не найдено</h3>
+        <p>Попробуйте изменить поисковый запрос или сбросить фильтры</p>
+        <button class="btn btn-secondary" id="btn-reset-filters">Сбросить фильтры</button>
+      </div>
+    </main>
+    </div><!-- /#jobs-view-section -->
+
+    <!-- Arsenal View Section -->
+    <div id="arsenal-view-section" class="arsenal-view-section" style="display: none;">
+      <!-- Top Action Bar -->
+      <div class="arsenal-top-bar">
+        <div class="arsenal-stats-row">
+          <div class="stat-pill" title="Оружий в арсенале">
+            <span class="stat-num" id="stat-arsenal-weps">0</span>
+            <span class="stat-lbl">ОРУЖИЯ</span>
+          </div>
+          <div class="stat-pill" title="Бодигрупп и вариантов брони">
+            <span class="stat-num" id="stat-arsenal-bgs">0</span>
+            <span class="stat-lbl">БОДИГРУПП</span>
+          </div>
+          <div class="stat-pill highlight" title="Максимальный вес снаряжения клона">
+            <div class="weight-limit-box">
+              <span class="stat-lbl">МАКС ВЕС:</span>
+              <input type="number" id="arsenal-max-weight-input" class="mini-weight-input" value="50" min="5" max="200" step="1">
+              <span class="stat-unit">КГ</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="arsenal-nav-actions">
+          <button class="btn btn-primary" id="btn-arsenal-add-wep" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            + Оружие
+          </button>
+          <button class="btn btn-secondary" id="btn-arsenal-add-bg" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            + Бодигруппа / Броня
+          </button>
+          <button class="btn btn-secondary" id="btn-arsenal-add-att" type="button" title="Добавить или настроить модификации оружия">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            + Модификации
+          </button>
+          <button class="btn btn-save" id="btn-arsenal-export-tab" type="button" title="Генератор и скачивание Lua-файлов">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Экспорт Lua</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Arsenal Sub-navigation -->
+      <div class="arsenal-subnav">
+        <button class="arsenal-subtab active" data-subtab="weps" type="button">
+          🔫 Оружие в арсенале (<span id="count-subtab-weps">0</span>)
+        </button>
+        <button class="arsenal-subtab" data-subtab="bgs" type="button">
+          🛡️ Бодигруппы и Броня (<span id="count-subtab-bgs">0</span>)
+        </button>
+        <button class="arsenal-subtab" data-subtab="atts" type="button">
+          ⚙️ Модификации (<span id="count-subtab-atts">0</span>)
+        </button>
+        <button class="arsenal-subtab" data-subtab="export" type="button">
+          💾 Генератор Lua & Файлы
+        </button>
+      </div>
+
+      <!-- Tab 1: Weapons -->
+      <div class="arsenal-tab-pane" id="arsenal-pane-weps">
+        <div class="arsenal-filter-bar">
+          <div class="arsenal-search-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" id="arsenal-wep-search" placeholder="Поиск по названию, классу (arccw_...), званию или спеке...">
+          </div>
+          <div class="arsenal-cat-pills" id="arsenal-wep-cat-pills">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <div class="arsenal-weapons-grid" id="arsenal-weapons-grid" style="margin-top: 16px;">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Tab 2: Bodygroups & Armor -->
+      <div class="arsenal-tab-pane" id="arsenal-pane-bgs" style="display: none;">
+        <div class="arsenal-filter-bar">
+          <div class="arsenal-search-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" id="arsenal-bg-search" placeholder="Поиск по SMD, названию, категории или званию...">
+          </div>
+          <div class="arsenal-cat-pills" id="arsenal-bg-cat-pills">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <div class="arsenal-table-container" style="margin-top: 16px;">
+          <table class="arsenal-data-table">
+            <thead>
+              <tr>
+                <th>SMD Файл</th>
+                <th>Название</th>
+                <th>Категория</th>
+                <th>Вес (кг)</th>
+                <th>Описание / Бонус</th>
+                <th>Звание</th>
+                <th>Спека</th>
+                <th style="text-align: right;">Действия</th>
+              </tr>
+            </thead>
+            <tbody id="arsenal-bgs-table-body">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab 3: Weapon Attachments / Modifications -->
+      <div class="arsenal-tab-pane" id="arsenal-pane-atts" style="display: none;">
+        <div class="arsenal-filter-bar">
+          <div class="arsenal-search-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" id="arsenal-att-search" placeholder="Поиск по оружию, слоту или названию модификации...">
+          </div>
+          <div class="arsenal-cat-pills" id="arsenal-att-cat-pills">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <div class="arsenal-atts-grid" id="arsenal-atts-grid" style="margin-top: 16px;">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Tab 4: Export -->
+      <div class="arsenal-tab-pane" id="arsenal-pane-export" style="display: none;">
+        <div class="arsenal-export-grid">
+          <!-- Shared Config Block (Single Source of Truth) -->
+          <div class="export-box full-width">
+            <div class="export-box-header">
+              <span class="export-box-title">Единый конфигурационный файл (sh_arsenal_config.lua)</span>
+              <div class="export-box-actions">
+                <button class="btn btn-secondary btn-sm" id="btn-copy-sh-lua" type="button">Скопировать код</button>
+                <button class="btn btn-secondary btn-sm" id="btn-download-sh-lua" type="button">Скачать .lua</button>
+                <button class="btn btn-save btn-sm" id="btn-save-sh-server" type="button">Сохранить на сервере</button>
+                <button class="btn btn-primary btn-sm" id="btn-arsenal-unified-backup" type="button" title="Открыть панель общего бэкапа">🛡️ Общий бэкап</button>
+              </div>
+            </div>
+            <p style="font-size: 13px; color: var(--text-secondary); margin: 0;">
+              Единый источник истины (Single Source of Truth) для оружия, категорий и обвесов. Серверная часть (init.lua) и клиентская (cl_init.lua) автоматически берут все правила и списки из этого файла.
+            </p>
+            <textarea id="export-sh-lua-text" class="export-textarea" style="height: 440px;" readonly spellcheck="false"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Special Equipment & Inventory View Section -->
+    <div id="inventory-view-section" class="inventory-view-section" style="display: none;">
+      <!-- Top Action Bar -->
+      <div class="arsenal-top-bar">
+        <div class="arsenal-stats-row">
+          <div class="stat-pill" title="Уникальных спец. предметов">
+            <span class="stat-num" id="stat-inv-items">21</span>
+            <span class="stat-lbl">ПРЕДМЕТОВ</span>
+          </div>
+          <div class="stat-pill" title="Весов оружия в базе">
+            <span class="stat-num" id="stat-inv-weights">128</span>
+            <span class="stat-lbl">ВЕСОВ ОРУЖИЯ</span>
+          </div>
+          <div class="stat-pill highlight" title="Званий в системе">
+            <span class="stat-num">20</span>
+            <span class="stat-lbl">ЗВАНИЙ (RCT→MC)</span>
+          </div>
+        </div>
+
+        <div class="arsenal-nav-actions">
+          <button class="btn btn-primary" id="btn-inv-add-item" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            + Предмет / Спецоборудование
+          </button>
+          <button class="btn btn-secondary" id="btn-inv-add-weight" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            + Вес оружия (SWEP)
+          </button>
+          <button class="btn btn-save" id="btn-inv-export-tab" type="button" title="Генератор и скачивание Lua">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Экспорт Lua</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Inventory Sub-navigation -->
+      <div class="arsenal-subnav">
+        <button class="arsenal-subtab active" id="subtab-btn-inv-items" data-invsubtab="items" type="button">
+          🎒 Спецоборудование & Предметы (<span id="count-invsubtab-items">0</span>)
+        </button>
+        <button class="arsenal-subtab" id="subtab-btn-inv-weights" data-invsubtab="weights" type="button">
+          ⚖️ База весов оружия (kg) (<span id="count-invsubtab-weights">0</span>)
+        </button>
+        <button class="arsenal-subtab" id="subtab-btn-inv-export" data-invsubtab="export" type="button">
+          💾 Конфиг aa_sh_inventory_config.lua
+        </button>
+      </div>
+
+      <!-- Subtab 1: Inventory Items -->
+      <div class="arsenal-tab-pane" id="inv-pane-items">
+        <div class="arsenal-filter-bar">
+          <div class="arsenal-search-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" id="inv-item-search" placeholder="Поиск по названию, классу, званию или спеке...">
+          </div>
+          <div class="arsenal-cat-pills" id="inv-category-pills">
+            <button class="cat-pill-btn active" data-invcat="" type="button">Все</button>
+            <button class="cat-pill-btn" data-invcat="med" type="button">Медицина</button>
+            <button class="cat-pill-btn" data-invcat="eng" type="button">Инженерия & Дроны</button>
+            <button class="cat-pill-btn" data-invcat="fire" type="button">Огневая поддержка & Миномёты</button>
+            <button class="cat-pill-btn" data-invcat="ammo" type="button">Боеприпасы</button>
+          </div>
+        </div>
+
+        <div class="arsenal-table-container" style="margin-top: 16px;">
+          <table class="arsenal-data-table">
+            <thead>
+              <tr>
+                <th>Класс энтити / SWEP</th>
+                <th>Название</th>
+                <th>Категория</th>
+                <th>Тип</th>
+                <th>Вес (кг)</th>
+                <th>Расходник</th>
+                <th>Звание</th>
+                <th>Спека</th>
+                <th style="text-align: right;">Действия</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-items-table-body">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Subtab 2: Weapon Weights -->
+      <div class="arsenal-tab-pane" id="inv-pane-weights" style="display: none;">
+        <div class="arsenal-filter-bar">
+          <div class="arsenal-search-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" id="inv-weight-search" placeholder="Поиск класса оружия (напр. arccw_k_dc15a)...">
+          </div>
+          <div style="font-size: 13px; color: var(--text-secondary);">
+            Таблица <code style="color: var(--accent-cyan);">nn.Config.WeaponWeights</code> используется инвентарём и арсеналом.
+          </div>
+        </div>
+
+        <div class="arsenal-table-container" style="margin-top: 16px;">
+          <table class="arsenal-data-table">
+            <thead>
+              <tr>
+                <th>Класс оружия SWEP</th>
+                <th>Вес (кг)</th>
+                <th style="text-align: right;">Действия</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-weights-table-body">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Subtab 3: Export & Direct Server Save -->
+      <div class="arsenal-tab-pane" id="inv-pane-export" style="display: none;">
+        <div class="arsenal-export-grid">
+          <div class="export-box full-width">
+            <div class="export-box-header">
+              <span class="export-box-title">Конфигурационный файл инвентаря (aa_sh_inventory_config.lua)</span>
+              <div class="export-box-actions">
+                <button class="btn btn-secondary btn-sm" id="btn-copy-inv-lua" type="button">Скопировать код</button>
+                <button class="btn btn-secondary btn-sm" id="btn-download-inv-lua" type="button">Скачать .lua</button>
+                <button class="btn btn-save btn-sm" id="btn-save-inv-server" type="button">Сохранить на сервере</button>
+                <button class="btn btn-primary btn-sm" id="btn-inv-unified-backup" type="button" title="Открыть панель общего бэкапа">🛡️ Общий бэкап</button>
+              </div>
+            </div>
+            <p style="font-size: 13px; color: var(--text-secondary); margin: 0;">
+              Обновляет секцию <code style="color: var(--accent-cyan);">nn.Inventory.Items</code> и <code style="color: var(--accent-cyan);">nn.Config.WeaponWeights</code>. Все существующие ранги и логика рюкзаков полностью сохраняются. При сохранении на сервере автоматически создаётся резервная копия в папке <code style="color: #f59e0b;">jobs_editor/backups/</code>.
+            </p>
+            <textarea id="export-inv-lua-text" class="export-textarea" style="height: 440px;" readonly spellcheck="false"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- Job Edit Modal -->
+    <div id="job-modal" class="modal-backdrop" style="display: none;">
+      <div class="modal-window">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <span class="modal-badge" id="modal-type-badge">РЕДАКТИРОВАНИЕ</span>
+            <h2 id="modal-job-title">Профессия</h2>
+          </div>
+          <button class="modal-close" id="modal-job-close">&times;</button>
+        </div>
+
+        <div class="modal-tabs">
+          <button class="tab-btn active" data-tab="tab-main">Основное</button>
+          <button class="tab-btn" data-tab="tab-model">Модель и Скин</button>
+          <button class="tab-btn" data-tab="tab-weapons">Оружие (<span id="tab-wep-count">0</span>)</button>
+          <button class="tab-btn" data-tab="tab-stats">Характеристики & Спавн</button>
+          <button class="tab-btn" data-tab="tab-access">Доступ & Звания</button>
+        </div>
+
+        <form id="job-form" class="modal-body">
+          <!-- TAB 1: Main -->
+          <div class="tab-pane active" id="tab-main">
+            <div class="form-grid">
+              <div class="form-group span-2">
+                <label for="input-job-name">Отображаемое имя (в табе / HUD) <span class="req">*</span></label>
+                <input type="text" id="input-job-name" required placeholder="Например: Корпус CT | Боец">
+              </div>
+
+              <div class="form-group">
+                <label for="input-team-var">TEAM_ Переменная <span class="req">*</span></label>
+                <div class="input-with-action">
+                  <input type="text" id="input-team-var" required placeholder="TEAM_CT1" class="font-mono">
+                  <button type="button" class="btn-input-action" id="btn-auto-team" title="Сгенерировать из имени">АВТО</button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="input-job-id">Уникальный ID (jobID) <span class="req">*</span></label>
+                <input type="text" id="input-job-id" required placeholder="Soldier" class="font-mono">
+                <small class="field-hint">Используется для базы данных и сохранений</small>
+              </div>
+
+              <div class="form-group">
+                <label for="input-job-cat">Категория (cat) <span class="req">*</span></label>
+                <div class="input-with-action">
+                  <select id="input-job-cat" required></select>
+                  <button type="button" class="btn-input-action" id="btn-quick-new-cat" title="Новая категория">+</button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="input-job-group">Формирование / Взвод (group_id)</label>
+                <input type="text" id="input-job-group" list="datalist-groups" placeholder="CT, 74th, 501st...">
+                <datalist id="datalist-groups"></datalist>
+              </div>
+
+              <div class="form-group">
+                <label for="input-job-spawn-group">Спавн-группа (spawn_group)</label>
+                <input type="text" id="input-job-spawn-group" list="datalist-spawns" placeholder="Clones, Droids, Administration...">
+                <datalist id="datalist-spawns"></datalist>
+              </div>
+
+              <div class="form-group">
+                <label>Цвет профессии (Color)</label>
+                <div class="color-picker-row">
+                  <input type="color" id="input-job-color-picker" value="#006400">
+                  <span class="font-mono" id="input-job-color-label">Color(0, 100, 0)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: Model & Skin -->
+          <div class="tab-pane" id="tab-model">
+            <div class="form-group">
+              <label for="input-job-model">Путь к модели (WorldModel) <span class="req">*</span></label>
+              <input type="text" id="input-job-model" list="datalist-models" required placeholder="models/trooper/trooper_ct.mdl" class="font-mono">
+              <datalist id="datalist-models"></datalist>
+              <small class="field-hint">Выберите из выпадающего списка или введите новый путь к .mdl</small>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="input-job-skin">Скин модели (skin)</label>
+                <input type="number" id="input-job-skin" min="0" max="100" value="0">
+              </div>
+            </div>
+
+            <div class="bodygroups-section">
+              <div class="section-title-row">
+                <h4>Бодигруппы по умолчанию (bodygroups)</h4>
+                <button type="button" class="btn btn-sm btn-secondary" id="btn-add-bg">+ Добавить группу</button>
+              </div>
+              <p class="section-desc">Установка конкретных бодигрупп модели при спавне (ID группы или имя -> номер бодигруппы)</p>
+              <div id="bg-list" class="bg-list"></div>
+            </div>
+
+            <div class="bodygroups-section" style="margin-top: 18px; border-top: 1px solid var(--border-color, #2a2f3d); padding-top: 14px;">
+              <div class="section-title-row">
+                <h4>🔒 Зафиксированные бодигруппы (locked_bodygroups)</h4>
+              </div>
+              <p class="section-desc">Элементы, которые игрок НЕ сможет сменить в арсенале (зафиксированы уставом формы). Перечислите через запятую, например: <code>Helmet, Chest</code> или <code>0, 1</code></p>
+              <input type="text" id="input-job-locked-bg" class="form-control font-mono" placeholder="например: Helmet, Chest">
+            </div>
+
+            <div class="bodygroups-section" style="margin-top: 14px;">
+              <div class="section-title-row">
+                <h4>✅ Разрешенные бодигруппы (allowed_bodygroups)</h4>
+              </div>
+              <p class="section-desc">Белый список: разрешено настраивать ТОЛЬКО указанные элементы (остальные заблокированы). Перечислите через запятую, например: <code>Backpack, Pistols</code></p>
+              <input type="text" id="input-job-allowed-bg" class="form-control font-mono" placeholder="например: Backpack, Pistols">
+            </div>
+
+            <div class="bodygroups-section" style="margin-top: 14px;">
+              <div class="section-title-row">
+                <h4>⛔ Запрещенные бодигруппы (banned_bodygroups)</h4>
+              </div>
+              <p class="section-desc">Черный список: элементы, которые этой профессии строго запрещено брать в арсенале. Перечислите через запятую, например: <code>Jetpack, Cape, Pauldron</code></p>
+              <input type="text" id="input-job-banned-bg" class="form-control font-mono" placeholder="например: Jetpack, Cape">
+            </div>
+
+            <div class="bodygroups-section" style="margin-top: 14px;">
+              <div class="section-title-row">
+                <h4>👁️ Скрытые из меню бодигруппы (hidden_bodygroups)</h4>
+              </div>
+              <p class="section-desc">Элементы, которые НЕ будут отображаться в списке арсенала для этой профессии (например, чтобы убрать причёски, лица или головы). Перечислите через запятую, например: <code>hair, fhair, head</code></p>
+              <input type="text" id="input-job-hidden-bg" class="form-control font-mono" placeholder="например: hair, fhair">
+            </div>
+          </div>
+
+          <!-- TAB 3: Weapons -->
+          <div class="tab-pane" id="tab-weapons">
+            <div class="weapons-search-bar">
+              <input type="text" id="wep-add-input" list="datalist-weapons" placeholder="Поиск оружия или введите свой classname (SWEP)..." class="font-mono">
+              <datalist id="datalist-weapons"></datalist>
+              <button type="button" class="btn btn-secondary" id="btn-add-wep">Добавить в профу</button>
+            </div>
+
+            <div class="weapons-box">
+              <div class="section-title-row">
+                <h4>Выбранное оружие (<span id="wep-active-count">0</span>)</h4>
+                <button type="button" class="btn-text-danger" id="btn-clear-weps">Очистить всё</button>
+              </div>
+              <div id="wep-tags-container" class="tags-container"></div>
+            </div>
+
+            <div class="quick-weps-section">
+              <span class="quick-title">Быстрое добавление базового снаряжения:</span>
+              <div class="quick-weps-chips">
+                <button type="button" class="chip" data-wep="weapon_physgun">+ Physgun</button>
+                <button type="button" class="chip" data-wep="gmod_tool">+ Toolgun</button>
+                <button type="button" class="chip" data-wep="nn_hands">+ Руки</button>
+                <button type="button" class="chip" data-wep="nn_datapad">+ Датапад</button>
+                <button type="button" class="chip" data-wep="nn_medical_datapad">+ Мед. Датапад</button>
+                <button type="button" class="chip" data-wep="nn_medkit">+ Аптечка</button>
+                <button type="button" class="chip" data-wep="nn_grapple">+ Крюк</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 4: Stats & PlayerSpawn -->
+          <div class="tab-pane" id="tab-stats">
+            <div class="stats-cards-grid">
+              <div class="stat-card">
+                <div class="stat-card-header">
+                  <span class="stat-icon armor-icon">🛡️</span>
+                  <span class="stat-card-title">БРОНЯ</span>
+                </div>
+                <div class="form-group">
+                  <label for="input-job-armor">Начальная броня</label>
+                  <input type="number" id="input-job-armor" min="0" max="10000" value="100">
+                </div>
+                <div class="form-group">
+                  <label for="input-job-maxarmor">Максимальная броня</label>
+                  <input type="number" id="input-job-maxarmor" min="0" max="10000" value="100">
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-card-header">
+                  <span class="stat-icon health-icon">❤️</span>
+                  <span class="stat-card-title">ЗДОРОВЬЕ</span>
+                </div>
+                <div class="form-group">
+                  <label for="input-job-health">Начальное здоровье</label>
+                  <input type="number" id="input-job-health" min="1" max="999999" value="100">
+                </div>
+                <div class="form-group">
+                  <label for="input-job-maxhealth">Максимальное здоровье</label>
+                  <input type="number" id="input-job-maxhealth" min="1" max="999999" value="100">
+                </div>
+              </div>
+            </div>
+
+            <div class="spawn-custom-section">
+              <div class="custom-toggle-row">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="toggle-custom-spawn">
+                  <span class="toggle-slider"></span>
+                </label>
+                <div>
+                  <strong>Пользовательский Lua-код функции PlayerSpawn</strong>
+                  <p class="section-desc">Включите, если профессии нужны уникальные хуки при возрождении (скорость, выдача патронов и т.д.)</p>
+                </div>
+              </div>
+
+              <div id="custom-spawn-container" style="display: none; margin-top: 12px;">
+                <textarea id="input-custom-spawn" class="font-mono code-textarea" rows="6" placeholder="ply:SetMaxArmor(100)&#10;ply:SetArmor(100)&#10;ply:SetRunSpeed(300)"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 5: Requirements & Access -->
+          <div class="tab-pane" id="tab-access">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="input-job-rank">Требуемое звание (rank)</label>
+                <input type="text" id="input-job-rank" list="datalist-ranks" placeholder="RCT, CPL, SGT, LT, CPT, CDR...">
+                <datalist id="datalist-ranks"></datalist>
+                <small class="field-hint">Оставьте пустым, если звание не требуется</small>
+              </div>
+
+              <div class="form-group">
+                <label for="input-job-spec">Требуемая приписка / спец. (spec)</label>
+                <input type="text" id="input-job-spec" list="datalist-specs" placeholder="CC, HEV, ART, MED, ARC, PRG...">
+                <datalist id="datalist-specs"></datalist>
+                <small class="field-hint">Оставьте пустым, если приписка не требуется</small>
+              </div>
+            </div>
+            <!-- Встроенное снаряжение (Исключения бодигрупп) -->
+            <div class="card" style="margin-top: 15px; padding: 14px; background: rgba(25, 30, 40, 0.7); border: 1px solid rgba(70, 130, 180, 0.4); border-radius: 8px;">
+              <div style="font-weight: 600; font-size: 14px; margin-bottom: 6px; color: #5bc0de; display: flex; align-items: center; gap: 6px;">
+                <span>⚡ Встроенное снаряжение (Исключения для бодигрупп)</span>
+              </div>
+              <div style="font-size: 12px; color: #a0aec0; margin-bottom: 12px;">
+                Позволяет использовать функции даже если на модели физически отсутствует нужный бодигрупп.
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                <div style="background: rgba(15, 20, 28, 0.5); padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
+                    <input type="checkbox" id="input-job-has-backpack" style="width: 16px; height: 16px;">
+                    <span>🎒 Встроенный рюкзак</span>
+                  </label>
+                  <div style="margin-left: 24px; margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+                    <span style="font-size: 12px; color: #a0aec0;">Слоты инвентаря:</span>
+                    <input type="number" id="input-job-backpack-slots" min="2" max="30" value="8" style="width: 55px; padding: 2px 6px; font-size: 12px; background: #1a202c; border: 1px solid #4a5568; border-radius: 4px; color: #fff;">
+                  </div>
+                </div>
+
+                <div style="background: rgba(15, 20, 28, 0.5); padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
+                    <input type="checkbox" id="input-job-has-jetpack" style="width: 16px; height: 16px;">
+                    <span>🚀 Встроенный джетпак</span>
+                  </label>
+                  <div style="margin-left: 24px; margin-top: 4px; font-size: 11px; color: #718096;">
+                    Работает без бодигруппы Jetpack
+                  </div>
+                </div>
+
+                <div style="background: rgba(15, 20, 28, 0.5); padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
+                    <input type="checkbox" id="input-job-has-nvg" style="width: 16px; height: 16px;">
+                    <span>🌙 Встроенный ПНВ</span>
+                  </label>
+                  <div style="margin-left: 24px; margin-top: 4px; font-size: 11px; color: #718096;">
+                    Активируется без опущенного визора
+                  </div>
+                </div>
+
+                <div style="background: rgba(15, 20, 28, 0.5); padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
+                    <input type="checkbox" id="input-job-has-thermal" style="width: 16px; height: 16px;">
+                    <span>🔥 Встроенный Тепловизор</span>
+                  </label>
+                  <div style="margin-left: 24px; margin-top: 4px; font-size: 11px; color: #718096;">
+                    Активируется без опущенного визора
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="modal-job-cancel">Отмена</button>
+          <button type="button" class="btn btn-primary" id="modal-job-submit">Применить изменения</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Categories & Formations Modal -->
+    <div id="cats-modal" class="modal-backdrop" style="display: none;">
+      <div class="modal-window modal-xl">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <h2>Конфигурация Категорий и Формирований</h2>
+            <span class="sub-header-info">Централизованная настройка nn.cats (ТАБ, Профы, Вайтлист) и nn.formations</span>
+          </div>
+          <button class="modal-close" id="modal-cats-close">&times;</button>
+        </div>
+
+        <div class="modal-tabs">
+          <button class="tab-btn active" id="tab-btn-cats" type="button">
+            Основные категории (nn.cats)
+            <span class="tab-badge" id="badge-cats-count">0</span>
+          </button>
+          <button class="tab-btn" id="tab-btn-formations" type="button">
+            Дополнительные формирования (nn.formations)
+            <span class="tab-badge" id="badge-formations-count">0</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <!-- TAB 1: Основные категории (nn.cats) -->
+          <div id="cats-tab-main" class="cats-tab-pane">
+            <div class="cat-info-banner">
+              <span style="font-size: 20px;">ℹ️</span>
+              <div>
+                <strong>Основные категории:</strong> задают группы профессий в TAB и F4 меню, цвета плашек, иконки и описания.
+                При заполнении <code>Formation ID</code> категория автоматически регистрируется как формирование в вайтлисте!
+              </div>
+            </div>
+
+            <!-- Create new category panel -->
+            <div class="cat-create-grid-panel">
+              <div class="form-grid-row">
+                <div class="cat-create-field" style="grid-column: span 2;">
+                  <label for="new-cat-name">Название категории *</label>
+                  <input type="text" id="new-cat-name" placeholder="Например: 501-й Легион">
+                </div>
+                <div class="cat-create-field">
+                  <label for="new-cat-order">Порядок (# order)</label>
+                  <input type="number" id="new-cat-order" placeholder="Напр. 25" min="1">
+                </div>
+                <div class="cat-create-field">
+                  <label>Цвет фона (bcolor)</label>
+                  <div class="cat-color-item">
+                    <input type="color" id="new-cat-bcolor" value="#2b4b7c">
+                    <span id="new-cat-bcolor-hex" class="font-mono" style="font-size: 11px;">#2b4b7c</span>
+                  </div>
+                </div>
+                <div class="cat-create-field">
+                  <label>Цвет текста (tcolor)</label>
+                  <div class="cat-color-item">
+                    <input type="color" id="new-cat-tcolor" value="#ffffff">
+                    <span id="new-cat-tcolor-hex" class="font-mono" style="font-size: 11px;">#ffffff</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-grid-row">
+                <div class="cat-create-field" style="grid-column: span 2;">
+                  <label for="new-cat-desc">Описание в ТАБ-меню (description)</label>
+                  <input type="text" id="new-cat-desc" placeholder="Например: Штурмовой батальон">
+                </div>
+                <div class="cat-create-field">
+                  <label for="new-cat-icon">Иконка ТАБа (icon)</label>
+                  <input type="text" id="new-cat-icon" placeholder="noname/tab/501.png">
+                </div>
+                <div class="cat-create-field">
+                  <label for="new-cat-formation-id">Formation ID (Вайтлист)</label>
+                  <input type="text" id="new-cat-formation-id" placeholder="Напр. 501st">
+                </div>
+                <div class="cat-create-field">
+                  <label for="new-cat-idn-prefix">Префикс IDN (номера)</label>
+                  <input type="text" id="new-cat-idn-prefix" placeholder="Напр. CC-, false">
+                </div>
+              </div>
+
+              <div class="cat-create-bottom-bar">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="font-size: 12px; color: var(--text-muted);">Превью:</span>
+                  <span class="cat-badge" id="new-cat-preview" style="background-color: #2b4b7c; color: #ffffff; font-weight: 700;">Превью плашки</span>
+                </div>
+                <button class="btn btn-primary" id="btn-create-cat" type="button">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                  Добавить категорию
+                </button>
+              </div>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="cat-table-toolbar">
+              <div class="cat-table-toolbar-left">
+                <input type="text" id="cats-search-input" class="input-search-sm" placeholder="Поиск по категориям...">
+                <span id="cats-count-label" style="font-size: 12px; color: var(--text-muted);">Всего: 0</span>
+              </div>
+              <div class="cat-table-toolbar-right">
+                <button class="btn btn-secondary btn-sm" id="btn-sort-cats-order" type="button" title="Отсортировать список по номеру order">
+                  ⇅ Сортировать по #
+                </button>
+                <button class="btn btn-secondary btn-sm" id="btn-renumber-cats" type="button" title="Присвоить порядковые номера 1, 2, 3... подряд">
+                  🔢 Перенумеровать (1..N)
+                </button>
+              </div>
+            </div>
+
+            <!-- Table -->
+            <div class="cat-list-table-wrapper">
+              <table class="cats-table">
+                <thead>
+                  <tr>
+                    <th style="width: 70px;">Порядок</th>
+                    <th>Название</th>
+                    <th>Превью плашки</th>
+                    <th>Цвета (Текст / Фон)</th>
+                    <th>Описание (ТАБ)</th>
+                    <th>Иконка (ТАБ)</th>
+                    <th>Вайтлист (Formation ID / IDN)</th>
+                    <th>Профессий</th>
+                    <th style="text-align: center;">Действия</th>
+                  </tr>
+                </thead>
+                <tbody id="cats-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- TAB 2: Дополнительные формирования (nn.formations) -->
+          <div id="cats-tab-formations" class="cats-tab-pane" style="display: none;">
+            <div class="cat-info-banner">
+              <span style="font-size: 20px;">🎖️</span>
+              <div>
+                <strong>Дополнительные формирования вайтлиста:</strong> используются для выдачи персонажам подразделений,
+                не выделенных в отдельные категории профессий (например: <em>Сенатские Коммандос</em>, <em>ARC «Alpha»</em>,
+                <em>Рота Дума</em>, <em>212-й Батальон</em>). Основные формирования автоматически берутся из категорий выше.
+              </div>
+            </div>
+
+            <!-- Create new formation panel -->
+            <div class="cat-create-grid-panel">
+              <div class="form-grid-row" style="grid-template-columns: 1fr 2fr 1fr auto; align-items: flex-end;">
+                <div class="cat-create-field">
+                  <label for="new-formation-id">ID формирования *</label>
+                  <input type="text" id="new-formation-id" placeholder="Например: doom, 212, arc_alpha">
+                </div>
+                <div class="cat-create-field">
+                  <label for="new-formation-name">Название формирования (отображение в вайтлисте) *</label>
+                  <input type="text" id="new-formation-name" placeholder="Например: Рота Дума">
+                </div>
+                <div class="cat-create-field">
+                  <label for="new-formation-idn">Префикс IDN (личного номера)</label>
+                  <input type="text" id="new-formation-idn" placeholder="Напр. CC-, Droid- или false">
+                </div>
+                <div class="cat-create-field">
+                  <button class="btn btn-primary" id="btn-create-formation" type="button" style="height: 36px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                    Добавить формирование
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Formations Table -->
+            <div class="cat-list-table-wrapper">
+              <table class="cats-table">
+                <thead>
+                  <tr>
+                    <th style="width: 50px;">#</th>
+                    <th style="width: 200px;">ID формирования (код)</th>
+                    <th>Название (в меню вайтлиста)</th>
+                    <th style="width: 220px;">Префикс IDN (личного номера)</th>
+                    <th style="text-align: center; width: 90px;">Действия</th>
+                  </tr>
+                </thead>
+                <tbody id="formations-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Backups Modal -->
+    <div id="backups-modal" class="modal-backdrop" style="display: none;">
+      <div class="modal-window modal-lg" style="max-width: 960px;">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <h2>Резервные копии и бэкапы системы</h2>
+            <span class="sub-header-info">Единый срез всех систем и локальные снимки</span>
+          </div>
+          <button class="modal-close" id="modal-backups-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <!-- Backups Mode Tabs -->
+          <div class="backup-filter-tabs" style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; align-items: center;">
+            <button class="diag-tab active" id="tab-btn-unified-backups" type="button">
+              🛡️ Общий бэкап (Всё: Профессии + Арсенал + Спецоборудование)
+              <span class="diag-badge-pill" id="unified-backups-count" style="display: inline-block;">0</span>
+            </button>
+            <button class="diag-tab" id="tab-btn-jobs-backups" type="button">
+              📋 Только Профессии (sh_jobs_config.lua)
+              <span class="diag-badge-pill" id="jobs-backups-count" style="display: inline-block;">0</span>
+            </button>
+          </div>
+
+          <!-- UNIFIED BACKUPS VIEW -->
+          <div id="unified-backups-view">
+            <div class="backups-top-bar" style="display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; background: rgba(0, 240, 255, 0.03); border: 1px solid rgba(0, 240, 255, 0.15); border-radius: var(--radius-sm); padding: 12px 16px;">
+              <div style="max-width: 58%;">
+                <strong style="color: var(--accent-cyan); display: block; margin-bottom: 4px;">Общий срез всех конфигураций</strong>
+                <p style="margin: 0; font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
+                  Сохраняет и восстанавливает всё синхронно: Профессии (<code>sh_jobs_config.lua</code>), Арсенал Республики (<code>sh_arsenal_config.lua</code>) и Спецоборудование/Инвентарь (<code>aa_sh_inventory_config.lua</code>).
+                </p>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <button class="btn btn-primary" id="btn-manual-unified-backup" type="button">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                  Создать общий бэкап
+                </button>
+                <button class="btn btn-secondary" id="btn-export-current-unified" type="button" title="Скачать JSON-файл с полным бэкапом на компьютер">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Экспорт .json
+                </button>
+                <label class="btn btn-secondary btn-open-file" title="Восстановить общий бэкап из сохранённого JSON-файла">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  Импорт .json
+                  <input type="file" id="unified-backup-file-input" accept=".json">
+                </label>
+              </div>
+            </div>
+
+            <div class="backups-list-wrapper" style="margin-top: 14px;">
+              <table class="backups-table">
+                <thead>
+                  <tr>
+                    <th style="width: 110px;">Тип</th>
+                    <th>Название и состав</th>
+                    <th style="width: 170px;">Дата и время</th>
+                    <th style="width: 160px;">Хранилище</th>
+                    <th style="width: 210px; text-align: right;">Действия</th>
+                  </tr>
+                </thead>
+                <tbody id="unified-backups-table-body">
+                  <tr><td colspan="5" style="text-align:center; padding: 24px;">Загрузка списка бэкапов...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- JOBS ONLY BACKUPS VIEW -->
+          <div id="jobs-backups-view" style="display: none;">
+            <div class="backups-top-bar">
+              <p>Бэкап создаётся <strong>автоматически</strong> перед каждой перезаписью <code>sh_jobs_config.lua</code>.</p>
+              <button class="btn btn-primary" id="btn-manual-backup" type="button">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                Создать бэкап профессий
+              </button>
+            </div>
+
+            <div class="backups-list-wrapper">
+              <table class="backups-table">
+                <thead>
+                  <tr>
+                    <th>Тип</th>
+                    <th>Имя файла</th>
+                    <th>Дата и время</th>
+                    <th>Размер</th>
+                    <th style="text-align: right;">Действие</th>
+                  </tr>
+                </thead>
+                <tbody id="backups-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Diagnostics Modal -->
+    <div id="diagnostics-modal" class="modal-backdrop" style="display: none;">
+      <div class="modal-window modal-lg">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <span class="modal-badge diag-head-badge">ИНСПЕКТОР ОШИБОК</span>
+            <h2>Поиск типовых ошибок конфига</h2>
+          </div>
+          <button class="modal-close" id="modal-diagnostics-close">&times;</button>
+        </div>
+
+        <div class="diag-filter-tabs">
+          <button class="diag-tab active" data-diag-filter="all">Все проблемы (<span id="diag-tab-all">0</span>)</button>
+          <button class="diag-tab" data-diag-filter="error">Критические ошибки (<span id="diag-tab-error" class="text-error">0</span>)</button>
+          <button class="diag-tab" data-diag-filter="warning">Предупреждения (<span id="diag-tab-warning" class="text-warning">0</span>)</button>
+          <button class="diag-tab" data-diag-filter="info">Рекомендации (<span id="diag-tab-info" class="text-info">0</span>)</button>
+          
+          <button class="btn btn-sm btn-primary diag-autofix-all" id="btn-autofix-all" style="margin-left: auto;">
+            ⚡ Авто-исправление типовых проблем
+          </button>
+        </div>
+
+        <div class="modal-body" id="diagnostics-list-container">
+          <!-- Populated by app.js -->
+        </div>
+      </div>
+    </div>
+
+    
+    <!-- Weapon Modal -->
+    <div id="arsenal-wep-modal" class="modal-backdrop" style="display: none;">
+      <div class="modal-window">
+        <div class="modal-header">
+          <h2 id="modal-wep-title">Добавить оружие в арсенал</h2>
+          <button class="modal-close" id="modal-wep-close">&times;</button>
+        </div>
+        <form id="arsenal-wep-form">
+          <input type="hidden" id="modal-wep-original-class">
+          <div class="modal-body">
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Название оружия <span class="required">*</span></label>
+                <input type="text" id="modal-wep-name" class="input-field" placeholder="DC-17" required>
+              </div>
+              <div class="form-group">
+                <label>SWEP Класс <span class="required">*</span></label>
+                <input type="text" id="modal-wep-class" class="input-field font-mono" placeholder="arccw_k_dc17" required>
+              </div>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Категория в арсенале</label>
+                <select id="modal-wep-cat" class="select-field"></select>
+              </div>
+              <div class="form-group">
+                <label>Вес (кг)</label>
+                <input type="number" id="modal-wep-weight" class="input-field" step="0.1" min="0" value="1.0">
+              </div>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Требуемое звание (Rank)</label>
+                <select id="modal-wep-rank" class="select-field"></select>
+              </div>
+              <div class="form-group">
+                <label>Требуемая спека (Spec)</label>
+                <input type="text" id="modal-wep-spec" class="input-field font-mono" placeholder="ARC, MED или пусто">
+                <span class="field-hint">Можно указать несколько через запятую (напр. PRG, MRK)</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Описание</label>
+              <input type="text" id="modal-wep-desc" class="input-field" placeholder="Бластер-пистолет">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="modal-wep-cancel">Отмена</button>
+            <button type="submit" class="btn btn-primary">Сохранить оружие</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Bodygroup Modal -->
+    <div id="arsenal-bg-modal" class="modal-backdrop" style="display: none;">
+      <div class="modal-window">
+        <div class="modal-header">
+          <h2 id="modal-bg-title">Добавить бодигруппу / броню</h2>
+          <button class="modal-close" id="modal-bg-close">&times;</button>
+        </div>
+        <form id="arsenal-bg-form">
+          <input type="hidden" id="modal-bg-original-smd">
+          <div class="modal-body">
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>SMD Файл <span class="required">*</span></label>
+                <input type="text" id="modal-bg-smd" class="input-field font-mono" placeholder="RightPauldron.smd" required>
+              </div>
+              <div class="form-group">
+                <label>Понятное название <span class="required">*</span></label>
+                <input type="text" id="modal-bg-name" class="input-field" placeholder="Правый наплечник" required>
+              </div>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Категория</label>
+                <select id="modal-bg-cat" class="select-field"></select>
+              </div>
+              <div class="form-group">
+                <label>Вес брони (кг, 0 = без веса)</label>
+                <input type="number" id="modal-bg-weight" class="input-field" step="0.5" min="0" value="0">
+              </div>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Требуемое звание (reqRank)</label>
+                <select id="modal-bg-rank" class="select-field"></select>
+              </div>
+              <div class="form-group">
+                <label>Требуемая спека (reqSpec)</label>
+                <input type="text" id="modal-bg-spec" class="input-field font-mono" placeholder="ARC, MED или пусто">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Описание / Эффект брони</label>
+              <input type="text" id="modal-bg-desc" class="input-field" placeholder="Наплечник +25 Брони">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="modal-bg-cancel">Отмена</button>
+            <button type="submit" class="btn btn-primary">Сохранить элемент</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Weapon Attachments Modal -->
+    <div id="arsenal-att-modal" class="modal-backdrop" style="display: none;">
+      <div class="modal-window modal-window-lg">
+        <div class="modal-header">
+          <div>
+            <h2 id="modal-att-title">Модификации оружия</h2>
+            <div id="modal-att-subtitle" style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;"></div>
+          </div>
+          <button class="modal-close" id="modal-att-close">&times;</button>
+        </div>
+        <form id="arsenal-att-form">
+          <input type="hidden" id="modal-att-original-wep-class">
+          <div class="modal-body">
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Класс оружия (SWEP) <span class="required">*</span></label>
+                <input type="text" id="modal-att-wep-class" class="input-field font-mono" placeholder="arccw_k_dc15s" required list="modal-att-wep-datalist">
+                <datalist id="modal-att-wep-datalist"></datalist>
+                <span class="field-hint">Выберите из списка арсенала или введите класс вручную</span>
+              </div>
+              <div class="form-group">
+                <label>Быстрые шаблоны слотов (Пресеты)</label>
+                <div class="att-preset-actions">
+                  <button type="button" class="btn btn-secondary btn-xs" id="btn-preset-scopes" title="Добавить слот 1 со стандартными прицелами">+ Прицелы (Слот 1)</button>
+                  <button type="button" class="btn btn-secondary btn-xs" id="btn-preset-cartridges" title="Добавить слот 5 со стандартными картриджами">+ Картриджи (Слот 5)</button>
+                  <button type="button" class="btn btn-secondary btn-xs" id="btn-preset-cartridges-sniper" title="Добавить слот 5 со снайперскими картриджами">+ Снайп. картриджи (Слот 5)</button>
+                  <button type="button" class="btn btn-secondary btn-xs" id="btn-preset-ubgl" title="Добавить слот 4 с подствольником/клинком">+ Подствольник (Слот 4)</button>
+                  <button type="button" class="btn btn-secondary btn-xs" id="btn-preset-launcher" title="Добавить слот 2 с ракетами">+ Ракеты (Слот 2)</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="att-slots-header">
+              <h3>Слоты модификаций оружия</h3>
+              <button type="button" class="btn btn-primary btn-sm" id="btn-add-custom-slot">
+                + Добавить свой слот
+              </button>
+            </div>
+
+            <div id="modal-att-slots-container" class="att-slots-container">
+              <!-- Rendered dynamically by JS -->
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="modal-att-cancel">Отмена</button>
+            <button type="submit" class="btn btn-primary">Сохранить модификации</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Inventory Item Modal -->
+    <div id="inv-item-modal" class="modal-backdrop" style="display: none;">
+      <div class="modal-window">
+        <div class="modal-header">
+          <h2 id="modal-invitem-title">Добавить спец. предмет</h2>
+          <button class="modal-close" id="modal-invitem-close">&times;</button>
+        </div>
+        <form id="inv-item-form">
+          <input type="hidden" id="modal-invitem-original-class">
+          <div class="modal-body">
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Класс энтити / SWEP <span class="required">*</span></label>
+                <input type="text" id="modal-invitem-class" class="input-field font-mono" placeholder="alydus_fusioncutter" required>
+              </div>
+              <div class="form-group">
+                <label>Название предмета <span class="required">*</span></label>
+                <input type="text" id="modal-invitem-name" class="input-field" placeholder="Резак" required>
+              </div>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Тип предмета</label>
+                <select id="modal-invitem-type" class="select-field">
+                  <option value="weapon">Оружие / Инструмент (weapon)</option>
+                  <option value="entity">Энтити / Дрон / Щит (entity)</option>
+                  <option value="consumable">Расходник / Боеприпасы (consumable)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Вес (кг)</label>
+                <input type="number" id="modal-invitem-weight" class="input-field" step="0.1" min="0" value="1.0">
+              </div>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Требуемое звание (Rank)</label>
+                <select id="modal-invitem-rank" class="select-field"></select>
+              </div>
+              <div class="form-group">
+                <label>Требуемая спека (Spec)</label>
+                <input type="text" id="modal-invitem-spec" class="input-field font-mono" placeholder="ENG, MED, FA, GN...">
+              </div>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Путь к иконке (GMod silkicon или материал)</label>
+                <input type="text" id="modal-invitem-icon" class="input-field font-mono" placeholder="icon16/wrench.png" value="icon16/wrench.png">
+              </div>
+              <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 24px;">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="modal-invitem-consumable">
+                  <span class="toggle-slider"></span>
+                </label>
+                <div>
+                  <strong>Тратится при использовании</strong>
+                  <span style="display: block; font-size: 11px; color: var(--text-muted);">(consumable_wep = true, напр. шприцы)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="modal-invitem-cancel">Отмена</button>
+            <button type="submit" class="btn btn-primary">Сохранить предмет</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Inventory Weapon Weight Modal -->
+    <div id="inv-weight-modal" class="modal-backdrop" style="display: none;">
+      <div class="modal-window modal-sm">
+        <div class="modal-header">
+          <h2 id="modal-invweight-title">Вес оружия</h2>
+          <button class="modal-close" id="modal-invweight-close">&times;</button>
+        </div>
+        <form id="inv-weight-form">
+          <input type="hidden" id="modal-invweight-original-class">
+          <div class="modal-body">
+            <div class="form-group">
+              <label>SWEP Класс оружия <span class="required">*</span></label>
+              <input type="text" id="modal-invweight-class" class="input-field font-mono" placeholder="arccw_k_dc15a" required>
+            </div>
+            <div class="form-group">
+              <label>Вес (кг) <span class="required">*</span></label>
+              <input type="number" id="modal-invweight-val" class="input-field" step="0.1" min="0" max="100" value="4.0" required>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="modal-invweight-cancel">Отмена</button>
+            <button type="submit" class="btn btn-primary">Сохранить вес</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="toast-container"></div>
+  </div>
+</div>
 
     </div>
 
@@ -2184,12 +3509,8 @@
                 }
                 if (data.type === 'editor_data') {
                     addToConsole(`[${ts()}] Получена живая конфигурация сервера (${(data.jobs || []).length} профессий)`);
-                    const frame = document.getElementById('configEditorFrame');
-                    if (frame && frame.contentWindow) {
-                        frame.contentWindow.postMessage({
-                            type: 'SERVER_CONFIG_DATA',
-                            data: data
-                        }, '*');
+                    if (window.applyLiveServerConfig) {
+                        window.applyLiveServerConfig(data);
                     }
                 }
                 if (data.type === 'ranks_data') {
@@ -3411,5 +4732,6 @@
             }
         })();
     </script>
+    <script src="editor_bundle.js" defer></script>
 </body>
 </html>
