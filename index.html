@@ -2182,6 +2182,16 @@
                     addToConsole(`[${ts()}] Конфигурация профессий обновлена (${data.context || 'realtime'}), синхронизируем данные...`);
                     this.sendCommand('get_jobs', '');
                 }
+                if (data.type === 'editor_data') {
+                    addToConsole(`[${ts()}] Получена живая конфигурация сервера (${(data.jobs || []).length} профессий)`);
+                    const frame = document.getElementById('configEditorFrame');
+                    if (frame && frame.contentWindow) {
+                        frame.contentWindow.postMessage({
+                            type: 'SERVER_CONFIG_DATA',
+                            data: data
+                        }, '*');
+                    }
+                }
                 if (data.type === 'ranks_data') {
                     ranksList = (data.ranks || []).sort((a,b) => (a.immun||0) - (b.immun||0));
                     const sel = document.getElementById('rankSelect');
@@ -3226,6 +3236,11 @@
                 setupDonateForm();
                 if (jobsList.length === 0) api.sendCommand('get_jobs', '');
             }
+            if (tab === 'config-editor') {
+                if (api && api.socket && api.socket.readyState === WebSocket.OPEN) {
+                    api.sendCommand('get_editor_data', '');
+                }
+            }
         }
 
         // ----- ЛОГИ ИГРОВОГО СЕРВЕРА (ТОЛЬКО ПО ЗАПРОСУ) -----
@@ -3352,6 +3367,22 @@
             document.getElementById('logsList').innerHTML = '';
             panelLogs.length = 0;
         }
+
+        // ----- МОСТ СВЯЗИ С РЕДАКТОРОМ КОНФИГУРАЦИЙ (EDITOR.HTML) -----
+        window.addEventListener('message', (event) => {
+            if (!event.data) return;
+            if (event.data.type === 'REQUEST_SERVER_CONFIG') {
+                if (api && api.socket && api.socket.readyState === WebSocket.OPEN) {
+                    api.sendCommand('get_editor_data', '');
+                }
+            } else if (event.data.type === 'SAVE_SERVER_CONFIG') {
+                if (api && api.socket && api.socket.readyState === WebSocket.OPEN) {
+                    api.sendCommand('editor_save_config', '', { lua: event.data.lua });
+                } else {
+                    alert('Нет связи с игровым сервером через WebSocket. Запустите сервер или используйте скачивание файла.');
+                }
+            }
+        });
 
         // ----- АВТО-ВХОД ПО DISCORD TOKEN ИЗ URL -----
         (function() {
