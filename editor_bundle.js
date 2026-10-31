@@ -624,6 +624,18 @@ function generateConfigLua({ categories, jobs, formations }) {
   lines.push('end');
   lines.push('\nif nn.util and nn.util.sync_categories then');
   lines.push('\tnn.util.sync_categories()');
+  lines.push('end');
+  lines.push('if SERVER then');
+  lines.push('\tfor _, ply in ipairs(player.GetAll()) do');
+  lines.push('\t\tif IsValid(ply) then');
+  lines.push('\t\t\tlocal curTeam = ply:Team()');
+  lines.push('\t\t\tlocal tName = team.GetName(curTeam)');
+  lines.push('\t\t\tif tName and tName ~= "" and nn and nn.jobs_by_name and nn.jobs_by_name[tName] then');
+  lines.push('\t\t\t\tlocal realIdx = nn.jobs_by_name[tName].index');
+  lines.push('\t\t\t\tif realIdx and realIdx ~= curTeam then ply:SetTeam(realIdx) end');
+  lines.push('\t\t\tend');
+  lines.push('\t\tend');
+  lines.push('\tend');
   lines.push('end\n');
 
   return lines.join('\n');
