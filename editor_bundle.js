@@ -16,6 +16,17 @@ const BUNDLED_INVENTORY_DATA = {"items":[{"class":"weapon_scpsl_medkit","name":"
 function applyLiveServerConfig(payload) {
   if (!payload) return;
   if (Array.isArray(payload.jobs) && payload.jobs.length > 0) {
+    payload.jobs.forEach((job, idx) => {
+      if (!job.teamVar || !String(job.teamVar).trim()) {
+        if (job.jobID && String(job.jobID).trim()) {
+          job.teamVar = 'TEAM_' + String(job.jobID).trim().toUpperCase().replace(/[^A-Z0-9_]/g, '_');
+        } else if (job.name && String(job.name).trim()) {
+          job.teamVar = 'TEAM_' + (typeof transliterate === 'function' ? transliterate(job.name) : 'JOB' + (idx + 1));
+        } else {
+          job.teamVar = 'TEAM_JOB' + (idx + 1);
+        }
+      }
+    });
     state.jobs = payload.jobs;
   }
   if (Array.isArray(payload.categories) && payload.categories.length > 0) {
