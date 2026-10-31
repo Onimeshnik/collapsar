@@ -1038,29 +1038,7 @@ async function loadData() {
 // Приём живых данных от родительской веб-панели через WebSocket
 window.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SERVER_CONFIG_DATA') {
-    const payload = event.data.data;
-    if (payload && Array.isArray(payload.jobs) && payload.jobs.length > 0) {
-      state.jobs = payload.jobs;
-      if (Array.isArray(payload.categories) && payload.categories.length > 0) {
-        state.categories = payload.categories;
-      }
-      if (Array.isArray(payload.formations)) {
-        state.formations = payload.formations;
-      }
-      if (Array.isArray(payload.weapons) && payload.weapons.length > 0) {
-        window.AUTOCOMPLETE_SUGGESTIONS = window.AUTOCOMPLETE_SUGGESTIONS || {};
-        window.AUTOCOMPLETE_SUGGESTIONS.weapons = payload.weapons;
-      }
-      updateServerIndicator(true);
-      gatherSuggestions();
-      updateStats();
-      populateFilters();
-      populateDatalists();
-      runDiagnostics();
-      renderJobs();
-      clearUnsaved();
-      showToast('Живая синхронизация: подгружено ' + state.jobs.length + ' профессий прямо с сервера Garry\'s Mod!', 'success', 5000);
-    }
+    applyLiveServerConfig(event.data.data);
   }
 });
 
