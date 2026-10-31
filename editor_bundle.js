@@ -1039,6 +1039,9 @@ async function loadData() {
 window.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SERVER_CONFIG_DATA') {
     applyLiveServerConfig(event.data.data);
+    return;
+  }
+    applyLiveServerConfig(event.data.data);
   }
 });
 
@@ -2586,9 +2589,42 @@ function initEditorBundle() {
     document.getElementById('backups-modal').style.display = 'flex';
   });
 
-  // Download / Save
+  // Download / Save - с контекстной поддержкой Профессий, Арсенала и Спецоборудования
   document.getElementById('btn-download-config').addEventListener('click', async () => {
     window._lastEditorSaveTime = Date.now();
+    const liveApi = (typeof api !== 'undefined' && api) || window.api;
+    const isSocketReady = liveApi && liveApi.socket && liveApi.socket.readyState === 1;
+    const currentView = (typeof arsenalState !== 'undefined' && arsenalState.activeMainView) || 'jobs';
+
+    if (currentView === 'arsenal') {
+      const lua = (typeof generateArsenalSharedLua === 'function') ? generateArsenalSharedLua() : '';
+      if (typeof saveArsenalState === 'function') saveArsenalState();
+      if (isSocketReady) {
+        liveApi.sendCommand('editor_save_arsenal', '', { lua: lua });
+        showToast('sh_arsenal_config.lua отправлен и применён на сервере в реальном времени!', 'success', 5000);
+        return;
+      }
+      if (typeof downloadLuaBlob === 'function') downloadLuaBlob('sh_arsenal_config.lua', lua);
+      else triggerDownload('sh_arsenal_config.lua', lua);
+      showToast('Сервер не подключен. sh_arsenal_config.lua скачан!', 'info', 5000);
+      return;
+    }
+
+    if (currentView === 'inventory') {
+      const lua = (typeof generateInventoryLua === 'function') ? generateInventoryLua() : '';
+      if (typeof saveInventoryState === 'function') saveInventoryState();
+      if (isSocketReady) {
+        liveApi.sendCommand('editor_save_inventory', '', { lua: lua });
+        showToast('aa_sh_inventory_config.lua отправлен и применён на сервере в реальном времени!', 'success', 5000);
+        return;
+      }
+      if (typeof downloadLuaBlob === 'function') downloadLuaBlob('aa_sh_inventory_config.lua', lua);
+      else triggerDownload('aa_sh_inventory_config.lua', lua);
+      showToast('Сервер не подключен. aa_sh_inventory_config.lua скачан!', 'info', 5000);
+      return;
+    }
+
+    // Default: Профессии (jobs)
     runDiagnostics();
     if (state.diagnostics.summary.errors > 0) {
       if (!confirm('Внимание: обнаружено ' + state.diagnostics.summary.errors + ' критических ошибок! Вы хотите сохранить файл?')) {
@@ -2599,27 +2635,38 @@ function initEditorBundle() {
     const generatedLua = generateConfigLua({ categories: state.categories, jobs: state.jobs, formations: state.formations });
     createLocalBackupSnapshot('Автоматический бэкап при экспорте');
 
-    const liveApi = (typeof api !== 'undefined' && api) || window.api;
-    if (liveApi && liveApi.socket && liveApi.socket.readyState === 1) {
+    if (isSocketReady) {
       liveApi.sendCommand('editor_save_config', '', { lua: generatedLua });
       clearUnsaved();
-      showToast('Конфигурация отправлена на сервер! Сервер обновил профессии в реальном времени.', 'success', 5000);
+      showToast('Конфигурация профессий отправлена на сервер и обновлена в реальном времени!', 'success', 5000);
       return;
     }
 
-    // Fallback if disconnected
     triggerDownload('sh_jobs_config.lua', generatedLua);
     clearUnsaved();
     showToast('Сервер не подключен. Файл sh_jobs_config.lua скачан на компьютер.', 'info', 5000);
   });
 
-  // Отдельная кнопка скачивания копии .lua файла
+  // Контекстное скачивание .lua копии файла в зависимости от активного раздела
   const dlLuaBtn = document.getElementById('btn-download-lua-file');
   if (dlLuaBtn) {
     dlLuaBtn.addEventListener('click', () => {
-      const generatedLua = generateConfigLua({ categories: state.categories, jobs: state.jobs, formations: state.formations });
-      triggerDownload('sh_jobs_config.lua', generatedLua);
-      showToast('Копия файла sh_jobs_config.lua скачана!', 'info', 4000);
+      const currentView = (typeof arsenalState !== 'undefined' && arsenalState.activeMainView) || 'jobs';
+      if (currentView === 'arsenal') {
+        const lua = (typeof generateArsenalSharedLua === 'function') ? generateArsenalSharedLua() : '';
+        if (typeof downloadLuaBlob === 'function') downloadLuaBlob('sh_arsenal_config.lua', lua);
+        else triggerDownload('sh_arsenal_config.lua', lua);
+        showToast('Файл sh_arsenal_config.lua скачан!', 'info', 4000);
+      } else if (currentView === 'inventory') {
+        const lua = (typeof generateInventoryLua === 'function') ? generateInventoryLua() : '';
+        if (typeof downloadLuaBlob === 'function') downloadLuaBlob('aa_sh_inventory_config.lua', lua);
+        else triggerDownload('aa_sh_inventory_config.lua', lua);
+        showToast('Файл aa_sh_inventory_config.lua скачан!', 'info', 4000);
+      } else {
+        const generatedLua = generateConfigLua({ categories: state.categories, jobs: state.jobs, formations: state.formations });
+        triggerDownload('sh_jobs_config.lua', generatedLua);
+        showToast('Копия файла sh_jobs_config.lua скачана!', 'info', 4000);
+      }
     });
   }
 
@@ -3030,6 +3077,27 @@ function switchMainModule(moduleName) {
     renderArsenalSubtab(arsenalState.activeSubtab);
   } else if (moduleName === 'inventory') {
     renderInventorySubtab(inventoryState.activeSubtab);
+  }
+
+  const saveBtn = document.getElementById('btn-download-config');
+  const dlBtn = document.getElementById('btn-download-lua-file');
+  if (saveBtn) {
+    if (moduleName === 'arsenal') {
+      saveBtn.title = 'Сохранить sh_arsenal_config.lua на игровом сервере';
+    } else if (moduleName === 'inventory') {
+      saveBtn.title = 'Сохранить aa_sh_inventory_config.lua на игровом сервере';
+    } else {
+      saveBtn.title = 'Сохранить sh_jobs_config.lua на игровом сервере';
+    }
+  }
+  if (dlBtn) {
+    if (moduleName === 'arsenal') {
+      dlBtn.title = 'Скачать sh_arsenal_config.lua';
+    } else if (moduleName === 'inventory') {
+      dlBtn.title = 'Скачать aa_sh_inventory_config.lua';
+    } else {
+      dlBtn.title = 'Скачать sh_jobs_config.lua';
+    }
   }
 }
 
