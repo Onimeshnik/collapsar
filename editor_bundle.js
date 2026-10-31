@@ -1039,9 +1039,6 @@ async function loadData() {
 window.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SERVER_CONFIG_DATA') {
     applyLiveServerConfig(event.data.data);
-    return;
-  }
-    applyLiveServerConfig(event.data.data);
   }
 });
 

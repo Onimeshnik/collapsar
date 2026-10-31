@@ -4711,7 +4711,8 @@
                 }
             } else if (event.data.type === 'SAVE_SERVER_CONFIG') {
                 if (api && api.socket && api.socket.readyState === WebSocket.OPEN) {
-                    api.sendCommand('editor_save_config', '', { lua: event.data.lua });
+                    const targetCmd = event.data.targetCmd || event.data.cmd || 'editor_save_config';
+                    api.sendCommand(targetCmd, '', { lua: event.data.lua });
                 } else {
                     alert('Нет связи с игровым сервером через WebSocket. Запустите сервер или используйте скачивание файла.');
                 }
