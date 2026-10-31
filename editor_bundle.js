@@ -29,6 +29,17 @@ function applyLiveServerConfig(payload) {
       AUTOCOMPLETE_SUGGESTIONS.weapons = payload.weapons;
     }
   }
+
+  // Update live indicator badge in topbar
+  const syncStatus = document.getElementById('editor-sync-status');
+  const syncDot = document.querySelector('#editor-sync-badge .sync-dot');
+  if (syncStatus) {
+    const timeStr = new Date().toLocaleTimeString();
+    syncStatus.textContent = 'GMod Сервер: живые данные (' + timeStr + ')';
+    syncStatus.title = 'Загружено: ' + state.jobs.length + ' проф, ' + state.categories.length + ' категорий, ' + (payload.weapons || []).length + ' оружий';
+  }
+  if (syncDot) syncDot.className = 'sync-dot live';
+
   updateServerIndicator(true);
   gatherSuggestions();
   updateStats();
@@ -37,8 +48,9 @@ function applyLiveServerConfig(payload) {
   runDiagnostics();
   renderJobs();
   clearUnsaved();
-  showToast('Синхронизировано: получено ' + state.jobs.length + ' профессий прямо с сервера Garry\'s Mod!', 'success', 5000);
-};
+  showToast('Синхронизировано: ' + state.jobs.length + ' профессий, ' + state.categories.length + ' категорий прямо из сервера Garry\'s Mod!', 'success', 5000);
+  return;
+}
 
 function triggerLiveWebSocketSync() {
   if (typeof api !== 'undefined' && api && api.socket && api.socket.readyState === 1) {
@@ -2524,6 +2536,22 @@ function loadLuaString(rawContent, filename = 'файл') {
 function initEditorBundle() {
   loadData();
 
+  const manualSyncBtn = document.getElementById('btn-manual-sync-editor');
+  if (manualSyncBtn) {
+    manualSyncBtn.addEventListener('click', () => {
+      const syncStatus = document.getElementById('editor-sync-status');
+      if (syncStatus) syncStatus.textContent = 'Запрос данных с сервера...';
+      const liveApi = (typeof api !== 'undefined' && api) || window.api;
+      if (liveApi && liveApi.socket && liveApi.socket.readyState === 1) {
+        liveApi.sendCommand('get_editor_data', '');
+        showToast('Запрос актуальной конфигурации отправлен на сервер...', 'info', 3000);
+      } else {
+        showToast('Нет подключения к игровому серверу через WebSocket', 'warning', 4000);
+      }
+    });
+  }
+
+
   // Navigation
   document.getElementById('btn-create-job').addEventListener('click', () => openJobModal(-1));
   document.getElementById('btn-open-cats').addEventListener('click', openCatsModal);
@@ -2545,47 +2573,18 @@ function initEditorBundle() {
     const generatedLua = generateConfigLua({ categories: state.categories, jobs: state.jobs, formations: state.formations });
     createLocalBackupSnapshot('Автоматический бэкап при экспорте');
 
-    // Если подключен сервер Node.js (запуск через bat / http) — сохраняем прямо на диск
-    if (window.location.protocol.startsWith('http')) {
-      try {
-        const res = await fetch('/api/save', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ categories: state.categories, jobs: state.jobs, formations: state.formations })
-        });
-        const result = await res.json();
-        if (result && result.success) {
-          clearUnsaved();
-          showToast('Успешно сохранено напрямую в sh_jobs_config.lua на сервере! (Бэкап: ' + (result.backupFile || 'создан') + ')', 'success', 6000);
-          return;
-        } else if (result && result.error) {
-          showToast('Ошибка сервера: ' + result.error, 'error', 6000);
-          return;
-        }
-      } catch(err) {
-        console.warn('Сервер не ответил на сохранение, скачиваем файл через браузер:', err);
-      }
+    const liveApi = (typeof api !== 'undefined' && api) || window.api;
+    if (liveApi && liveApi.socket && liveApi.socket.readyState === 1) {
+      liveApi.sendCommand('editor_save_config', '', { lua: generatedLua });
+      clearUnsaved();
+      showToast('Конфигурация отправлена на сервер! Сервер обновил профессии в реальном времени.', 'success', 5000);
+      return;
     }
 
-    // Если находимся во фрейме веб-панели — отправляем на живой сервер через WebSocket
-    if (window.parent && window.parent !== window) {
-      try {
-        window.parent.postMessage({
-          type: 'SAVE_SERVER_CONFIG',
-          lua: generatedLua
-        }, '*');
-        showToast('Отправка на игровой сервер через WebSocket в реальном времени...', 'info', 5000);
-      } catch(e) {}
-    }
-
-    // Автономный режим или fallback
-    if (typeof api !== 'undefined' && api && api.socket && api.socket.readyState === 1) {
-    api.sendCommand('editor_save_config', '', { lua: generatedLua });
-    showToast('Конфигурация отправлена на игровой сервер через WebSocket в реальном времени!', 'info', 5000);
-  }
-  triggerDownload('sh_jobs_config.lua', generatedLua);
+    // Fallback if disconnected
+    triggerDownload('sh_jobs_config.lua', generatedLua);
     clearUnsaved();
-    showToast('Файл sh_jobs_config.lua успешно сохранён и скачан!', 'success', 5000);
+    showToast('Сервер не подключен. Файл sh_jobs_config.lua скачан на компьютер.', 'info', 5000);
   });
 
   // Отдельная кнопка скачивания копии .lua файла

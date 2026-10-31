@@ -1635,6 +1635,11 @@
         </button>
       </div>
 
+      <div class="server-sync-badge" id="editor-sync-badge" title="Статус связи с сервером Garry's Mod">
+        <span class="sync-dot live"></span>
+        <span id="editor-sync-status">Сервер: ожидание данных...</span>
+        <button type="button" class="btn-sync-icon" id="btn-manual-sync-editor" title="Запросить свежую конфигурацию с сервера"><i class="fas fa-sync-alt"></i></button>
+      </div>
       <div class="nav-stats" id="jobs-nav-stats">
         <div class="stat-pill" title="Всего профессий в конфиге">
           <span class="stat-num" id="stat-total-jobs">0</span>
@@ -3662,6 +3667,7 @@
         }
 
         const api = new GModServerAPI();
+        window.api = api;
 
         // ----- МОДАЛКИ -----
         function openKickModal(name, steamId) {
