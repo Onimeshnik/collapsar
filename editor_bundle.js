@@ -483,6 +483,14 @@ function generateConfigLua({ categories, jobs, formations }) {
   lines.push('if nn.util and nn.util.sync_categories then');
   lines.push('\tnn.util.sync_categories()');
   lines.push('end\n');
+  lines.push('if nn.util and nn.util.reset_jobs then');
+  lines.push('\tnn.util.reset_jobs()');
+  lines.push('else');
+  lines.push('\tnn.jobs = {}');
+  lines.push('\tnn.jobs_by_id = {}');
+  lines.push('\tnn.jobs_by_name = {}');
+  lines.push('\tnn.job_index = 1');
+  lines.push('end\n');
 
   for (const job of jobs) {
     const teamVar = job.teamVar || ('TEAM_' + (job.jobID || 'CUSTOM').toUpperCase().replace(/[^A-Z0-9_]/g, '_'));
