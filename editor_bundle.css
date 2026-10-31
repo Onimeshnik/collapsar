@@ -448,6 +448,11 @@ select:focus, input:focus {
   padding: 3px 8px;
   border-radius: var(--radius-sm);
   border: 1px solid rgba(0, 240, 255, 0.2);
+  max-width: 190px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
 }
 
 .job-name {
@@ -634,6 +639,7 @@ select:focus, input:focus {
   flex-direction: column;
   box-shadow: var(--shadow-md);
   animation: modal-pop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
 }
 
 .modal-window.modal-lg {
@@ -719,7 +725,12 @@ select:focus, input:focus {
   border-bottom-color: var(--accent-cyan);
 }
 
-.modal-
+.modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+  max-height: calc(90vh - 130px);
+}
 
 .modal-footer {
   padding: 16px 24px;
@@ -1915,7 +1926,12 @@ select:focus, input:focus {
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
-.wep-card-
+.wep-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
 
 .wep-card-title {
   font-size: 16px;

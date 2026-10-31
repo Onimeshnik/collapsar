@@ -1087,6 +1087,8 @@ function updateStats() {
   const totalWepsEl = document.getElementById('stat-total-weps');
   if (totalJobsEl) totalJobsEl.textContent = state.jobs.length;
   if (totalCatsEl) totalCatsEl.textContent = state.categories.length;
+  const modJobsCount = document.getElementById("mod-jobs-count");
+  if (modJobsCount) modJobsCount.textContent = state.jobs.length;
 
   const weps = new Set();
   state.jobs.forEach(j => (j.weapons || []).forEach(w => weps.add(w)));
@@ -3874,22 +3876,11 @@ function setupArsenalEventListeners() {
   if (saveShServerBtn) {
     saveShServerBtn.addEventListener('click', async () => {
       const lua = generateArsenalSharedLua();
-      if (window.location.protocol.startsWith('http')) {
-        try {
-          const res = await fetch('/api/save-arsenal', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ luaContent: lua })
-          });
-          const ret = await res.json();
-          if (ret && ret.success) {
-            showToast('sh_arsenal_config.lua успешно сохранён напрямую на сервере!', 'success', 5000);
-            return;
-          } else if (ret && ret.error) {
-            showToast('Ошибка сервера: ' + ret.error, 'error');
-            return;
-          }
-        } catch(e) { console.warn(e); }
+      const liveApi = (typeof api !== 'undefined' && api) || window.api;
+      if (liveApi && liveApi.socket && liveApi.socket.readyState === 1) {
+        liveApi.sendCommand('editor_save_arsenal', '', { lua: lua });
+        showToast('sh_arsenal_config.lua отправлен и сохранён на сервере!', 'success');
+        return;
       }
       downloadLuaBlob('sh_arsenal_config.lua', lua);
       showToast('sh_arsenal_config.lua скачан!', 'success');
@@ -4587,24 +4578,11 @@ function setupInventoryEventListeners() {
   if (saveInvServerBtn) {
     saveInvServerBtn.addEventListener('click', async () => {
       const lua = generateInventoryLua();
-      if (window.location.protocol.startsWith('http')) {
-        try {
-          const res = await fetch('/api/save-inventory', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ luaContent: lua })
-          });
-          const ret = await res.json();
-          if (ret && ret.success) {
-            showToast('aa_sh_inventory_config.lua успешно сохранён напрямую на сервере!', 'success', 5000);
-            return;
-          } else if (ret && ret.error) {
-            showToast('Ошибка сервера: ' + ret.error, 'error');
-            return;
-          }
-        } catch (e) {
-          console.warn(e);
-        }
+      const liveApi = (typeof api !== 'undefined' && api) || window.api;
+      if (liveApi && liveApi.socket && liveApi.socket.readyState === 1) {
+        liveApi.sendCommand('editor_save_inventory', '', { lua: lua });
+        showToast('aa_sh_inventory_config.lua отправлен и сохранён на сервере!', 'success');
+        return;
       }
       downloadLuaBlob('aa_sh_inventory_config.lua', lua);
       showToast('aa_sh_inventory_config.lua скачан!', 'success');
@@ -4614,7 +4592,37 @@ function setupInventoryEventListeners() {
 
 
 
-  // Expose global bridge functions
+  // Expose global bridge functions for UI handlers & inline onclicks
+  window.editJob = editJob;
+  window.duplicateJob = duplicateJob;
+  window.deleteJob = deleteJob;
+  window.openDiagnosticsModal = openDiagnosticsModal;
+  window.fixInEditor = fixInEditor;
+  window.autoFixSingleIssue = autoFixSingleIssue;
+  window.updateBodygroup = updateBodygroup;
+  window.removeBodygroup = removeBodygroup;
+  window.removeWeapon = removeWeapon;
+
+  // Arsenal controller actions
+  window.switchMainModule = switchMainModule;
+  window.switchArsenalSubtab = switchArsenalSubtab;
+  window.openAddWeaponModal = openAddWeaponModal;
+  window.openEditWeaponModal = openEditWeaponModal;
+  window.duplicateWeapon = duplicateWeapon;
+  window.deleteWeapon = deleteWeapon;
+  window.openAddBgModal = openAddBgModal;
+  window.openEditBgModal = openEditBgModal;
+  window.deleteBodygroup = deleteBodygroup;
+
+  // Inventory / Special equipment controller actions
+  window.switchInventorySubtab = switchInventorySubtab;
+  window.openAddInvItemModal = openAddInvItemModal;
+  window.openEditInvItemModal = openEditInvItemModal;
+  window.deleteInvItem = deleteInvItem;
+  window.openAddInvWeightModal = openAddInvWeightModal;
+  window.openEditInvWeightModal = openEditInvWeightModal;
+  window.deleteInvWeight = deleteInvWeight;
+
   window.applyLiveServerConfig = applyLiveServerConfig;
   window.initEditorBundle = initEditorBundle;
   window.refreshConfigEditorView = function() {
