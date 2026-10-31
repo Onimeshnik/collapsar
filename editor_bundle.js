@@ -15,6 +15,16 @@ const BUNDLED_INVENTORY_DATA = {"items":[{"class":"weapon_scpsl_medkit","name":"
 // ===== ПРЯМАЯ ИНТЕГРАЦИЯ С ГЛАВНОЙ ВЕБ-ПАНЕЛЬЮ ЧЕРЕЗ WEBSOCKET =====
 function applyLiveServerConfig(payload) {
   if (!payload) return;
+
+  // Protect client edits: don't overwrite if user recently saved or has active unsaved edits
+  if (Date.now() - (window._lastEditorSaveTime || 0) < 15000) {
+    const syncStatus = document.getElementById('editor-sync-status');
+    const syncDot = document.querySelector('#editor-sync-badge .sync-dot');
+    if (syncStatus) syncStatus.textContent = 'GMod Сервер: живые данные (' + new Date().toLocaleTimeString() + ')';
+    if (syncDot) syncDot.className = 'sync-dot live';
+    updateServerIndicator(true);
+    return;
+  }
   if (Array.isArray(payload.jobs) && payload.jobs.length > 0) {
     payload.jobs.forEach((job, idx) => {
       if (!job.teamVar || !String(job.teamVar).trim()) {
@@ -499,6 +509,10 @@ function generateConfigLua({ categories, jobs, formations }) {
     }
 
     lines.push('\tskin = ' + (job.skin !== undefined ? job.skin : 0) + ',');
+    lines.push('\thealth = ' + (job.health !== undefined ? job.health : 100) + ',');
+    lines.push('\tmaxHealth = ' + (job.maxHealth !== undefined ? job.maxHealth : 100) + ',');
+    lines.push('\tarmor = ' + (job.armor !== undefined ? job.armor : 100) + ',');
+    lines.push('\tmaxArmor = ' + (job.maxArmor !== undefined ? job.maxArmor : 100) + ',');
 
     if (job.has_backpack) {
       lines.push('\thas_backpack = true,');
@@ -2574,6 +2588,7 @@ function initEditorBundle() {
 
   // Download / Save
   document.getElementById('btn-download-config').addEventListener('click', async () => {
+    window._lastEditorSaveTime = Date.now();
     runDiagnostics();
     if (state.diagnostics.summary.errors > 0) {
       if (!confirm('Внимание: обнаружено ' + state.diagnostics.summary.errors + ' критических ошибок! Вы хотите сохранить файл?')) {
