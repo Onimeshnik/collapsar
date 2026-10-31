@@ -1251,9 +1251,9 @@ function renderGrid(filtered) {
       </div>
 
       <div class="job-card-actions">
-        <button class="btn-card" onclick="duplicateJob(${job._originalIndex})" title="Клонировать">📑 Копия</button>
-        <button class="btn-card" onclick="editJob(${job._originalIndex})" title="Редактировать">✏️ Редактировать</button>
-        <button class="btn-card danger" onclick="deleteJob(${job._originalIndex})" title="Удалить">🗑️</button>
+        <button class="btn-card" onclick="duplicateJob(${job._originalIndex})" title="Копировать"><i class="fas fa-copy"></i> Копия</button>
+        <button class="btn-card btn-card-edit" onclick="editJob(${job._originalIndex})" title="Редактировать"><i class="fas fa-pencil-alt"></i> Редактировать</button>
+        <button class="btn-card danger" onclick="deleteJob(${job._originalIndex})" title="Удалить"><i class="fas fa-trash-alt"></i></button>
       </div>
     `;
 
@@ -1310,9 +1310,9 @@ function renderTable(filtered) {
       </td>
       <td class="th-actions">
         <div class="table-actions">
-          <button class="btn-card" onclick="duplicateJob(${job._originalIndex})" title="Клонировать">📑</button>
-          <button class="btn-card" onclick="editJob(${job._originalIndex})" title="Редактировать">✏️</button>
-          <button class="btn-card danger" onclick="deleteJob(${job._originalIndex})" title="Удалить">🗑️</button>
+          <button class="btn-card" onclick="duplicateJob(${job._originalIndex})" title="Копировать"><i class="fas fa-copy"></i></button>
+          <button class="btn-card btn-card-edit" onclick="editJob(${job._originalIndex})" title="Редактировать"><i class="fas fa-pencil-alt"></i></button>
+          <button class="btn-card danger" onclick="deleteJob(${job._originalIndex})" title="Удалить"><i class="fas fa-trash-alt"></i></button>
         </div>
       </td>
     `;
