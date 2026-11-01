@@ -3120,6 +3120,7 @@ function switchArsenalSubtab(subtabName) {
 function renderArsenalSubtab(subtabName) {
   if (subtabName === 'weps') renderArsenalWeapons();
   else if (subtabName === 'bgs') renderArsenalBodygroups();
+  else if (subtabName === 'atts') renderArsenalAttachments();
   else if (subtabName === 'export') generateArsenalExportCode();
 }
 
@@ -3605,20 +3606,8 @@ function generateArsenalSharedLua() {
   lua += '-- ============================================================================\n';
   lua += '-- 3. НАСТРОЙКИ МОДИФИКАЦИЙ ДЛЯ ОРУЖИЯ (ArcCW)\n';
   lua += '-- ============================================================================\n';
-  lua += "NN_Arsenal.AttachmentsConfig = {\n    [\"arccw_k_dc15s_grenadier\"] = {\n        [4] = {\n            name = \"Подствольный модуль\",\n            options = {\n                { name = \"Отсутствует\", class = \"\" },\n                { name = \"Гранатомёт\", class = \"acwatt_ubgl_dc15\" },\n                { name = \"Виброклинок\", class = \"acwatt_universal_vibroknife\" }\n            }\n        },\n        [5] = {\n            name = \"Модификация картриджа\",\n            options = {\n                { name = \"Классика\", class = \"\" },\n                { name = \"Long Engagements\", class = \"acwatt_mode_le\" },\n                { name = \"Heat-Based\", class = \"acwatt_mode_heatbased\" },\n                { name = \"Anti-Tank\", class = \"acwatt_mode_at\" }\n            }\n        }\n    },\n\n    [\"arccw_k_dc15a_grenadier\"] = {\n        [1] = { \n            name = \"Прицелы\",\n            options = {\n                { name = \"Снять\", class = \"\" },\n                { name = \"Прицел x8\", class = \"acwatt_arccw_k_dlt15x_scope\" },\n                { name = \"Прицел x4\", class = \"acwatt_arccw_k_dlt15a_scope\" }\n            }\n        },\n        [5] = {\n            name = \"Подствольный модуль\",\n            options = {\n                { name = \"Отсутствует\", class = \"\" },\n                { name = \"Виброклинок\", class = \"acwatt_universal_vibroknife\" }\n            }\n        },\n        [6] = {\n            name = \"Модификация картриджа\",\n            options = {\n                { name = \"Классика\", class = \"\" },\n                { name = \"Long Engagements\", class = \"acwatt_mode_le\" },\n                { name = \"Heat-Based\", class = \"acwatt_mode_heatbased\" },\n                { name = \"Anti-Tank\", class = \"acwatt_mode_at\" }\n            }\n        }\n    },\n\n    [\"arccw_k_dc15s\"] = {\n        [5] = {\n            name = \"Модификация картриджа\",\n            options = {\n                { name = \"Классика\", class = \"\" },\n                { name = \"Long Engagements\", class = \"acwatt_mode_le\" },\n                { name = \"Heat-Based\", class = \"acwatt_mode_heatbased\" },\n                { name = \"Anti-Tank\", class = \"acwatt_mode_at\" }\n            }\n        }\n    },\n\n    [\"arccw_k_dc15x\"] = {\n        [1] = { \n            name = \"Прицелы\",\n            options = {\n                { name = \"Снять\", class = \"\" },\n                { name = \"Прицел x8\", class = \"acwatt_arccw_k_dlt15x_scope\" },\n                { name = \"Прицел x4\", class = \"acwatt_arccw_k_dlt15a_scope\" }\n            }\n        },\n        [5] = {\n            name = \"Модификация картриджа\",\n            options = {\n                { name = \"Классика\", class = \"\" },\n                { name = \"Super-Sonic\", class = \"acwatt_mode_supersonic\" },\n                { name = \"Overcharged\", class = \"acwatt_mode_overcharged\" },\n                { name = \"Heat-Based\", class = \"acwatt_mode_heatbased\" }\n            }\n        }\n    },\n\n    [\"arccw_k_dc15xr\"] = {\n        [1] = { \n            name = \"Прицелы\",\n            options = {\n                { name = \"Снять\", class = \"\" },\n                { name = \"Прицел x8\", class = \"acwatt_arccw_k_dlt15x_scope\" },\n                { name = \"Прицел x4\", class = \"acwatt_arccw_k_dlt15a_scope\" }\n            }\n        }\n    },\n\n    [\"arccw_k_valken38\"] = {\n        [1] = { \n            name = \"Прицелы\",\n            options = {\n                { name = \"Снять\", class = \"\" },\n                { name = \"Прицел №1 x8/IR\", class = \"acwatt_arccw_k_valken38_scope_ir\" },\n                { name = \"Прицел №1 x8\", class = \"acwatt_arccw_k_valken38_scope\" },\n                { name = \"Прицел №2 x8/IR\", class = \"acwatt_arccw_k_dc15x_scope_ir\" },\n                { name = \"Прицел №2 x8\", class = \"acwatt_arccw_k_dlt15x_scope\" },\n            }\n        },\n        [5] = {\n            name = \"Подствольный модуль\",\n            options = {\n                { name = \"Отсутствует\", class = \"\" },\n                { name = \"Ремень\", class = \"acwatt_valken38_sling\" },\n                { name = \"Виброклинок\", class = \"acwatt_universal_vibroknife\" }\n            }\n        },\n        [4] = {\n            name = \"Модификация картриджа\",\n            options = {\n                { name = \"Классика\", class = \"\" },\n                { name = \"Super-Sonic\", class = \"acwatt_mode_supersonic\" },\n                { name = \"Overcharged\", class = \"acwatt_mode_overcharged\" },\n                { name = \"Heat-Based\", class = \"acwatt_mode_heatbased\" }\n            }\n        }\n    },\n\n    [\"arccw_k_dc17m_sniper_republic\"] = {\n        [1] = { \n            name = \"Прицелы\",\n            options = {\n                { name = \"Снять\", class = \"\" },\n                { name = \"Прицел x8\", class = \"acwatt_arccw_k_dlt15x_scope\" }\n            }\n        }\n    },\n\n    [\"arccw_sops_republic_t702\"] = {\n        [1] = { \n            name = \"Прицелы\",\n            options = {\n                { name = \"Снять\", class = \"\" },\n                { name = \"Прицел x5\", class = \"acwatt_arccw_k_westar35_scope_ir\" }\n            }\n        }\n    },\n\n    [\"arccw_k_westarm5\"] = {\n        [1] = { \n            name = \"Прицелы\",\n            options = {\n                { name = \"Снять\", class = \"\" },\n                { name = \"Прицел X6\", class = \"acwatt_arccw_k_westarm5_scope_x6ir\" },\n                { name = \"Прицел X2\", class = \"acwatt_arccw_k_westarm5_scope_x2\" },\n            }\n        },\n        [3] = {\n            name = \"Модификация картриджа\",\n            options = {\n                { name = \"Классика\", class = \"\" },\n                { name = \"Long Engagements\", class = \"acwatt_mode_le\" },\n                { name = \"Heat-Based\", class = \"acwatt_mode_heatbased\" },\n                { name = \"Anti-Tank\", class = \"acwatt_mode_at\" }\n            }\n        }\n    },\n\n    [\"arccw_k_iqa11\"] = {\n        [1] = { \n            name = \"Прицелы\",\n            options = {\n                { name = \"Снять\", class = \"\" },\n                { name = \"Прицел X8/IR\", class = \"acwatt_arccw_k_valken38_scope_ir\" },\n                { name = \"Прицел X8\", class = \"acwatt_arccw_k_valken38_scope\" },\n            }\n        }\n    },\n\n    [\"arccw_k_launcher_rps6\"] = {\n        [2] = {\n            name = \"Вид ракетницы\",\n            options = {\n                { name = \"Классическая\", class = \"\" },\n                { name = \"Трекер\", class = \"acwatt_ammunition_track\" },\n                { name = \"Кластер\", class = \"acwatt_ammunition_cluster\" }\n            }\n        },\n    },\n\n    [\"arccw_k_launcher_plx1\"] = {\n        [2] = {\n            name = \"Вид ракетницы\",\n            options = {\n                { name = \"Самонаводящаяся\", class = \"\" },\n                { name = \"Противотанковая\", class = \"acwatt_ammxunition_heatfs\" }\n            }\n        }\n    },\n}\n\n";
-  lua += '-- ============================================================================\n';
-  lua += '-- 4. АВТОМАТИЧЕСКАЯ ГЕНЕРАЦИЯ СЕРВЕРНЫХ ПРАВИЛ ВАЛИДАЦИИ\n';
-  lua += '-- (Single Source of Truth: гарантирует 100% совпадение клиента и сервера)\n';
-  lua += '-- ============================================================================\n';
-  lua += 'NN_Arsenal.WeaponRules = {}\n';
-  lua += 'for _, wep in ipairs(NN_Arsenal.WeaponConfig) do\n';
-  lua += '    NN_Arsenal.WeaponRules[wep.class] = {\n';
-  lua += '        rank = wep.rank,\n';
-  lua += '        spec = wep.spec\n';
-  lua += '    }\n';
-  lua += 'end\n\n';
-  lua += 'NN_Arsenal.WeaponRules["weapon_defibrilator"] = { rank = "CPL", spec = "MED" }\n\n';
-  lua += 'NN_Arsenal.AttachmentRules = {}\n';
+  lua += generateAttachmentsConfigLua();
+
   lua += 'for wepClass, slots in pairs(NN_Arsenal.AttachmentsConfig) do\n';
   lua += '    NN_Arsenal.AttachmentRules[wepClass] = {}\n';
   lua += '    for slotID, slotData in pairs(slots) do\n';
@@ -4693,3 +4682,876 @@ function setupInventoryEventListeners() {
     initEditorBundle();
   }
 })();
+
+/* COLLAPSAR ATTACHMENTS & UNIFIED BACKUPS SYSTEM */
+
+// ============================================================================
+// BUNDLED ATTACHMENTS DATA & STATE
+// ============================================================================
+const BUNDLED_ATTACHMENTS_DATA = [{"wepClass":"arccw_k_dc15s_grenadier","slots":{"4":{"name":"Подствольный модуль","options":[{"name":"Отсутствует","class":""},{"name":"Гранатомёт","class":"acwatt_ubgl_dc15"},{"name":"Виброклинок","class":"acwatt_universal_vibroknife"}]},"5":{"name":"Модификация картриджа","options":[{"name":"Классика","class":""},{"name":"Long Engagements","class":"acwatt_mode_le"},{"name":"Heat-Based","class":"acwatt_mode_heatbased"},{"name":"Anti-Tank","class":"acwatt_mode_at"}]}}},{"wepClass":"arccw_k_dc15a_grenadier","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел x8","class":"acwatt_arccw_k_dlt15x_scope"},{"name":"Прицел x4","class":"acwatt_arccw_k_dlt15a_scope"}]},"5":{"name":"Подствольный модуль","options":[{"name":"Отсутствует","class":""},{"name":"Виброклинок","class":"acwatt_universal_vibroknife"}]},"6":{"name":"Модификация картриджа","options":[{"name":"Классика","class":""},{"name":"Long Engagements","class":"acwatt_mode_le"},{"name":"Heat-Based","class":"acwatt_mode_heatbased"},{"name":"Anti-Tank","class":"acwatt_mode_at"}]}}},{"wepClass":"arccw_k_dc15s","slots":{"5":{"name":"Модификация картриджа","options":[{"name":"Классика","class":""},{"name":"Long Engagements","class":"acwatt_mode_le"},{"name":"Heat-Based","class":"acwatt_mode_heatbased"},{"name":"Anti-Tank","class":"acwatt_mode_at"}]}}},{"wepClass":"arccw_k_dc15x","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел x8","class":"acwatt_arccw_k_dlt15x_scope"},{"name":"Прицел x4","class":"acwatt_arccw_k_dlt15a_scope"}]},"5":{"name":"Модификация картриджа","options":[{"name":"Классика","class":""},{"name":"Super-Sonic","class":"acwatt_mode_supersonic"},{"name":"Overcharged","class":"acwatt_mode_overcharged"},{"name":"Heat-Based","class":"acwatt_mode_heatbased"}]}}},{"wepClass":"arccw_k_dc15xr","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел x8","class":"acwatt_arccw_k_dlt15x_scope"},{"name":"Прицел x4","class":"acwatt_arccw_k_dlt15a_scope"}]}}},{"wepClass":"arccw_k_valken38","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел №1 x8/IR","class":"acwatt_arccw_k_valken38_scope_ir"},{"name":"Прицел №1 x8","class":"acwatt_arccw_k_valken38_scope"},{"name":"Прицел №2 x8/IR","class":"acwatt_arccw_k_dc15x_scope_ir"},{"name":"Прицел №2 x8","class":"acwatt_arccw_k_dlt15x_scope"}]},"4":{"name":"Модификация картриджа","options":[{"name":"Классика","class":""},{"name":"Super-Sonic","class":"acwatt_mode_supersonic"},{"name":"Overcharged","class":"acwatt_mode_overcharged"},{"name":"Heat-Based","class":"acwatt_mode_heatbased"}]},"5":{"name":"Подствольный модуль","options":[{"name":"Отсутствует","class":""},{"name":"Ремень","class":"acwatt_valken38_sling"},{"name":"Виброклинок","class":"acwatt_universal_vibroknife"}]}}},{"wepClass":"arccw_k_dc17m_sniper_republic","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел x8","class":"acwatt_arccw_k_dlt15x_scope"}]}}},{"wepClass":"arccw_sops_republic_t702","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел x5","class":"acwatt_arccw_k_westar35_scope_ir"}]}}},{"wepClass":"arccw_k_westarm5","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел X6","class":"acwatt_arccw_k_westarm5_scope_x6ir"},{"name":"Прицел X2","class":"acwatt_arccw_k_westarm5_scope_x2"}]},"3":{"name":"Модификация картриджа","options":[{"name":"Классика","class":""},{"name":"Long Engagements","class":"acwatt_mode_le"},{"name":"Heat-Based","class":"acwatt_mode_heatbased"},{"name":"Anti-Tank","class":"acwatt_mode_at"}]}}},{"wepClass":"arccw_k_iqa11","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел X8/IR","class":"acwatt_arccw_k_valken38_scope_ir"},{"name":"Прицел X8","class":"acwatt_arccw_k_valken38_scope"}]}}},{"wepClass":"arccw_k_launcher_rps6","slots":{"2":{"name":"Вид ракетницы","options":[{"name":"Классическая","class":""},{"name":"Трекер","class":"acwatt_ammunition_track"},{"name":"Кластер","class":"acwatt_ammunition_cluster"}]}}},{"wepClass":"arccw_k_launcher_plx1","slots":{"2":{"name":"Вид ракетницы","options":[{"name":"Самонаводящаяся","class":""},{"name":"Противотанковая","class":"acwatt_ammxunition_heatfs"}]}}}];
+
+// Initialize attachments in arsenalState
+if (typeof arsenalState !== 'undefined') {
+  if (!arsenalState.attachments || !Array.isArray(arsenalState.attachments) || arsenalState.attachments.length === 0) {
+    try {
+      const stored = localStorage.getItem('collapsar_arsenal_attachments');
+      if (stored) {
+        arsenalState.attachments = JSON.parse(stored);
+      }
+    } catch(e) {
+      console.warn('Failed to load stored attachments, using defaults:', e);
+    }
+    if (!arsenalState.attachments || arsenalState.attachments.length === 0) {
+      arsenalState.attachments = JSON.parse(JSON.stringify(BUNDLED_ATTACHMENTS_DATA));
+    }
+  }
+}
+
+// ============================================================================
+// ATTACHMENTS (МОДИФИКАЦИИ ОРУЖИЯ ArcCW) CONTROLLER
+// ============================================================================
+function saveArsenalAttachmentsState() {
+  if (typeof arsenalState !== 'undefined' && Array.isArray(arsenalState.attachments)) {
+    try {
+      localStorage.setItem('collapsar_arsenal_attachments', JSON.stringify(arsenalState.attachments));
+    } catch(e) {
+      console.error('Failed to save attachments to localStorage:', e);
+    }
+    updateArsenalAttachmentBadges();
+    if (typeof generateArsenalExportCode === 'function') {
+      generateArsenalExportCode();
+    }
+  }
+}
+
+function updateArsenalAttachmentBadges() {
+  const countSpan = document.getElementById('count-subtab-atts');
+  if (countSpan && typeof arsenalState !== 'undefined') {
+    countSpan.textContent = (arsenalState.attachments || []).length;
+  }
+}
+
+function renderArsenalAttachments() {
+  const container = document.getElementById('arsenal-atts-grid');
+  const catPills = document.getElementById('arsenal-att-cat-pills');
+  if (!container) return;
+
+  updateArsenalAttachmentBadges();
+
+  if (!arsenalState.attachments) {
+    arsenalState.attachments = JSON.parse(JSON.stringify(BUNDLED_ATTACHMENTS_DATA));
+  }
+
+  // Category Pills
+  if (catPills) {
+    const categories = ['Все'];
+    const usedCats = new Set();
+    arsenalState.attachments.forEach(att => {
+      const wep = (arsenalState.weapons || []).find(w => w.class === att.wepClass);
+      const cat = (wep && wep.category) ? wep.category : 'Табельное';
+      usedCats.add(cat);
+    });
+    usedCats.forEach(c => categories.push(c));
+
+    const curCat = arsenalState.attFilterCat || 'Все';
+    catPills.innerHTML = categories.map(cat => `
+      <button type="button" class="cat-pill-btn ${curCat === cat ? 'active' : ''}" data-cat="${escapeHtml(cat)}">
+        ${escapeHtml(cat)}
+      </button>
+    `).join('');
+
+    catPills.querySelectorAll('.cat-pill-btn').forEach(btn => {
+      btn.onclick = () => {
+        arsenalState.attFilterCat = btn.getAttribute('data-cat') || 'Все';
+        renderArsenalAttachments();
+      };
+    });
+  }
+
+  const search = (arsenalState.attSearch || '').toLowerCase().trim();
+  const catFilter = arsenalState.attFilterCat || 'Все';
+
+  const filtered = arsenalState.attachments.filter(att => {
+    const wep = (arsenalState.weapons || []).find(w => w.class === att.wepClass);
+    const wepName = wep ? wep.name : '';
+    const wepCat = wep ? wep.category : 'Табельное';
+
+    if (catFilter !== 'Все' && wepCat !== catFilter) return false;
+
+    if (search) {
+      const matchClass = att.wepClass.toLowerCase().includes(search);
+      const matchName = wepName.toLowerCase().includes(search);
+      const matchSlots = Object.values(att.slots || {}).some(s => {
+        const slotNameMatch = (s.name || '').toLowerCase().includes(search);
+        const optMatch = (s.options || []).some(o => 
+          (o.name || '').toLowerCase().includes(search) || (o.class || '').toLowerCase().includes(search)
+        );
+        return slotNameMatch || optMatch;
+      });
+      if (!matchClass && !matchName && !matchSlots) return false;
+    }
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: rgba(18,24,36,0.5); border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px;">
+        <div style="font-size: 36px; margin-bottom: 12px;">⚙️</div>
+        <h3 style="margin: 0 0 8px 0; color: var(--text-primary); font-size: 16px;">Модификации оружия не найдены</h3>
+        <p style="margin: 0 0 16px 0; font-size: 13px; color: var(--text-secondary);">
+          ${search ? 'По вашему поисковому запросу ничего не найдено.' : 'В арсенале пока не настроены модификации для оружия.'}
+        </p>
+        <button type="button" class="btn btn-primary" onclick="openArsenalAttModal()">+ Настроить модификации оружия</button>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = filtered.map(att => {
+    const wep = (arsenalState.weapons || []).find(w => w.class === att.wepClass);
+    const wepName = wep ? wep.name : att.wepClass;
+    const wepCat = wep ? (wep.category || 'Табельное') : 'Модификация';
+
+    const slotEntries = Object.entries(att.slots || {}).sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
+
+    return `
+      <div class="att-card">
+        <div class="att-card-header">
+          <div style="min-width: 0; flex: 1;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+              <h3 class="att-card-title" title="${escapeHtml(wepName)}">${escapeHtml(wepName)}</h3>
+              <span class="meta-tag cat-badge" style="font-size: 11px;">${escapeHtml(wepCat)}</span>
+            </div>
+            <div class="att-card-class font-mono">${escapeHtml(att.wepClass)}</div>
+          </div>
+        </div>
+
+        <div class="att-card-slots">
+          ${slotEntries.map(([sId, sData]) => `
+            <div class="att-slot-block">
+              <div class="att-slot-title">
+                <span class="slot-num-pill">Слот ${sId}</span>
+                <strong>${escapeHtml(sData.name || 'Слот ' + sId)}</strong>
+                <span class="slot-opts-count">${(sData.options || []).length} вар.</span>
+              </div>
+              <div class="att-opts-pill-list">
+                ${(sData.options || []).map(opt => `
+                  <span class="att-opt-pill ${!opt.class ? 'opt-pill-empty' : ''}" title="${opt.class ? 'Класс: ' + escapeHtml(opt.class) : 'Снять (без обвеса)'}">
+                    ${escapeHtml(opt.name || (opt.class ? opt.class : 'Снять'))}
+                  </span>
+                `).join('')}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="att-card-actions">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="editArsenalAttachment('${escapeHtml(att.wepClass)}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            Редактировать
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="duplicateArsenalAttachment('${escapeHtml(att.wepClass)}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+            Копировать
+          </button>
+          <button type="button" class="btn btn-danger btn-sm" onclick="deleteArsenalAttachment('${escapeHtml(att.wepClass)}')">
+            ✕
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+window.openArsenalAttModal = function(editWepClass = null) {
+  const modal = document.getElementById('arsenal-att-modal');
+  const form = document.getElementById('arsenal-att-form');
+  const title = document.getElementById('modal-att-title');
+  const subtitle = document.getElementById('modal-att-subtitle');
+  const wepClassInput = document.getElementById('modal-att-wep-class');
+  const origClassInput = document.getElementById('modal-att-original-wep-class');
+  const slotsContainer = document.getElementById('modal-att-slots-container');
+  const datalist = document.getElementById('modal-att-wep-datalist');
+  if (!modal) return;
+
+  // Populate datalist with weapons from arsenal
+  if (datalist && arsenalState.weapons) {
+    datalist.innerHTML = arsenalState.weapons.map(w => `
+      <option value="${escapeHtml(w.class)}">${escapeHtml(w.name)} (${escapeHtml(w.category || 'Оружие')})</option>
+    `).join('');
+  }
+
+  slotsContainer.innerHTML = '';
+
+  if (editWepClass) {
+    const existing = (arsenalState.attachments || []).find(a => a.wepClass === editWepClass);
+    if (!existing) return;
+
+    const wep = (arsenalState.weapons || []).find(w => w.class === editWepClass);
+    title.textContent = 'Редактировать модификации оружия';
+    subtitle.textContent = (wep ? wep.name + ' (' + editWepClass + ')' : editWepClass);
+    wepClassInput.value = existing.wepClass;
+    origClassInput.value = existing.wepClass;
+
+    const sortedSlots = Object.entries(existing.slots || {}).sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
+    sortedSlots.forEach(([sId, sData]) => {
+      addSlotEditCard(parseInt(sId), sData.name || '', sData.options || []);
+    });
+  } else {
+    title.textContent = 'Добавить модификации оружия';
+    subtitle.textContent = 'Задайте слоты обвесов и доступные варианты для оружия';
+    wepClassInput.value = '';
+    origClassInput.value = '';
+    // By default add Slot 1 Scopes
+    addSlotPresetScopes();
+  }
+
+  modal.style.display = 'flex';
+};
+
+window.editArsenalAttachment = function(wepClass) {
+  openArsenalAttModal(wepClass);
+};
+
+window.duplicateArsenalAttachment = function(wepClass) {
+  const existing = (arsenalState.attachments || []).find(a => a.wepClass === wepClass);
+  if (!existing) return;
+  const newClass = prompt('Введите класс оружия для копирования модификаций (например arccw_k_...):', existing.wepClass + '_copy');
+  if (!newClass || !newClass.trim()) return;
+  const targetClass = newClass.trim();
+
+  if (arsenalState.attachments.some(a => a.wepClass === targetClass)) {
+    if (!confirm('Модификации для ' + targetClass + ' уже настроены! Перезаписать?')) return;
+    const idx = arsenalState.attachments.findIndex(a => a.wepClass === targetClass);
+    arsenalState.attachments[idx] = {
+      wepClass: targetClass,
+      slots: JSON.parse(JSON.stringify(existing.slots))
+    };
+  } else {
+    arsenalState.attachments.push({
+      wepClass: targetClass,
+      slots: JSON.parse(JSON.stringify(existing.slots))
+    });
+  }
+
+  saveArsenalAttachmentsState();
+  renderArsenalAttachments();
+  showToast('Модификации успешно скопированы на ' + targetClass + '!', 'success');
+};
+
+window.deleteArsenalAttachment = function(wepClass) {
+  if (!confirm('Удалить конфигурацию модификаций для ' + wepClass + '?')) return;
+  const idx = (arsenalState.attachments || []).findIndex(a => a.wepClass === wepClass);
+  if (idx !== -1) {
+    arsenalState.attachments.splice(idx, 1);
+    saveArsenalAttachmentsState();
+    renderArsenalAttachments();
+    showToast('Модификации для ' + wepClass + ' удалены!', 'success');
+  }
+};
+
+function addSlotEditCard(slotId = 1, slotName = '', options = []) {
+  const container = document.getElementById('modal-att-slots-container');
+  if (!container) return;
+
+  const card = document.createElement('div');
+  card.className = 'att-slot-edit-card';
+  card.setAttribute('data-slot-id', slotId);
+
+  card.innerHTML = `
+    <div class="att-slot-edit-header">
+      <div style="display: flex; gap: 8px; align-items: center; flex: 1;">
+        <span class="slot-badge">Слот</span>
+        <input type="number" class="input-field input-slot-id" value="${slotId}" min="1" max="20" style="width: 65px; text-align: center;" required>
+        <input type="text" class="input-field input-slot-name" value="${escapeHtml(slotName)}" placeholder="Название слота (напр. Прицелы)" style="flex: 1;" required>
+      </div>
+      <button type="button" class="btn btn-danger btn-xs btn-remove-slot" title="Удалить этот слот">Удалить слот</button>
+    </div>
+    <div class="att-options-list" style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;"></div>
+    <button type="button" class="btn btn-secondary btn-xs btn-add-option" style="margin-top: 8px;">+ Добавить вариант</button>
+  `;
+
+  const optsList = card.querySelector('.att-options-list');
+  const addOptBtn = card.querySelector('.btn-add-option');
+  const removeSlotBtn = card.querySelector('.btn-remove-slot');
+
+  const addOptionRow = (name = '', cls = '') => {
+    const row = document.createElement('div');
+    row.className = 'att-option-row';
+    row.style.cssText = 'display: flex; gap: 8px; align-items: center;';
+    row.innerHTML = `
+      <input type="text" class="input-field input-opt-name" value="${escapeHtml(name)}" placeholder="Отображаемое имя (напр. Прицел x8)" style="flex: 1;" required>
+      <input type="text" class="input-field font-mono input-opt-class" value="${escapeHtml(cls)}" placeholder="Класс (acwatt_...) или пусто для снятия" style="flex: 1.2;">
+      <button type="button" class="btn btn-danger btn-xs btn-remove-opt" title="Удалить вариант" style="padding: 4px 8px;">✕</button>
+    `;
+    row.querySelector('.btn-remove-opt').onclick = () => row.remove();
+    optsList.appendChild(row);
+  };
+
+  if (options.length === 0) {
+    addOptionRow('Снять', '');
+  } else {
+    options.forEach(o => addOptionRow(o.name, o.class));
+  }
+
+  addOptBtn.onclick = () => addOptionRow('', '');
+  removeSlotBtn.onclick = () => card.remove();
+
+  container.appendChild(card);
+}
+
+// Presets for Attachment Modal
+function addSlotPresetScopes() {
+  addSlotEditCard(1, 'Прицелы', [
+    { name: 'Снять', class: '' },
+    { name: 'Прицел x8', class: 'acwatt_arccw_k_dlt15x_scope' },
+    { name: 'Прицел x4', class: 'acwatt_arccw_k_dlt15a_scope' }
+  ]);
+}
+
+function addSlotPresetCartridges() {
+  addSlotEditCard(5, 'Модификация картриджа', [
+    { name: 'Классика', class: '' },
+    { name: 'Long Engagements', class: 'acwatt_mode_le' },
+    { name: 'Heat-Based', class: 'acwatt_mode_heatbased' },
+    { name: 'Anti-Tank', class: 'acwatt_mode_at' }
+  ]);
+}
+
+function addSlotPresetCartridgesSniper() {
+  addSlotEditCard(5, 'Модификация картриджа', [
+    { name: 'Классика', class: '' },
+    { name: 'Super-Sonic', class: 'acwatt_mode_supersonic' },
+    { name: 'Overcharged', class: 'acwatt_mode_overcharged' },
+    { name: 'Heat-Based', class: 'acwatt_mode_heatbased' }
+  ]);
+}
+
+function addSlotPresetUBGL() {
+  addSlotEditCard(4, 'Подствольный модуль', [
+    { name: 'Отсутствует', class: '' },
+    { name: 'Гранатомёт', class: 'acwatt_ubgl_dc15' },
+    { name: 'Виброклинок', class: 'acwatt_universal_vibroknife' }
+  ]);
+}
+
+function addSlotPresetLauncher() {
+  addSlotEditCard(2, 'Вид ракетницы', [
+    { name: 'Классическая', class: '' },
+    { name: 'Трекер', class: 'acwatt_ammunition_track' },
+    { name: 'Кластер', class: 'acwatt_ammunition_cluster' }
+  ]);
+}
+
+// Setup Attachments Event Listeners
+function setupAttachmentsEventListeners() {
+  const addAttBtn = document.getElementById('btn-arsenal-add-att');
+  if (addAttBtn) {
+    addAttBtn.onclick = () => openArsenalAttModal();
+  }
+
+  const attSearch = document.getElementById('arsenal-att-search');
+  if (attSearch) {
+    attSearch.oninput = (e) => {
+      arsenalState.attSearch = e.target.value;
+      renderArsenalAttachments();
+    };
+  }
+
+  // Preset buttons
+  const pScopes = document.getElementById('btn-preset-scopes');
+  if (pScopes) pScopes.onclick = addSlotPresetScopes;
+
+  const pCartridges = document.getElementById('btn-preset-cartridges');
+  if (pCartridges) pCartridges.onclick = addSlotPresetCartridges;
+
+  const pCartridgesSniper = document.getElementById('btn-preset-cartridges-sniper');
+  if (pCartridgesSniper) pCartridgesSniper.onclick = addSlotPresetCartridgesSniper;
+
+  const pUBGL = document.getElementById('btn-preset-ubgl');
+  if (pUBGL) pUBGL.onclick = addSlotPresetUBGL;
+
+  const pLauncher = document.getElementById('btn-preset-launcher');
+  if (pLauncher) pLauncher.onclick = addSlotPresetLauncher;
+
+  const btnAddCustomSlot = document.getElementById('btn-add-custom-slot');
+  if (btnAddCustomSlot) {
+    btnAddCustomSlot.onclick = () => {
+      const container = document.getElementById('modal-att-slots-container');
+      const existingCards = container ? container.querySelectorAll('.att-slot-edit-card') : [];
+      let nextId = 1;
+      existingCards.forEach(c => {
+        const id = parseInt(c.querySelector('.input-slot-id')?.value || 0);
+        if (id >= nextId) nextId = id + 1;
+      });
+      addSlotEditCard(nextId, 'Слот ' + nextId, []);
+    };
+  }
+
+  // Modal Close & Cancel
+  const modal = document.getElementById('arsenal-att-modal');
+  const closeBtn = document.getElementById('modal-att-close');
+  const cancelBtn = document.getElementById('modal-att-cancel');
+  if (closeBtn) closeBtn.onclick = () => { if (modal) modal.style.display = 'none'; };
+  if (cancelBtn) cancelBtn.onclick = () => { if (modal) modal.style.display = 'none'; };
+
+  // Form Submit
+  const form = document.getElementById('arsenal-att-form');
+  if (form) {
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      const wepClass = (document.getElementById('modal-att-wep-class')?.value || '').trim();
+      const origClass = (document.getElementById('modal-att-original-wep-class')?.value || '').trim();
+      if (!wepClass) {
+        showToast('Укажите класс оружия!', 'warning');
+        return;
+      }
+
+      const slotCards = document.querySelectorAll('#modal-att-slots-container .att-slot-edit-card');
+      if (slotCards.length === 0) {
+        showToast('Добавьте хотя бы один слот модификаций!', 'warning');
+        return;
+      }
+
+      const slots = {};
+      slotCards.forEach(c => {
+        const sId = parseInt(c.querySelector('.input-slot-id')?.value || 1);
+        const sName = (c.querySelector('.input-slot-name')?.value || '').trim() || ('Слот ' + sId);
+        const optRows = c.querySelectorAll('.att-option-row');
+        const options = [];
+        optRows.forEach(r => {
+          const name = (r.querySelector('.input-opt-name')?.value || '').trim();
+          const cls = (r.querySelector('.input-opt-class')?.value || '').trim();
+          if (name || cls) {
+            options.push({ name: name || cls, class: cls });
+          }
+        });
+        slots[sId] = { name: sName, options };
+      });
+
+      const attObj = { wepClass, slots };
+
+      if (!arsenalState.attachments) arsenalState.attachments = [];
+      const idx = arsenalState.attachments.findIndex(a => a.wepClass === (origClass || wepClass));
+      if (idx !== -1) {
+        arsenalState.attachments[idx] = attObj;
+      } else {
+        const existingClsIdx = arsenalState.attachments.findIndex(a => a.wepClass === wepClass);
+        if (existingClsIdx !== -1) {
+          arsenalState.attachments[existingClsIdx] = attObj;
+        } else {
+          arsenalState.attachments.push(attObj);
+        }
+      }
+
+      saveArsenalAttachmentsState();
+      renderArsenalAttachments();
+      if (modal) modal.style.display = 'none';
+      showToast('Модификации для ' + wepClass + ' успешно сохранены!', 'success');
+    };
+  }
+}
+
+// Generate Lua Code for AttachmentsConfig
+function generateAttachmentsConfigLua() {
+  if (!arsenalState.attachments || arsenalState.attachments.length === 0) {
+    return 'NN_Arsenal.AttachmentsConfig = {}\n\n';
+  }
+
+  let lua = '-- 3. Модификации оружия (ArcCW)\n';
+  lua += 'NN_Arsenal.AttachmentsConfig = {\n';
+
+  arsenalState.attachments.forEach(att => {
+    lua += '    ["' + att.wepClass + '"] = {\n';
+    const sortedSlots = Object.entries(att.slots || {}).sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
+    sortedSlots.forEach(([sId, sData]) => {
+      lua += '        [' + sId + '] = {\n';
+      lua += '            name = "' + (sData.name || ('Слот ' + sId)).replace(/"/g, '\\"') + '",\n';
+      lua += '            options = {\n';
+      (sData.options || []).forEach(opt => {
+        lua += '                { name = "' + (opt.name || '').replace(/"/g, '\\"') + '", class = "' + (opt.class || '').replace(/"/g, '\\"') + '" },\n';
+      });
+      lua += '            }\n';
+      lua += '        },\n';
+    });
+    lua += '    },\n\n';
+  });
+
+  lua += '}\n\n';
+  return lua;
+}
+
+// ============================================================================
+// UNIFIED BACKUPS SYSTEM (ЕДИНЫЙ СРЕЗ ВСЕХ СИСТЕМ)
+// ============================================================================
+function getUnifiedBackups() {
+  try {
+    const raw = localStorage.getItem('collapsar_unified_backups');
+    return raw ? JSON.parse(raw) : [];
+  } catch(e) {
+    console.error('Failed to get unified backups:', e);
+    return [];
+  }
+}
+
+function setUnifiedBackups(list) {
+  try {
+    localStorage.setItem('collapsar_unified_backups', JSON.stringify(list));
+  } catch(e) {
+    console.error('Failed to set unified backups:', e);
+  }
+}
+
+function createUnifiedBackupSnapshot(label = 'Ручной общий срез', type = 'manual') {
+  const list = getUnifiedBackups();
+
+  const jobsData = {
+    jobs: (typeof state !== 'undefined' && state.jobs) ? JSON.parse(JSON.stringify(state.jobs)) : [],
+    categories: (typeof state !== 'undefined' && state.categories) ? JSON.parse(JSON.stringify(state.categories)) : [],
+    formations: (typeof state !== 'undefined' && state.formations) ? JSON.parse(JSON.stringify(state.formations)) : []
+  };
+
+  const arsenalData = (typeof arsenalState !== 'undefined') ? {
+    weapons: JSON.parse(JSON.stringify(arsenalState.weapons || [])),
+    bodygroups: JSON.parse(JSON.stringify(arsenalState.bodygroups || [])),
+    attachments: JSON.parse(JSON.stringify(arsenalState.attachments || [])),
+    maxWeight: arsenalState.maxWeight || 50,
+    armorWeights: JSON.parse(JSON.stringify(arsenalState.armorWeights || {}))
+  } : null;
+
+  const inventoryData = (typeof inventoryState !== 'undefined') ? {
+    items: JSON.parse(JSON.stringify(inventoryState.items || [])),
+    wepWeights: JSON.parse(JSON.stringify(inventoryState.wepWeights || {}))
+  } : null;
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('ru-RU') + ' ' + now.toLocaleTimeString('ru-RU');
+
+  const snap = {
+    id: Date.now(),
+    label: label,
+    type: type,
+    dateStr: dateStr,
+    timestamp: now.getTime(),
+    storage: 'Локальный снимок (LocalStorage)',
+    data: {
+      jobs: jobsData,
+      arsenal: arsenalData,
+      inventory: inventoryData
+    }
+  };
+
+  list.unshift(snap);
+  if (list.length > 30) list.pop();
+  setUnifiedBackups(list);
+  updateBackupsBadges();
+  renderUnifiedBackupsTable();
+  return snap;
+}
+
+function updateBackupsBadges() {
+  const uCount = document.getElementById('unified-backups-count');
+  const jCount = document.getElementById('jobs-backups-count');
+  const uList = getUnifiedBackups();
+  const jList = (typeof getLocalBackups === 'function') ? getLocalBackups() : [];
+
+  if (uCount) uCount.textContent = uList.length;
+  if (jCount) jCount.textContent = jList.length;
+}
+
+function renderUnifiedBackupsTable() {
+  const tbody = document.getElementById('unified-backups-table-body');
+  if (!tbody) return;
+
+  updateBackupsBadges();
+  const list = getUnifiedBackups();
+
+  if (list.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align: center; padding: 32px 20px; color: var(--text-secondary);">
+          <div style="font-size: 28px; margin-bottom: 8px;">🛡️</div>
+          <div style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Общие резервные копии пока не созданы</div>
+          <div style="font-size: 12px; margin-bottom: 12px;">Нажмите "Создать общий бэкап" для сохранения синхронного снимка всех трёх систем.</div>
+          <button type="button" class="btn btn-primary btn-sm" onclick="createManualUnifiedBackupClick()">+ Создать первый общий срез</button>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = list.map(b => {
+    const jobsCount = b.data?.jobs?.jobs?.length || 0;
+    const wepsCount = b.data?.arsenal?.weapons?.length || 0;
+    const attsCount = b.data?.arsenal?.attachments?.length || 0;
+    const invCount = b.data?.inventory?.items?.length || 0;
+
+    const typeBadge = b.type === 'auto' 
+      ? '<span class="meta-tag" style="color: #3b82f6; border-color: #3b82f6;">АВТОСРЕЗ</span>'
+      : b.type === 'import'
+      ? '<span class="meta-tag" style="color: #a855f7; border-color: #a855f7;">ИМПОРТ</span>'
+      : '<span class="meta-tag" style="color: #00d2ff; border-color: #00d2ff;">ОБЩИЙ СРЕЗ</span>';
+
+    return `
+      <tr>
+        <td>${typeBadge}</td>
+        <td>
+          <strong style="color: var(--text-primary); font-size: 14px;">${escapeHtml(b.label || 'Общий срез')}</strong>
+          <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+            <span style="color: #10b981;">${jobsCount} проф</span> • 
+            <span style="color: #00d2ff;">${wepsCount} оружия</span> • 
+            <span style="color: #f59e0b;">${attsCount} обвесов</span> • 
+            <span style="color: #8b5cf6;">${invCount} спец. предм.</span>
+          </div>
+        </td>
+        <td style="font-size: 13px; color: var(--text-secondary);">${escapeHtml(b.dateStr)}</td>
+        <td style="font-size: 12px;"><span style="color: var(--text-secondary);">${escapeHtml(b.storage || 'LocalStorage')}</span></td>
+        <td style="text-align: right; white-space: nowrap;">
+          <div style="display: inline-flex; gap: 6px; align-items: center;">
+            <button class="btn btn-primary btn-sm" onclick="restoreUnifiedBackup(${b.id})" title="Восстановить всё синхронно">
+              Восстановить
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="exportSingleUnifiedBackup(${b.id})" title="Скачать .json">
+              Скачать
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="deleteUnifiedBackup(${b.id})" title="Удалить этот снимок">
+              ✕
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+window.createManualUnifiedBackupClick = function() {
+  createUnifiedBackupSnapshot('Ручной общий бэкап', 'manual');
+  showToast('Синхронный срез всех трёх систем успешно сохранён!', 'success');
+};
+
+window.restoreUnifiedBackup = function(id) {
+  const list = getUnifiedBackups();
+  const snap = list.find(s => s.id === id);
+  if (!snap) return;
+
+  const msg = 'Восстановить конфигурации из среза "' + snap.label + '" (' + snap.dateStr + ')?\n\n' +
+    'Будут восстановлены:\n' +
+    '- Профессии: ' + (snap.data?.jobs?.jobs?.length || 0) + ' шт.\n' +
+    '- Оружие арсенала: ' + (snap.data?.arsenal?.weapons?.length || 0) + ' шт.\n' +
+    '- Модификации оружия: ' + (snap.data?.arsenal?.attachments?.length || 0) + ' шт.\n' +
+    '- Спецоборудование: ' + (snap.data?.inventory?.items?.length || 0) + ' шт.';
+
+  if (!confirm(msg)) return;
+
+  // 1. Restore Jobs
+  if (snap.data?.jobs && typeof state !== 'undefined') {
+    state.jobs = JSON.parse(JSON.stringify(snap.data.jobs.jobs || []));
+    state.categories = JSON.parse(JSON.stringify(snap.data.jobs.categories || []));
+    state.formations = JSON.parse(JSON.stringify(snap.data.jobs.formations || []));
+    if (typeof gatherSuggestions === 'function') gatherSuggestions();
+    if (typeof updateStats === 'function') updateStats();
+    if (typeof populateFilters === 'function') populateFilters();
+    if (typeof populateDatalists === 'function') populateDatalists();
+    if (typeof runDiagnostics === 'function') runDiagnostics();
+    if (typeof renderJobs === 'function') renderJobs();
+  }
+
+  // 2. Restore Arsenal
+  if (snap.data?.arsenal && typeof arsenalState !== 'undefined') {
+    arsenalState.weapons = JSON.parse(JSON.stringify(snap.data.arsenal.weapons || []));
+    arsenalState.bodygroups = JSON.parse(JSON.stringify(snap.data.arsenal.bodygroups || []));
+    arsenalState.attachments = JSON.parse(JSON.stringify(snap.data.arsenal.attachments || []));
+    arsenalState.maxWeight = snap.data.arsenal.maxWeight || 50;
+    arsenalState.armorWeights = JSON.parse(JSON.stringify(snap.data.arsenal.armorWeights || {}));
+    if (typeof saveArsenalState === 'function') saveArsenalState();
+    if (typeof renderArsenalSubtab === 'function') renderArsenalSubtab(arsenalState.activeSubtab || 'weps');
+    if (typeof renderArsenalAttachments === 'function') renderArsenalAttachments();
+  }
+
+  // 3. Restore Inventory
+  if (snap.data?.inventory && typeof inventoryState !== 'undefined') {
+    inventoryState.items = JSON.parse(JSON.stringify(snap.data.inventory.items || []));
+    inventoryState.wepWeights = JSON.parse(JSON.stringify(snap.data.inventory.wepWeights || {}));
+    if (typeof saveInventoryState === 'function') saveInventoryState();
+    if (typeof renderInventorySubtab === 'function') renderInventorySubtab(inventoryState.activeSubtab || 'items');
+  }
+
+  const modal = document.getElementById('backups-modal');
+  if (modal) modal.style.display = 'none';
+
+  showToast('Все конфигурации (Профессии, Арсенал, Спецоборудование) успешно восстановлены!', 'success');
+};
+
+window.exportSingleUnifiedBackup = function(id) {
+  const list = getUnifiedBackups();
+  const snap = list.find(s => s.id === id);
+  if (!snap) return;
+
+  const jsonStr = JSON.stringify(snap, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'collapsar_unified_backup_' + snap.id + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Резервная копия скачана в формате .json', 'success');
+};
+
+window.deleteUnifiedBackup = function(id) {
+  if (!confirm('Удалить эту резервную копию?')) return;
+  const list = getUnifiedBackups();
+  const filtered = list.filter(s => s.id !== id);
+  setUnifiedBackups(filtered);
+  updateBackupsBadges();
+  renderUnifiedBackupsTable();
+  showToast('Резервная копия удалена', 'success');
+};
+
+function setupUnifiedBackupsEventListeners() {
+  // Tabs switching in Backups modal
+  const tabUnified = document.getElementById('tab-btn-unified-backups');
+  const tabJobs = document.getElementById('tab-btn-jobs-backups');
+  const viewUnified = document.getElementById('unified-backups-view');
+  const viewJobs = document.getElementById('jobs-backups-view');
+
+  if (tabUnified && tabJobs && viewUnified && viewJobs) {
+    tabUnified.onclick = () => {
+      tabUnified.classList.add('active');
+      tabJobs.classList.remove('active');
+      viewUnified.style.display = 'block';
+      viewJobs.style.display = 'none';
+      renderUnifiedBackupsTable();
+    };
+
+    tabJobs.onclick = () => {
+      tabJobs.classList.add('active');
+      tabUnified.classList.remove('active');
+      viewJobs.style.display = 'block';
+      viewUnified.style.display = 'none';
+      if (typeof renderLocalBackupsTable === 'function') {
+        renderLocalBackupsTable();
+      }
+    };
+  }
+
+  // Create manual unified backup
+  const btnManualUnified = document.getElementById('btn-manual-unified-backup');
+  if (btnManualUnified) {
+    btnManualUnified.onclick = () => {
+      createManualUnifiedBackupClick();
+    };
+  }
+
+  // Export Unified Backup button
+  const btnExportUnified = document.getElementById('btn-export-unified-backup');
+  if (btnExportUnified) {
+    btnExportUnified.onclick = () => {
+      const snap = createUnifiedBackupSnapshot('Экспортированный общий срез', 'manual');
+      exportSingleUnifiedBackup(snap.id);
+    };
+  }
+
+  // Import Unified Backup file input
+  const fileInput = document.getElementById('unified-backup-file-input');
+  if (fileInput) {
+    fileInput.onchange = (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const parsed = JSON.parse(event.target.result);
+          if (!parsed || (!parsed.data && !parsed.jobs && !parsed.weapons)) {
+            showToast('Неверный формат файла бэкапа!', 'error');
+            return;
+          }
+
+          let snapData = parsed.data || parsed;
+          const now = new Date();
+          const snap = {
+            id: Date.now(),
+            label: 'Импорт: ' + file.name,
+            type: 'import',
+            dateStr: now.toLocaleDateString('ru-RU') + ' ' + now.toLocaleTimeString('ru-RU'),
+            timestamp: now.getTime(),
+            storage: 'Импортирован из файла',
+            data: {
+              jobs: snapData.jobs || (typeof state !== 'undefined' ? { jobs: state.jobs, categories: state.categories } : null),
+              arsenal: snapData.arsenal || (typeof arsenalState !== 'undefined' ? { weapons: arsenalState.weapons, bodygroups: arsenalState.bodygroups, attachments: arsenalState.attachments } : null),
+              inventory: snapData.inventory || (typeof inventoryState !== 'undefined' ? { items: inventoryState.items, wepWeights: inventoryState.wepWeights } : null)
+            }
+          };
+
+          const list = getUnifiedBackups();
+          list.unshift(snap);
+          setUnifiedBackups(list);
+          updateBackupsBadges();
+          renderUnifiedBackupsTable();
+
+          if (confirm('Бэкап из файла "' + file.name + '" импортирован! Восстановить конфигурации прямо сейчас?')) {
+            restoreUnifiedBackup(snap.id);
+          } else {
+            showToast('Файл бэкапа успешно добавлен в список резервных копий!', 'success');
+          }
+        } catch(err) {
+          console.error(err);
+          showToast('Ошибка чтения файла бэкапа: ' + err.message, 'error');
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    };
+  }
+
+  // Cross-module buttons that open unified backups
+  const btnArsenalUnified = document.getElementById('btn-arsenal-unified-backup');
+  if (btnArsenalUnified) {
+    btnArsenalUnified.onclick = () => {
+      const modal = document.getElementById('backups-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+        if (tabUnified) tabUnified.click();
+      }
+    };
+  }
+
+  const btnInvUnified = document.getElementById('btn-inv-unified-backup');
+  if (btnInvUnified) {
+    btnInvUnified.onclick = () => {
+      const modal = document.getElementById('backups-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+        if (tabUnified) tabUnified.click();
+      }
+    };
+  }
+
+  // Main backups button in top toolbar
+  const mainBackupsBtn = document.getElementById('open-backups-btn');
+  if (mainBackupsBtn) {
+    const origHandler = mainBackupsBtn.onclick;
+    mainBackupsBtn.onclick = (e) => {
+      if (typeof origHandler === 'function') origHandler(e);
+      const modal = document.getElementById('backups-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+        if (tabUnified) tabUnified.click();
+      }
+    };
+  }
+}
+
+
+// Initialize attachments and unified backups listeners
+try {
+  setupAttachmentsEventListeners();
+  setupUnifiedBackupsEventListeners();
+  updateBackupsBadges();
+  updateArsenalAttachmentBadges();
+} catch(e) {
+  console.error('Initialization error in attachments/backups:', e);
+}
