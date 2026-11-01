@@ -3867,6 +3867,7 @@ function generateArsenalSharedLua() {
     parts.push('name = "' + (w.name || w.class) + '"');
     parts.push('class = "' + w.class + '"');
     if (w.desc) parts.push('desc = "' + w.desc + '"');
+    if (w.category) parts.push('category = "' + w.category + '"');
     if (w.rank) parts.push('rank = "' + w.rank + '"');
     if (w.spec) {
       if (Array.isArray(w.spec)) {
