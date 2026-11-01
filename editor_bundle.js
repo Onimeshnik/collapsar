@@ -16,7 +16,11 @@ const BUNDLED_INVENTORY_DATA = {"items":[{"class":"weapon_scpsl_medkit","name":"
 function applyLiveServerConfig(payload) {
   if (!payload) return;
 
-  // Protect client edits: don't overwrite if user recently saved or has active unsaved edits
+  // Protect client edits: don't overwrite if user has unsaved edits, loaded a file, or recently saved
+  if (state.hasUnsavedChanges || (Date.now() - (window._lastEditorSaveTime || 0) < 60000) || (Date.now() - (window._lastFileLoadTime || 0) < 60000)) {
+    console.log('[COLLAPSAR] Protected local edits: skipped background overwrite from live server config.');
+    return;
+  }
   if (Date.now() - (window._lastEditorSaveTime || 0) < 15000) {
     const syncStatus = document.getElementById('editor-sync-status');
     const syncDot = document.querySelector('#editor-sync-badge .sync-dot');
