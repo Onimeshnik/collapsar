@@ -2532,25 +2532,280 @@ window.restoreLocalSnapshot = function(id) {
   }
 };
 
+
+// ============================================================================
+// UNIVERSAL LUA CONFIG PARSERS & FILE LOADERS (JOBS / ARSENAL / INVENTORY)
+// ============================================================================
+function parseArsenalLua(raw) {
+  let maxWeight = 50;
+  const mwMatch = raw.match(/MAX_WEIGHT\s*=\s*(\d+)/i);
+  if (mwMatch) maxWeight = parseInt(mwMatch[1]);
+
+  const weapons = [];
+  const wepBlockMatch = raw.match(/NN_Arsenal\.WeaponConfig\s*=\s*\{([\s\S]*?)\n\}/);
+  if (wepBlockMatch) {
+    const block = wepBlockMatch[1];
+    const itemRegex = /\{([^}]+)\}/g;
+    let m;
+    while ((m = itemRegex.exec(block)) !== null) {
+      const line = m[1];
+      const getStr = (key) => {
+        const sm = line.match(new RegExp(key + '\\s*=\\s*["\']([^"\']*)["\']'));
+        return sm ? sm[1] : '';
+      };
+      const getNum = (key) => {
+        const nm = line.match(new RegExp(key + '\\s*=\\s*([\\d\\.]+)'));
+        return nm ? parseFloat(nm[1]) : 0;
+      };
+      const cls = getStr('class');
+      if (cls) {
+        weapons.push({
+          name: getStr('name') || cls,
+          class: cls,
+          desc: getStr('desc'),
+          rank: getStr('rank') || 'RCT',
+          spec: getStr('spec') || '',
+          weight: getNum('weight'),
+          category: getStr('category') || 'Табельное'
+        });
+      }
+    }
+  }
+
+  // Parse armor weights
+  const armorWeights = {};
+  const awMatch = raw.match(/NN_Arsenal\.ArmorWeights\s*=\s*NN_Arsenal\.ArmorWeights\s*or\s*\{([\s\S]*?)\n\}/);
+  if (awMatch) {
+    const wRegex = /\["([^"]+)"\]\s*=\s*([\d\.]+)/g;
+    let wm;
+    while ((wm = wRegex.exec(awMatch[1])) !== null) {
+      armorWeights[wm[1]] = parseFloat(wm[2]);
+    }
+  }
+
+  // Parse bodygroups (SubmodelInfo)
+  const bodygroups = [];
+  const submodelMatch = raw.match(/(?:NN_Arsenal\.SubmodelInfo|SUBMODEL_INFO)\s*=\s*(?:NN_Arsenal\.SubmodelInfo\s*or\s*)?\{([\s\S]*?)\n\}/);
+  if (submodelMatch) {
+    const block = submodelMatch[1];
+    const bgRegex = /\["([^"]+)"\]\s*=\s*\{([^}]+)\}/g;
+    let bm;
+    while ((bm = bgRegex.exec(block)) !== null) {
+      const smd = bm[1];
+      const bBody = bm[2];
+      const getStr = (key) => {
+        const sm = bBody.match(new RegExp(key + '\\s*=\\s*["\']([^"\']*)["\']'));
+        return sm ? sm[1] : '';
+      };
+      const getNum = (key) => {
+        const nm = bBody.match(new RegExp(key + '\\s*=\\s*([\\d\\.]+)'));
+        return nm ? parseFloat(nm[1]) : 0;
+      };
+      const weight = armorWeights[smd] || getNum('weight') || 0;
+
+      let category = 'Прочее';
+      const lSmd = smd.toLowerCase();
+      if (lSmd.includes('helmet') || lSmd.includes('helm') || lSmd.includes('visor') || lSmd.includes('head')) category = 'Шлем';
+      else if (lSmd.includes('pauldron')) category = 'Плечи';
+      else if (lSmd.includes('chest') || lSmd.includes('strap') || lSmd.includes('belt')) category = 'Нагрудник';
+      else if (lSmd.includes('back') || lSmd.includes('jetpack') || lSmd.includes('pack') || lSmd.includes('radio')) category = 'Спина';
+      else if (lSmd.includes('kama') || lSmd.includes('cloak') || lSmd.includes('hood')) category = 'Кама';
+      else if (lSmd.includes('holster') || lSmd.includes('pistol')) category = 'Кобуры';
+      else if (lSmd.includes('arm') || lSmd.includes('antenna') || lSmd.includes('ammo')) category = 'Руки';
+
+      bodygroups.push({
+        smd: smd,
+        name: getStr('name') || smd,
+        desc: getStr('desc') || '',
+        reqRank: getStr('reqRank') || '',
+        reqSpec: getStr('reqSpec') || '',
+        icon: getStr('icon') || '',
+        category: category,
+        weight: weight
+      });
+    }
+  }
+
+  // Parse attachments
+  const attachments = [];
+  const attStart = raw.indexOf('NN_Arsenal.AttachmentsConfig = {');
+  if (attStart !== -1) {
+    const attEnd = raw.indexOf('NN_Arsenal.WeaponRules', attStart);
+    const chunk = attEnd !== -1 ? raw.slice(attStart, attEnd) : raw.slice(attStart);
+    const wepBlocks = chunk.split(/\["([^"]+)"\]\s*=\s*\{/);
+    for (let i = 1; i < wepBlocks.length; i += 2) {
+      const wepClass = wepBlocks[i];
+      const block = wepBlocks[i + 1];
+      const slots = {};
+
+      const slotBlocks = block.split(/\[(\d+)\]\s*=\s*\{/);
+      for (let j = 1; j < slotBlocks.length; j += 2) {
+        const slotId = parseInt(slotBlocks[j]);
+        const sContent = slotBlocks[j + 1];
+
+        const nameMatch = sContent.match(/name\s*=\s*"([^"]*)"/);
+        const slotName = nameMatch ? nameMatch[1] : ('Слот ' + slotId);
+
+        const options = [];
+        const optRegex = /\{\s*name\s*=\s*"([^"]*)",\s*class\s*=\s*"([^"]*)"\s*\}/g;
+        let optMatch;
+        while ((optMatch = optRegex.exec(sContent)) !== null) {
+          options.push({ name: optMatch[1], class: optMatch[2] });
+        }
+
+        slots[slotId] = { name: slotName, options };
+      }
+      if (Object.keys(slots).length > 0) {
+        attachments.push({ wepClass, slots });
+      }
+    }
+  }
+
+  return {
+    maxWeight,
+    weapons,
+    bodygroups,
+    attachments,
+    armorWeights
+  };
+}
+
+function parseInventoryLua(raw) {
+  const items = [];
+  const wepWeights = {};
+
+  const itemsMatch = raw.match(/nn\.Inventory\.Items\s*=\s*\{([\s\S]*?)\n\}\s*\n/);
+  if (itemsMatch) {
+    const rawItems = itemsMatch[1];
+    const regex = /\[['"]([^'"]+)['"]\]\s*=\s*\{([^}]+)\}/g;
+    let m;
+    while ((m = regex.exec(rawItems)) !== null) {
+      const cls = m[1];
+      const body = m[2];
+      const nameM = body.match(/name\s*=\s*['"]([^'"]+)['"]/);
+      const weightM = body.match(/weight\s*=\s*([\d\.]+)/);
+      const typeM = body.match(/type\s*=\s*['"]([^'"]+)['"]/);
+      const iconM = body.match(/icon\s*=\s*['"]([^'"]+)['"]/);
+      const rankM = body.match(/rank\s*=\s*['"]([^'"]+)['"]/);
+      const specM = body.match(/spec\s*=\s*['"]([^'"]+)['"]/);
+      const consM = body.match(/consumable_wep\s*=\s*true/);
+
+      items.push({
+        class: cls,
+        name: nameM ? nameM[1] : cls,
+        weight: weightM ? parseFloat(weightM[1]) : 1,
+        type: typeM ? typeM[1] : 'weapon',
+        icon: iconM ? iconM[1] : 'icon16/wrench.png',
+        rank: rankM ? rankM[1] : '',
+        spec: specM ? specM[1] : '',
+        consumable_wep: !!consM
+      });
+    }
+  }
+
+  const weightsMatch = raw.match(/nn\.Config\.WeaponWeights\s*=\s*\{([\s\S]*?)\n\}/);
+  if (weightsMatch) {
+    const wRegex = /\[['"]([^'"]+)['"]\]\s*=\s*([\d\.]+)/g;
+    let wm;
+    while ((wm = wRegex.exec(weightsMatch[1])) !== null) {
+      wepWeights[wm[1]] = parseFloat(wm[2]);
+    }
+  }
+
+  return { items, wepWeights };
+}
+
+
 function loadLuaString(rawContent, filename = 'файл') {
   try {
-    const parsed = parseConfigString(rawContent);
-    if (parsed.jobs.length === 0 && parsed.categories.length === 0) {
-      showToast('В файле не найдено nn.util.addjob или nn.cats!', 'warning');
+    if (!rawContent || typeof rawContent !== 'string') {
+      showToast('Файл пуст или повреждён!', 'error');
       return;
     }
-    createLocalBackupSnapshot('Перед открытием ' + filename);
-    state.jobs = parsed.jobs;
-    state.categories = parsed.categories;
-    state.formations = parsed.formations || [];
-    gatherSuggestions();
-    updateStats();
-    populateFilters();
-    populateDatalists();
-    runDiagnostics();
-    renderJobs();
-    markUnsaved();
-    showToast('Успешно загружено ' + parsed.jobs.length + ' профессий из ' + filename + '!', 'success');
+
+    const lowerName = (filename || '').toLowerCase();
+    const isArsenal = rawContent.includes('NN_Arsenal') || rawContent.includes('WeaponConfig') || lowerName.includes('arsenal');
+    const isInventory = rawContent.includes('nn.Inventory') || rawContent.includes('Inventory.Items') || lowerName.includes('inventory');
+    const isJobs = rawContent.includes('nn.util.addjob') || rawContent.includes('nn.cats') || lowerName.includes('jobs');
+
+    // 1. ARSENAL LOADER
+    if (isArsenal) {
+      const parsed = parseArsenalLua(rawContent);
+      if (parsed.weapons.length === 0 && parsed.bodygroups.length === 0) {
+        showToast('В файле не найдено оружие (WeaponConfig) или бодигруппы (SubmodelInfo)!', 'warning');
+        return;
+      }
+      if (typeof createUnifiedBackupSnapshot === 'function') {
+        createUnifiedBackupSnapshot('Перед открытием арсенала: ' + filename, 'auto');
+      }
+      arsenalState.weapons = parsed.weapons;
+      if (parsed.bodygroups.length > 0) arsenalState.bodygroups = parsed.bodygroups;
+      if (parsed.attachments.length > 0) arsenalState.attachments = parsed.attachments;
+      if (parsed.maxWeight) {
+        arsenalState.maxWeight = parsed.maxWeight;
+        const maxWeightInput = document.getElementById('arsenal-max-weight-input');
+        if (maxWeightInput) maxWeightInput.value = parsed.maxWeight;
+      }
+      if (Object.keys(parsed.armorWeights).length > 0) arsenalState.armorWeights = parsed.armorWeights;
+
+      saveArsenalState();
+      if (typeof saveArsenalAttachmentsState === 'function') saveArsenalAttachmentsState();
+      updateArsenalStats();
+      if (typeof switchMainModule === 'function') switchMainModule('arsenal');
+      renderArsenalSubtab(arsenalState.activeSubtab || 'weps');
+      showToast('Арсенал успешно загружен из ' + filename + ' (' + parsed.weapons.length + ' оружия, ' + parsed.bodygroups.length + ' брони, ' + parsed.attachments.length + ' обвесов)!', 'success');
+      return;
+    }
+
+    // 2. INVENTORY / SPECIAL EQUIPMENT LOADER
+    if (isInventory) {
+      const parsed = parseInventoryLua(rawContent);
+      if (parsed.items.length === 0) {
+        showToast('В файле не найдены предметы nn.Inventory.Items!', 'warning');
+        return;
+      }
+      if (typeof createUnifiedBackupSnapshot === 'function') {
+        createUnifiedBackupSnapshot('Перед открытием инвентаря: ' + filename, 'auto');
+      }
+      inventoryState.items = parsed.items;
+      if (Object.keys(parsed.wepWeights).length > 0) inventoryState.wepWeights = parsed.wepWeights;
+
+      if (typeof saveInventoryState === 'function') saveInventoryState();
+      if (typeof switchMainModule === 'function') switchMainModule('inventory');
+      if (typeof renderInventorySubtab === 'function') renderInventorySubtab(inventoryState.activeSubtab || 'items');
+      showToast('Спецоборудование успешно загружено из ' + filename + ' (' + parsed.items.length + ' предметов)!', 'success');
+      return;
+    }
+
+    // 3. JOBS CONFIG LOADER
+    if (isJobs) {
+      const parsed = parseConfigString(rawContent);
+      if (parsed.jobs.length === 0 && parsed.categories.length === 0) {
+        showToast('В файле не найдено nn.util.addjob или nn.cats!', 'warning');
+        return;
+      }
+      if (typeof createLocalBackupSnapshot === 'function') {
+        createLocalBackupSnapshot('Перед открытием ' + filename);
+      }
+      if (typeof createUnifiedBackupSnapshot === 'function') {
+        createUnifiedBackupSnapshot('Перед открытием профессий: ' + filename, 'auto');
+      }
+      state.jobs = parsed.jobs;
+      state.categories = parsed.categories;
+      state.formations = parsed.formations || [];
+      gatherSuggestions();
+      updateStats();
+      populateFilters();
+      populateDatalists();
+      runDiagnostics();
+      if (typeof switchMainModule === 'function') switchMainModule('jobs');
+      renderJobs();
+      markUnsaved();
+      showToast('Успешно загружено ' + parsed.jobs.length + ' профессий из ' + filename + '!', 'success');
+      return;
+    }
+
+    showToast('Не удалось распознать формат файла: файл не содержит настроек Профессий, Арсенала или Спецоборудования!', 'warning');
   } catch(err) {
     console.error(err);
     showToast('Ошибка разбора файла: ' + err.message, 'error');
@@ -2582,8 +2837,14 @@ function initEditorBundle() {
   document.getElementById('btn-open-cats').addEventListener('click', openCatsModal);
   document.getElementById('btn-open-diagnostics').addEventListener('click', () => openDiagnosticsModal('all'));
   document.getElementById('btn-open-backups').addEventListener('click', () => {
-    renderLocalBackupsTable();
-    document.getElementById('backups-modal').style.display = 'flex';
+    if (typeof openBackupsModal === 'function') {
+      openBackupsModal('unified');
+    } else {
+      if (typeof updateBackupsBadges === 'function') updateBackupsBadges();
+      if (typeof renderUnifiedBackupsTable === 'function') renderUnifiedBackupsTable();
+      if (typeof renderLocalBackupsTable === 'function') renderLocalBackupsTable();
+      document.getElementById('backups-modal').style.display = 'flex';
+    }
   });
 
   // Download / Save - с контекстной поддержкой Профессий, Арсенала и Спецоборудования
@@ -2949,7 +3210,28 @@ const arsenalState = {
   activeMainView: 'jobs'
 };
 
-function initArsenalModule() {
+async function initArsenalModule() {
+  // 0. Fetch live data from server if online
+  if (window.location.protocol.startsWith('http')) {
+    try {
+      const res = await fetch('/api/arsenal');
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.success && Array.isArray(data.weapons) && data.weapons.length > 0) {
+          arsenalState.weapons = data.weapons;
+          if (data.bodygroups && data.bodygroups.length > 0) arsenalState.bodygroups = data.bodygroups;
+          if (data.attachments && data.attachments.length > 0) arsenalState.attachments = data.attachments;
+          if (data.maxWeight) arsenalState.maxWeight = data.maxWeight;
+          if (data.armorWeights) arsenalState.armorWeights = data.armorWeights;
+          saveArsenalState();
+          if (typeof saveArsenalAttachmentsState === 'function') saveArsenalAttachmentsState();
+        }
+      }
+    } catch(e) {
+      console.warn('Could not fetch /api/arsenal:', e);
+    }
+  }
+
   // 1. Load data from LocalStorage or Bundled Data
   try {
     const cached = localStorage.getItem('swrp_arsenal_saved_data');
@@ -3071,7 +3353,11 @@ function switchMainModule(moduleName) {
   if (invSection) invSection.style.display = (moduleName === 'inventory') ? 'flex' : 'none';
 
   if (moduleName === 'arsenal') {
-    renderArsenalSubtab(arsenalState.activeSubtab);
+    if (typeof switchArsenalSubtab === 'function') {
+      switchArsenalSubtab(arsenalState.activeSubtab || 'weps');
+    } else {
+      renderArsenalSubtab(arsenalState.activeSubtab || 'weps');
+    }
   } else if (moduleName === 'inventory') {
     renderInventorySubtab(inventoryState.activeSubtab);
   }
@@ -3107,6 +3393,7 @@ function switchArsenalSubtab(subtabName) {
   const panes = {
     'weps': document.getElementById('arsenal-pane-weps'),
     'bgs': document.getElementById('arsenal-pane-bgs'),
+    'atts': document.getElementById('arsenal-pane-atts'),
     'export': document.getElementById('arsenal-pane-export')
   };
 
@@ -3755,6 +4042,19 @@ function fallbackCopy(text, message) {
 // EVENT LISTENERS SETUP
 // --------------------------------------------------------------------------
 function setupArsenalEventListeners() {
+
+
+  const arFileInput = document.getElementById('arsenal-file-input');
+  if (arFileInput) {
+    arFileInput.onchange = (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => loadLuaString(evt.target.result, file.name);
+      reader.readAsText(file);
+      e.target.value = '';
+    };
+  }
   // Top nav switcher
   const jobsBtn = document.getElementById('tab-nav-jobs');
   const arsenalBtn = document.getElementById('tab-nav-arsenal');
@@ -4477,6 +4777,19 @@ function generateInventoryExportCode() {
 }
 
 function setupInventoryEventListeners() {
+
+
+  const invFileInput = document.getElementById('inv-file-input');
+  if (invFileInput) {
+    invFileInput.onchange = (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => loadLuaString(evt.target.result, file.name);
+      reader.readAsText(file);
+      e.target.value = '';
+    };
+  }
   // Top nav button
   const invBtn = document.getElementById('tab-nav-inventory');
   if (invBtn) invBtn.addEventListener('click', () => switchMainModule('inventory'));
@@ -5410,6 +5723,50 @@ window.deleteUnifiedBackup = function(id) {
   showToast('Резервная копия удалена', 'success');
 };
 
+function openBackupsModal(preferredTab = 'unified') {
+  if (typeof updateBackupsBadges === 'function') updateBackupsBadges();
+  
+  // Auto-create initial baseline backup if none exists and we have data
+  try {
+    const existing = getUnifiedBackups();
+    if (existing.length === 0) {
+      const hasJobs = typeof state !== 'undefined' && state.jobs && state.jobs.length > 0;
+      const hasWeps = typeof arsenalState !== 'undefined' && arsenalState.weapons && arsenalState.weapons.length > 0;
+      if (hasJobs || hasWeps) {
+        createUnifiedBackupSnapshot('Начальное состояние (Автоматический срез)', 'auto');
+      }
+    }
+  } catch(e) {
+    console.error('Error auto-creating baseline backup:', e);
+  }
+
+  const tabUnified = document.getElementById('tab-btn-unified-backups');
+  const tabJobs = document.getElementById('tab-btn-jobs-backups');
+  const viewUnified = document.getElementById('unified-backups-view');
+  const viewJobs = document.getElementById('jobs-backups-view');
+
+  if (preferredTab === 'unified' && tabUnified && viewUnified) {
+    tabUnified.classList.add('active');
+    if (tabJobs) tabJobs.classList.remove('active');
+    viewUnified.style.display = 'block';
+    if (viewJobs) viewJobs.style.display = 'none';
+    if (typeof renderUnifiedBackupsTable === 'function') renderUnifiedBackupsTable();
+  } else if (preferredTab === 'jobs' && tabJobs && viewJobs) {
+    tabJobs.classList.add('active');
+    if (tabUnified) tabUnified.classList.remove('active');
+    viewJobs.style.display = 'block';
+    if (viewUnified) viewJobs.style.display = 'none';
+    if (typeof renderLocalBackupsTable === 'function') renderLocalBackupsTable();
+  } else {
+    if (typeof renderUnifiedBackupsTable === 'function') renderUnifiedBackupsTable();
+    if (typeof renderLocalBackupsTable === 'function') renderLocalBackupsTable();
+  }
+
+  const modal = document.getElementById('backups-modal');
+  if (modal) modal.style.display = 'flex';
+}
+window.openBackupsModal = openBackupsModal;
+
 function setupUnifiedBackupsEventListeners() {
   // Tabs switching in Backups modal
   const tabUnified = document.getElementById('tab-btn-unified-backups');
@@ -5446,9 +5803,16 @@ function setupUnifiedBackupsEventListeners() {
   }
 
   // Export Unified Backup button
-  const btnExportUnified = document.getElementById('btn-export-unified-backup');
+  const btnExportUnified = document.getElementById('btn-export-unified-backup') || document.getElementById('btn-export-current-unified');
   if (btnExportUnified) {
     btnExportUnified.onclick = () => {
+      const snap = createUnifiedBackupSnapshot('Экспортированный общий срез', 'manual');
+      exportSingleUnifiedBackup(snap.id);
+    };
+  }
+  const btnExportCurrent = document.getElementById('btn-export-current-unified');
+  if (btnExportCurrent && btnExportCurrent !== btnExportUnified) {
+    btnExportCurrent.onclick = () => {
       const snap = createUnifiedBackupSnapshot('Экспортированный общий срез', 'manual');
       exportSingleUnifiedBackup(snap.id);
     };
@@ -5531,7 +5895,7 @@ function setupUnifiedBackupsEventListeners() {
   }
 
   // Main backups button in top toolbar
-  const mainBackupsBtn = document.getElementById('open-backups-btn');
+  const mainBackupsBtn = document.getElementById('btn-open-backups') || document.getElementById('open-backups-btn');
   if (mainBackupsBtn) {
     const origHandler = mainBackupsBtn.onclick;
     mainBackupsBtn.onclick = (e) => {
@@ -5546,11 +5910,18 @@ function setupUnifiedBackupsEventListeners() {
 }
 
 
+  const statBackupsPill = document.getElementById('stat-backups-pill');
+  if (statBackupsPill) {
+    statBackupsPill.style.cursor = 'pointer';
+    statBackupsPill.onclick = () => openBackupsModal('unified');
+  }
+
 // Initialize attachments and unified backups listeners
 try {
   setupAttachmentsEventListeners();
   setupUnifiedBackupsEventListeners();
   updateBackupsBadges();
+  renderUnifiedBackupsTable();
   updateArsenalAttachmentBadges();
 } catch(e) {
   console.error('Initialization error in attachments/backups:', e);
