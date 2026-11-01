@@ -3152,12 +3152,14 @@
             subordinates: 'Подчинённые',
             donate: 'Донат',
             jobs: 'Профессии',
+            config_editor: 'Конфигуратор',
         };
+        const BASE_SUPERADMIN_PERMISSIONS = ['logs', 'server_logs', 'bans', 'kick', 'message', 'rank', 'whitelist', 'delete_characters', 'subordinates', 'donate', 'jobs'];
         const DEFAULT_PANEL_ROLE_PERMISSIONS = {
             viewer: [],
             moderator: ['kick', 'message', 'whitelist', 'jobs'],
             admin: ['logs', 'server_logs', 'bans', 'kick', 'message', 'rank', 'whitelist', 'subordinates', 'jobs'],
-            superadmin: Object.keys(PERMISSION_LABELS),
+            superadmin: BASE_SUPERADMIN_PERMISSIONS,
             commander: ['whitelist', 'subordinates', 'jobs'],
             depcom: ['whitelist', 'subordinates', 'jobs'],
             gcmd: ['whitelist', 'subordinates', 'jobs'],
@@ -3247,7 +3249,7 @@
             return !!currentIsOwner;
         }
         function canUseConfigEditor() {
-            return canUseSettings() || hasCommanderAccess() || ['superadmin', 'admin', 'commander', 'head_admin'].includes(currentRole) || hasPanelPermission('jobs');
+            return hasPanelPermission('config_editor');
         }
         function getFormationName(id) {
             const formation = FORMATIONS.find(f => f.id === normalizeUnit(id));
