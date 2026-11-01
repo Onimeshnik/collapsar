@@ -2532,11 +2532,157 @@ window.restoreLocalSnapshot = function(id) {
   }
 };
 
-function loadLuaString(rawContent, filename = 'файл') {
+function parseArsenalLua(content) {
+  content = (content || '').replace(/\r\n/g, '\n');
+
+  if (content.includes('nn.util.addjob') && !content.includes('NN_Arsenal.WeaponConfig')) {
+    return { success: false, error: 'Файл содержит профессии (nn.util.addjob), а не конфигурацию Арсенала! Переключитесь на вкладку «ПРОФЕССИИ».' };
+  }
+  if (content.includes('nn.Inventory.Items') && !content.includes('NN_Arsenal.WeaponConfig')) {
+    return { success: false, error: 'Файл содержит спецоборудование (nn.Inventory.Items), а не Арсенал! Переключитесь на вкладку «СПЕЦОБОРУДОВАНИЕ».' };
+  }
+  if (!content.includes('NN_Arsenal.WeaponConfig') && !content.includes('NN_Arsenal')) {
+    return { success: false, error: 'Файл не содержит таблицы NN_Arsenal.WeaponConfig! Убедитесь, что выбран sh_arsenal_config.lua.' };
+  }
+
+  const weapons = [];
+  const wepConfigMatch = content.match(/NN_Arsenal\.WeaponConfig\s*=\s*\{([\s\S]*?)\n\s*\}\s*(?:\n\s*(?:NN_Arsenal|--|\z)|$)/);
+  const wepBlock = wepConfigMatch ? wepConfigMatch[1] : content;
+
+  const wepRegex = /\{([^{}]+)\}/g;
+  let wm;
+  while ((wm = wepRegex.exec(wepBlock)) !== null) {
+    const body = wm[1];
+    const classM = body.match(/class\s*=\s*["']([^"']+)["']/);
+    if (!classM) continue;
+    const cls = classM[1].trim();
+    const nameM = body.match(/name\s*=\s*["']([^"']+)["']/);
+    const descM = body.match(/desc\s*=\s*["']([^"']+)["']/);
+    const rankM = body.match(/rank\s*=\s*["']([^"']+)["']/);
+    const weightM = body.match(/weight\s*=\s*([\d\.]+)/);
+    const catM = body.match(/category\s*=\s*["']([^"']+)["']/);
+
+    let spec = '';
+    const specTableM = body.match(/spec\s*=\s*\{([^}]+)\}/);
+    if (specTableM) {
+      spec = specTableM[1].split(',').map(s => s.replace(/["'\s]/g, '')).filter(Boolean);
+    } else {
+      const specStrM = body.match(/spec\s*=\s*["']([^"']+)["']/);
+      if (specStrM) spec = specStrM[1].trim();
+    }
+
+    weapons.push({
+      class: cls,
+      name: nameM ? nameM[1] : cls,
+      desc: descM ? descM[1] : '',
+      rank: rankM ? rankM[1] : '',
+      spec: spec,
+      weight: weightM ? parseFloat(weightM[1]) : 2.5,
+      category: catM ? catM[1] : ''
+    });
+  }
+
+  const catMatch = content.match(/NN_Arsenal\.Categories\s*=\s*\{([\s\S]*?)\n\s*\}/);
+  if (catMatch) {
+    const catRegex = /\[["']([^"']+)["']\]\s*=\s*["']([^"']+)["']/g;
+    let cm;
+    while ((cm = catRegex.exec(catMatch[1])) !== null) {
+      const wep = weapons.find(w => w.class === cm[1]);
+      if (wep && !wep.category) wep.category = cm[2];
+    }
+  }
+
+  const armorWeights = {};
+  const armorMatch = content.match(/NN_Arsenal\.ArmorWeights\s*(?:=\s*(?:NN_Arsenal\.ArmorWeights\s*or\s*)?\{|\s*=\s*\{)([\s\S]*?)\n\s*\}/);
+  if (armorMatch) {
+    const armorRegex = /\[["']([^"']+)["']\]\s*=\s*([\d\.]+)/g;
+    let am;
+    while ((am = armorRegex.exec(armorMatch[1])) !== null) {
+      armorWeights[am[1]] = parseFloat(am[2]);
+    }
+  }
+
+  if (weapons.length === 0) {
+    return { success: false, error: 'В таблице NN_Arsenal.WeaponConfig не обнаружено корректных записей оружия.' };
+  }
+
+  return { success: true, weapons, armorWeights };
+}
+
+function parseInventoryLua(content) {
+  content = (content || '').replace(/\r\n/g, '\n');
+
+  if (content.includes('nn.util.addjob') && !content.includes('nn.Inventory.Items')) {
+    return { success: false, error: 'Файл содержит профессии (nn.util.addjob), а не спецоборудование! Переключитесь на вкладку «ПРОФЕССИИ».' };
+  }
+  if (content.includes('NN_Arsenal.WeaponConfig') && !content.includes('nn.Inventory.Items')) {
+    return { success: false, error: 'Файл содержит Арсенал (NN_Arsenal), а не спецоборудование! Переключитесь на вкладку «АРСЕНАЛ».' };
+  }
+  if (!content.includes('nn.Inventory.Items') && !content.includes('nn.Config.WeaponWeights') && !content.includes('nn.Inventory')) {
+    return { success: false, error: 'Файл не содержит nn.Inventory.Items или nn.Config.WeaponWeights! Убедитесь, что выбран aa_sh_inventory_config.lua.' };
+  }
+
+  const items = [];
+  const itemsMatch = content.match(/nn\.Inventory\.Items\s*=\s*\{([\s\S]*?)\n\s*\}\s*(?:\n\s*(?:STORAGE_ITEM_DB|ITEM_DB|nn\.Config|--|\z)|$)/);
+  if (itemsMatch) {
+    const raw = itemsMatch[1];
+    const regex = /\[["']([^"']+)["']\]\s*=\s*\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}/g;
+    let m;
+    while ((m = regex.exec(raw)) !== null) {
+      const cls = m[1];
+      const body = m[2];
+      const nameM = body.match(/name\s*=\s*["']([^"']+)["']/);
+      const weightM = body.match(/weight\s*=\s*([\d\.]+)/);
+      const typeM = body.match(/type\s*=\s*["']([^"']+)["']/);
+      const iconM = body.match(/icon\s*=\s*["']([^"']+)["']/);
+      const specM = body.match(/spec\s*=\s*["']([^"']+)["']/);
+      const rankM = body.match(/rank\s*=\s*["']([^"']+)["']/);
+      const consumableWepM = body.match(/consumable_wep\s*=\s*(\w+)/);
+
+      items.push({
+        class: cls,
+        name: nameM ? nameM[1] : cls,
+        weight: weightM ? parseFloat(weightM[1]) : 1.0,
+        type: typeM ? typeM[1] : 'weapon',
+        icon: iconM ? iconM[1] : 'icon16/wrench.png',
+        spec: specM ? specM[1] : '',
+        rank: rankM ? rankM[1] : '',
+        consumable_wep: consumableWepM ? consumableWepM[1] === 'true' : false
+      });
+    }
+  }
+
+  const wepWeights = {};
+  const wepWeightsMatch = content.match(/nn\.Config\.WeaponWeights\s*=\s*\{([\s\S]*?)\n\s*\}/);
+  if (wepWeightsMatch) {
+    const rawWeps = wepWeightsMatch[1];
+    const regexWep = /\[["']([^"']+)["']\]\s*=\s*([\d\.]+)/g;
+    let mw;
+    while ((mw = regexWep.exec(rawWeps)) !== null) {
+      wepWeights[mw[1]] = parseFloat(mw[2]);
+    }
+  }
+
+  if (items.length === 0 && Object.keys(wepWeights).length === 0) {
+    return { success: false, error: 'В файле не найдено ни одного предмета nn.Inventory.Items и ни одного веса nn.Config.WeaponWeights.' };
+  }
+
+  return { success: true, items, wepWeights };
+}
+
+function loadJobsFile(rawContent, filename = 'sh_jobs_config.lua') {
   try {
+    if (rawContent.includes('NN_Arsenal.WeaponConfig')) {
+      showToast('Ошибка валидации: файл содержит Арсенал, а не профессии! Перейдите во вкладку «АРСЕНАЛ».', 'error', 6000);
+      return;
+    }
+    if (rawContent.includes('nn.Inventory.Items') && !rawContent.includes('nn.util.addjob')) {
+      showToast('Ошибка валидации: файл содержит спецоборудование, а не профессии! Перейдите во вкладку «СПЕЦОБОРУДОВАНИЕ».', 'error', 6000);
+      return;
+    }
     const parsed = parseConfigString(rawContent);
     if (parsed.jobs.length === 0 && parsed.categories.length === 0) {
-      showToast('В файле не найдено nn.util.addjob или nn.cats!', 'warning');
+      showToast('Ошибка валидации: в файле не найдено вызовов nn.util.addjob или категорий nn.cats!', 'error', 6000);
       return;
     }
     createLocalBackupSnapshot('Перед открытием ' + filename);
@@ -2550,11 +2696,94 @@ function loadLuaString(rawContent, filename = 'файл') {
     runDiagnostics();
     renderJobs();
     markUnsaved();
-    showToast('Успешно загружено ' + parsed.jobs.length + ' профессий из ' + filename + '!', 'success');
+    showToast('Успешно загружено: ' + parsed.jobs.length + ' профессий, ' + parsed.categories.length + ' категорий из ' + filename + '!', 'success', 5000);
   } catch(err) {
     console.error(err);
-    showToast('Ошибка разбора файла: ' + err.message, 'error');
+    showToast('Ошибка разбора файла профессий: ' + err.message, 'error', 6000);
   }
+}
+
+function loadArsenalFile(rawContent, filename = 'sh_arsenal_config.lua') {
+  try {
+    const res = parseArsenalLua(rawContent);
+    if (!res.success) {
+      showToast(res.error, 'error', 7000);
+      return;
+    }
+    arsenalState.weapons = res.weapons;
+    if (res.armorWeights && Object.keys(res.armorWeights).length > 0) {
+      arsenalState.armorWeights = res.armorWeights;
+    }
+    saveArsenalState();
+    updateArsenalStats();
+    renderArsenalSubtab(arsenalState.activeSubtab || 'weps');
+    showToast('Успешно загружен Арсенал: ' + res.weapons.length + ' позиций оружия, ' + Object.keys(arsenalState.armorWeights || {}).length + ' весов брони из ' + filename + '!', 'success', 5000);
+  } catch(err) {
+    console.error(err);
+    showToast('Ошибка разбора Арсенала: ' + err.message, 'error', 6000);
+  }
+}
+
+function loadInventoryFile(rawContent, filename = 'aa_sh_inventory_config.lua') {
+  try {
+    const res = parseInventoryLua(rawContent);
+    if (!res.success) {
+      showToast(res.error, 'error', 7000);
+      return;
+    }
+    if (res.items && res.items.length > 0) {
+      inventoryState.items = res.items;
+    }
+    if (res.wepWeights && Object.keys(res.wepWeights).length > 0) {
+      inventoryState.wepWeights = res.wepWeights;
+    }
+    saveInventoryState();
+    updateInventoryBadges();
+    renderInventorySubtab(inventoryState.activeSubtab || 'items');
+    showToast('Успешно загружено Спецоборудование: ' + (res.items || []).length + ' предметов, ' + Object.keys(res.wepWeights || {}).length + ' весов SWEP из ' + filename + '!', 'success', 5000);
+  } catch(err) {
+    console.error(err);
+    showToast('Ошибка разбора Спецоборудования: ' + err.message, 'error', 6000);
+  }
+}
+
+function handleContextualFileLoad(rawContent, filename = 'файл', forcedModule = null) {
+  if (forcedModule === 'jobs') {
+    return loadJobsFile(rawContent, filename);
+  }
+  if (forcedModule === 'arsenal') {
+    return loadArsenalFile(rawContent, filename);
+  }
+  if (forcedModule === 'inventory') {
+    return loadInventoryFile(rawContent, filename);
+  }
+
+  const isArsenal = rawContent.includes('NN_Arsenal.WeaponConfig') || (rawContent.includes('NN_Arsenal') && !rawContent.includes('nn.util.addjob'));
+  const isInventory = rawContent.includes('nn.Inventory.Items') || (rawContent.includes('nn.Config.WeaponWeights') && !rawContent.includes('nn.util.addjob'));
+  const isJobs = rawContent.includes('nn.util.addjob') || rawContent.includes('nn.cats');
+
+  const currentView = (typeof arsenalState !== 'undefined' && arsenalState.activeMainView) || 'jobs';
+
+  if (isArsenal && currentView !== 'arsenal') {
+    if (typeof switchMainModule === 'function') switchMainModule('arsenal');
+    return loadArsenalFile(rawContent, filename);
+  }
+  if (isInventory && currentView !== 'inventory') {
+    if (typeof switchMainModule === 'function') switchMainModule('inventory');
+    return loadInventoryFile(rawContent, filename);
+  }
+  if (isJobs && currentView !== 'jobs') {
+    if (typeof switchMainModule === 'function') switchMainModule('jobs');
+    return loadJobsFile(rawContent, filename);
+  }
+
+  if (currentView === 'arsenal') return loadArsenalFile(rawContent, filename);
+  if (currentView === 'inventory') return loadInventoryFile(rawContent, filename);
+  return loadJobsFile(rawContent, filename);
+}
+
+function loadLuaString(rawContent, filename = 'файл') {
+  handleContextualFileLoad(rawContent, filename);
 }
 
 // Event Listeners
@@ -2676,20 +2905,25 @@ function initEditorBundle() {
     showToast('Снимок текущего состояния сохранён!', 'success');
   });
 
-  // File Input (Open file)
-  const fileInput = document.getElementById('file-input');
-  if (fileInput) {
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
+  // File Inputs (Contextual and module-specific)
+  const bindFileInput = (id, forcedModule = null) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = (evt) => {
-        loadLuaString(evt.target.result, file.name);
+        handleContextualFileLoad(evt.target.result, file.name, forcedModule);
       };
       reader.readAsText(file);
-      fileInput.value = '';
+      el.value = '';
     });
-  }
+  };
+
+  bindFileInput('file-input');
+  bindFileInput('arsenal-file-input', 'arsenal');
+  bindFileInput('inventory-file-input', 'inventory');
 
   // Drag and Drop
   const overlay = document.getElementById('drop-overlay');
@@ -2710,7 +2944,7 @@ function initEditorBundle() {
         const file = e.dataTransfer.files[0];
         const reader = new FileReader();
         reader.onload = (evt) => {
-          loadLuaString(evt.target.result, file.name);
+          handleContextualFileLoad(evt.target.result, file.name);
         };
         reader.readAsText(file);
       }
@@ -3078,6 +3312,28 @@ function switchMainModule(moduleName) {
 
   const saveBtn = document.getElementById('btn-download-config');
   const dlBtn = document.getElementById('btn-download-lua-file');
+  const openLabel = document.getElementById('btn-main-open-label');
+  const openBtn = document.getElementById('btn-main-open-file');
+
+  if (openLabel) {
+    if (moduleName === 'arsenal') {
+      openLabel.textContent = 'Открыть sh_arsenal_config.lua';
+    } else if (moduleName === 'inventory') {
+      openLabel.textContent = 'Открыть aa_sh_inventory_config.lua';
+    } else {
+      openLabel.textContent = 'Открыть sh_jobs_config.lua';
+    }
+  }
+  if (openBtn) {
+    if (moduleName === 'arsenal') {
+      openBtn.title = 'Открыть и валидировать sh_arsenal_config.lua';
+    } else if (moduleName === 'inventory') {
+      openBtn.title = 'Открыть и валидировать aa_sh_inventory_config.lua';
+    } else {
+      openBtn.title = 'Открыть и валидировать sh_jobs_config.lua';
+    }
+  }
+
   if (saveBtn) {
     if (moduleName === 'arsenal') {
       saveBtn.title = 'Сохранить sh_arsenal_config.lua на игровом сервере';
