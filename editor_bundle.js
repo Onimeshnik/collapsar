@@ -3202,6 +3202,7 @@ const arsenalState = {
   bgCategories: ["Шлем", "Плечи", "Нагрудник", "Спина", "Кама", "Кобуры", "Модули", "Руки", "Прочее"],
   ranks: ["RCT", "PV1", "PV2", "PFC", "SPC", "CPL", "SGT", "SSG", "MSG", "SGM", "JLT", "LT", "SLT", "CPT", "MAJ", "LTC", "CO", "SCO", "COL", "MC"],
   specs: ["ARC", "CM", "SO", "Mando", "ARF", "AG", "UNV", "RC", "PRT", "MSC", "ENG", "PRG", "MRK", "SN", "SM", "HEV", "DM", "SD", "SK", "GH", "GN", "MED", "FA", "PR", "MN", "REC", "ART", "Hound", "Boss", "Scorch", "Fixer", "Sev", "Niner", "Darman", "Atin", "Fi"],
+  attachments: [],
   activeSubtab: 'weps',
   wepSearch: '',
   wepFilterCat: '',
@@ -3242,6 +3243,9 @@ async function initArsenalModule() {
         arsenalState.bodygroups = parsed.bodygroups || [];
         arsenalState.maxWeight = parsed.maxWeight || 50;
         arsenalState.armorWeights = parsed.armorWeights || {};
+        if (Array.isArray(parsed.attachments) && parsed.attachments.length > 0) {
+          arsenalState.attachments = parsed.attachments;
+        }
       }
     }
   } catch (e) {
@@ -3309,6 +3313,7 @@ function saveArsenalState() {
     localStorage.setItem('swrp_arsenal_saved_data', JSON.stringify({
       weapons: arsenalState.weapons,
       bodygroups: arsenalState.bodygroups,
+      attachments: arsenalState.attachments || [],
       maxWeight: arsenalState.maxWeight,
       armorWeights: arsenalState.armorWeights
     }));
@@ -4078,6 +4083,8 @@ function setupArsenalEventListeners() {
   if (btnAddWep) btnAddWep.addEventListener('click', openAddWeaponModal);
   if (btnAddBg) btnAddBg.addEventListener('click', openAddBgModal);
   if (btnExportTab) btnExportTab.addEventListener('click', () => switchArsenalSubtab('export'));
+  const btnAddAtt = document.getElementById('btn-arsenal-add-att');
+  if (btnAddAtt) btnAddAtt.addEventListener('click', () => openArsenalAttModal());
 
   // Searches
   const wepSearch = document.getElementById('arsenal-wep-search');
@@ -4994,9 +5001,13 @@ function setupInventoryEventListeners() {
   } else {
     initEditorBundle();
   }
-})();
 
-/* COLLAPSAR ATTACHMENTS & UNIFIED BACKUPS SYSTEM */
+
+/* ============================================================================
+   COLLAPSAR ATTACHMENTS & UNIFIED BACKUPS SYSTEM (INSIDE SCOPE)
+   ============================================================================ */
+
+
 
 // ============================================================================
 // BUNDLED ATTACHMENTS DATA & STATE
@@ -5051,8 +5062,16 @@ function renderArsenalAttachments() {
 
   updateArsenalAttachmentBadges();
 
-  if (!arsenalState.attachments) {
-    arsenalState.attachments = JSON.parse(JSON.stringify(BUNDLED_ATTACHMENTS_DATA));
+  if (!arsenalState.attachments || !Array.isArray(arsenalState.attachments) || arsenalState.attachments.length === 0) {
+    try {
+      const stored = localStorage.getItem('collapsar_arsenal_attachments');
+      if (stored) {
+        arsenalState.attachments = JSON.parse(stored);
+      }
+    } catch(e) {}
+    if (!arsenalState.attachments || !Array.isArray(arsenalState.attachments) || arsenalState.attachments.length === 0) {
+      arsenalState.attachments = JSON.parse(JSON.stringify(BUNDLED_ATTACHMENTS_DATA));
+    }
   }
 
   // Category Pills
@@ -5297,8 +5316,9 @@ function addSlotEditCard(slotId = 1, slotName = '', options = []) {
       <input type="text" class="input-field font-mono input-opt-class" value="${escapeHtml(cls)}" placeholder="Класс (acwatt_...) или пусто для снятия" style="flex: 1.2;">
       <button type="button" class="btn btn-danger btn-xs btn-remove-opt" title="Удалить вариант" style="padding: 4px 8px;">✕</button>
     `;
-    row.querySelector('.btn-remove-opt').onclick = () => row.remove();
-    optsList.appendChild(row);
+    const removeOptBtn = row.querySelector('.btn-remove-opt');
+    if (removeOptBtn) removeOptBtn.onclick = () => row.remove();
+    if (optsList) optsList.appendChild(row);
   };
 
   if (options.length === 0) {
@@ -5307,8 +5327,8 @@ function addSlotEditCard(slotId = 1, slotName = '', options = []) {
     options.forEach(o => addOptionRow(o.name, o.class));
   }
 
-  addOptBtn.onclick = () => addOptionRow('', '');
-  removeSlotBtn.onclick = () => card.remove();
+  if (addOptBtn) addOptBtn.onclick = () => addOptionRow('', '');
+  if (removeSlotBtn) removeSlotBtn.onclick = () => card.remove();
 
   container.appendChild(card);
 }
@@ -5926,3 +5946,52 @@ try {
 } catch(e) {
   console.error('Initialization error in attachments/backups:', e);
 }
+
+
+  // Window exposures
+  window.renderArsenalAttachments = renderArsenalAttachments;
+  window.openArsenalAttModal = openArsenalAttModal;
+  window.editArsenalAttachment = editArsenalAttachment;
+  window.duplicateArsenalAttachment = duplicateArsenalAttachment;
+  window.deleteArsenalAttachment = deleteArsenalAttachment;
+  window.addSlotPresetScopes = addSlotPresetScopes;
+  window.addSlotPresetCartridges = addSlotPresetCartridges;
+  window.addSlotPresetCartridgesSniper = addSlotPresetCartridgesSniper;
+  window.addSlotPresetUBGL = addSlotPresetUBGL;
+  window.addSlotPresetLauncher = addSlotPresetLauncher;
+
+  window.openBackupsModal = openBackupsModal;
+  window.renderUnifiedBackupsTable = renderUnifiedBackupsTable;
+  window.createManualUnifiedBackupClick = createManualUnifiedBackupClick;
+  window.restoreUnifiedBackup = restoreUnifiedBackup;
+  window.exportSingleUnifiedBackup = exportSingleUnifiedBackup;
+  window.deleteUnifiedBackup = deleteUnifiedBackup;
+  window.createUnifiedBackupSnapshot = createUnifiedBackupSnapshot;
+
+  // Safe initialization
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      initEditorBundle();
+      try {
+        setupAttachmentsEventListeners();
+        setupUnifiedBackupsEventListeners();
+        updateBackupsBadges();
+        renderUnifiedBackupsTable();
+        updateArsenalAttachmentBadges();
+      } catch(e) {
+        console.error('Initialization error in attachments/backups:', e);
+      }
+    });
+  } else {
+    initEditorBundle();
+    try {
+      setupAttachmentsEventListeners();
+      setupUnifiedBackupsEventListeners();
+      updateBackupsBadges();
+      renderUnifiedBackupsTable();
+      updateArsenalAttachmentBadges();
+    } catch(e) {
+      console.error('Initialization error in attachments/backups:', e);
+    }
+  }
+})();
