@@ -377,12 +377,14 @@ function parseConfigString(content) {
     const hasJetpackM = blockText.match(/\bhas_jetpack\s*=\s*(true|false)/i) || blockText.match(/\bjetpack\s*=\s*(true|false|['"]mk\d['"])/i);
     const hasNvgM = blockText.match(/\b(?:has_nvg|has_pnv|nvg|pnv)\s*=\s*(true|false)/i);
     const hasThermalM = blockText.match(/\b(?:has_thermal|has_heat|thermal|heat)\s*=\s*(true|false)/i);
+    const hasKatarnM = blockText.match(/\b(?:has_katarn|has_extra_armor)\s*=\s*(true|false)/i);
 
     const has_backpack = hasBackpackM ? hasBackpackM[1].toLowerCase() === 'true' : false;
     const backpack_slots = backpackSlotsM ? parseInt(backpackSlotsM[1], 10) : (has_backpack ? 8 : undefined);
     const has_jetpack = hasJetpackM ? (hasJetpackM[1].toLowerCase() === 'true' || hasJetpackM[1].includes('mk')) : false;
     const has_nvg = hasNvgM ? hasNvgM[1].toLowerCase() === 'true' : false;
     const has_thermal = hasThermalM ? hasThermalM[1].toLowerCase() === 'true' : false;
+    const has_katarn = hasKatarnM ? hasKatarnM[1].toLowerCase() === 'true' : false;
 
     jobs.push({
       teamVar: cur.teamVar,
@@ -392,6 +394,7 @@ function parseConfigString(content) {
       has_jetpack,
       has_nvg,
       has_thermal,
+      has_katarn,
       color: toCol(colorM),
       worldModel: modelM ? modelM[2] : '',
       skin: skinM ? parseInt(skinM[1], 10) : 0,
@@ -545,6 +548,10 @@ function generateConfigLua({ categories, jobs, formations }) {
 
     if (job.has_thermal) {
       lines.push('\thas_thermal = true,');
+    }
+
+    if (job.has_katarn || job.has_extra_armor) {
+      lines.push('\thas_katarn = true,');
     }
 
     if (job.bodygroups && Object.keys(job.bodygroups).length > 0) {
@@ -1449,6 +1456,9 @@ function openJobModal(jobIndex = -1, targetTab = 'tab-main', highlightField = nu
   const cbThermal = document.getElementById('input-job-has-thermal');
   if (cbThermal) cbThermal.checked = !!job.has_thermal;
 
+  const cbKatarn = document.getElementById('input-job-has-katarn');
+  if (cbKatarn) cbKatarn.checked = !!(job.has_katarn || job.has_extra_armor);
+
   switchJobModalTab(targetTab);
 
   if (highlightField) {
@@ -1482,6 +1492,7 @@ function createDefaultJob() {
     has_jetpack: false,
     has_nvg: false,
     has_thermal: false,
+    has_katarn: false,
     weapons: ['nn_hands'],
     jobID: 'new_job_' + Date.now().toString().slice(-4),
     groupId: 'CT',
@@ -1694,6 +1705,8 @@ function saveJobModal() {
   const has_nvg = cbNvg ? cbNvg.checked : false;
   const cbThermal = document.getElementById('input-job-has-thermal');
   const has_thermal = cbThermal ? cbThermal.checked : false;
+  const cbKatarn = document.getElementById('input-job-has-katarn');
+  const has_katarn = cbKatarn ? cbKatarn.checked : false;
 
   const jobData = {
     teamVar,
@@ -1706,6 +1719,7 @@ function saveJobModal() {
     has_jetpack,
     has_nvg,
     has_thermal,
+    has_katarn,
     weapons: [...state.currentWeapons],
     jobID,
     groupId,
