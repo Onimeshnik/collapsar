@@ -5697,7 +5697,7 @@
       "Name": "DC-15S",
       "Damage": 38,
       "DamageMin": 24,
-      "RPM": 360,
+      "RPM": 400,
       "Recoil": 0.55
     },
     "arccw_k_dc15s_grenadier": {

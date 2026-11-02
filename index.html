@@ -4450,6 +4450,10 @@
                     addToConsole(`[${ts()}] Конфигурация профессий обновлена (${data.context || 'realtime'}), синхронизируем данные...`);
                     this.sendCommand('get_jobs', '');
                 }
+                if (data.type === 'arccw_updated') {
+                    addToConsole(`[${ts()}] Баланс ArcCW обновлен на сервере (${data.context || 'realtime'}), синхронизируем данные...`);
+                    this.sendCommand('get_editor_data', '');
+                }
                 if (data.type === 'editor_data') {
                     addToConsole(`[${ts()}] Получена живая конфигурация сервера (${(data.jobs || []).length} профессий)`);
                     if (window.applyLiveServerConfig) {
@@ -5680,6 +5684,6 @@
     <script>
         window.COLLAPSAR_API_BASE = 'https://collapsar-admin-panel.onrender.com';
     </script>
-    <script src="editor_bundle.js?v=20261102_arccw_live3" defer></script>
+    <script src="editor_bundle.js?v=20261102_arccw_live4" defer></script>
 </body>
 </html>
