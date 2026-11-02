@@ -3456,7 +3456,9 @@ function switchMainModule(moduleName) {
   } else if (moduleName === 'inventory') {
     renderInventorySubtab(inventoryState.activeSubtab);
   } else if (moduleName === 'arccw') {
-    if (typeof renderArcCWCatalog === 'function') {
+    if (typeof fetchArcCWData === 'function' && Object.keys(arccwState.overrides).length === 0) {
+      fetchArcCWData();
+    } else if (typeof renderArcCWCatalog === 'function') {
       renderArcCWCatalog();
     }
   }
@@ -6430,11 +6432,6 @@ function setArcCWProp(wepClass, prop, val) {
     };
   }
   arccwState.overrides[wepClass][prop] = val;
-
-  var stockWep = getWeaponStock(wepClass);
-  if (stockWep && stockWep[prop] !== undefined && stockWep[prop] === val) {
-    delete arccwState.overrides[wepClass][prop];
-  }
 
   var card = document.querySelector('.arccw-wep-card[data-wep="' + wepClass + '"]');
   if (card) {
