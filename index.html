@@ -2015,7 +2015,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="editor_bundle.css?v=20261102_unslop">
+    <link rel="stylesheet" href="editor_bundle.css?v=20261102_arccw">
 </head>
 <body>
     <!-- LOGIN SCREEN -->
@@ -2420,6 +2420,11 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
           <span>СПЕЦОБОРУДОВАНИЕ</span>
           <span class="mod-badge" id="mod-inventory-count">21</span>
+        </button>
+        <button class="mod-tab" id="tab-nav-arccw" type="button" title="Перейти в Редактор Баланса ArcCW">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M3 12h3m12 0h3M12 3v3m0 12v3"/></svg>
+          <span>БАЛАНС ARCCW</span>
+          <span class="mod-badge" id="mod-arccw-count">39</span>
         </button>
       </div>
 
@@ -2879,6 +2884,121 @@
               Обновляет секцию <code style="color: var(--accent-cyan);">nn.Inventory.Items</code> и <code style="color: var(--accent-cyan);">nn.Config.WeaponWeights</code>. Все существующие ранги и логика рюкзаков полностью сохраняются. При сохранении на сервере автоматически создаётся резервная копия в папке <code style="color: #f59e0b;">jobs_editor/backups/</code>.
             </p>
             <textarea id="export-inv-lua-text" class="export-textarea" style="height: 440px;" readonly spellcheck="false"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =====================================================================
+         ARCCW WEAPON BALANCE VIEW SECTION
+         ===================================================================== -->
+    <div id="arccw-view-section" class="arccw-view-section" style="display: none;">
+      <!-- Top Action Bar -->
+      <div class="arsenal-top-bar">
+        <div class="arsenal-stats-row">
+          <div class="stat-pill" title="Всего доступных видов ArcCW оружия">
+            <span class="stat-num" id="stat-arccw-total">295</span>
+            <span class="stat-lbl">ВСЕГО ОРУЖИЯ</span>
+          </div>
+          <div class="stat-pill highlight" title="Количество модифицированных оружий с кастомным балансом">
+            <span class="stat-num" id="stat-arccw-modified">39</span>
+            <span class="stat-lbl">ИЗМЕНЕНО</span>
+          </div>
+          <div class="stat-pill" title="Текущая выборка в каталоге">
+            <span class="stat-num" id="stat-arccw-filtered">295</span>
+            <span class="stat-lbl">В СПИСКЕ</span>
+          </div>
+        </div>
+
+        <div class="arsenal-nav-actions">
+          <div class="search-box" style="width: 250px;">
+            <i class="fas fa-search"></i>
+            <input type="text" id="arccw-search-input" placeholder="Поиск оружия или SWEP..." autocomplete="off">
+          </div>
+          <button class="btn btn-secondary" id="btn-arccw-export-view" type="button" title="Просмотр и экспорт сгенерированного sh_arccw_balance.lua">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            <span>Экспорт Lua</span>
+          </button>
+          <button class="btn btn-save" id="btn-arccw-save-server" type="button" title="Сохранить баланс sh_arccw_balance.lua на игровом сервере">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <span>Сохранить на сервере</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="arsenal-subnav" id="arccw-category-bar">
+        <button class="arsenal-subtab active" data-arccw-cat="all" type="button">
+          Все (<span id="cat-count-all">295</span>)
+        </button>
+        <button class="arsenal-subtab" data-arccw-cat="modified" type="button" style="color: var(--amber);">
+          ● Измененные (<span id="cat-count-modified">39</span>)
+        </button>
+        <button class="arsenal-subtab" data-arccw-cat="rifle" type="button">
+          Винтовки & Карабины (<span id="cat-count-rifle">0</span>)
+        </button>
+        <button class="arsenal-subtab" data-arccw-cat="pistol" type="button">
+          Пистолеты (<span id="cat-count-pistol">0</span>)
+        </button>
+        <button class="arsenal-subtab" data-arccw-cat="heavy" type="button">
+          Тяжелое & Пулеметы (<span id="cat-count-heavy">0</span>)
+        </button>
+        <button class="arsenal-subtab" data-arccw-cat="sniper" type="button">
+          Снайперские (<span id="cat-count-sniper">0</span>)
+        </button>
+        <button class="arsenal-subtab" data-arccw-cat="shotgun" type="button">
+          Дробовики (<span id="cat-count-shotgun">0</span>)
+        </button>
+        <button class="arsenal-subtab" data-arccw-cat="explosive" type="button">
+          Гранаты & Ракетницы (<span id="cat-count-explosive">0</span>)
+        </button>
+      </div>
+
+      <!-- Main Dual Pane Workspace -->
+      <div class="arccw-workspace" id="arccw-workspace-main">
+        <!-- Left: Weapon Catalog Grid -->
+        <div class="arccw-catalog-panel">
+          <div class="arccw-catalog-header">
+            <span id="arccw-catalog-summary">Показано 295 единиц оружия</span>
+            <div class="arccw-sort-options">
+              <label>Сортировка:</label>
+              <select id="arccw-sort-select">
+                <option value="modified-first">Сначала измененные</option>
+                <option value="name">По названию (А-Я)</option>
+                <option value="dps-desc">По DPS (убывание)</option>
+                <option value="damage-desc">По урону (убывание)</option>
+                <option value="rpm-desc">По скорострельности</option>
+              </select>
+            </div>
+          </div>
+          <div class="arccw-cards-grid" id="arccw-cards-container">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Right: Weapon Inspector & Tuning Form -->
+        <div class="arccw-inspector-panel" id="arccw-inspector-container">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Export Pane (Code View) -->
+      <div class="arsenal-tab-pane" id="arccw-pane-export" style="display: none;">
+        <div class="arsenal-export-grid">
+          <div class="export-box full-width">
+            <div class="export-box-header">
+              <span class="export-box-title">Конфигурация sh_arccw_balance.lua</span>
+              <div class="export-box-actions">
+                <button class="btn btn-secondary btn-sm" id="btn-copy-arccw-lua" type="button">Скопировать</button>
+                <button class="btn btn-secondary btn-sm" id="btn-download-arccw-lua" type="button">Скачать .lua</button>
+                <button class="btn btn-save btn-sm" id="btn-save-arccw-server-export" type="button">Сохранить на сервере</button>
+                <button class="btn btn-secondary btn-sm" id="btn-close-arccw-export" type="button">Закрыть просмотр</button>
+              </div>
+            </div>
+            <p style="font-size: 13px; color: var(--text-secondary); margin: 0;">
+              Файл генерирует актуальную таблицу <code style="color: var(--amber);">ArcCW_Balance.Weapons</code> и сохраняет системные хуки применения на лету. При сохранении создаётся резервная копия в <code style="color: var(--amber);">backups/</code>.
+            </p>
+            <textarea id="export-arccw-lua-text" class="export-textarea" style="height: 480px;" readonly spellcheck="false"></textarea>
           </div>
         </div>
       </div>
@@ -5557,6 +5677,6 @@
             }
         })();
     </script>
-    <script src="editor_bundle.js?v=1793563450000" defer></script>
+    <script src="editor_bundle.js?v=20261102_arccw" defer></script>
 </body>
 </html>
