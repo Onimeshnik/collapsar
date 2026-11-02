@@ -6397,6 +6397,13 @@ function renderArcCWInspector(wepClass) {
         var numVal = parseFloat(val);
         setArcCWProp(wepClass, prop, isNaN(numVal) ? val : numVal);
       }
+
+      var currentEff = getWeaponEffective(wepClass);
+      var currentDPS = calcArcCWDPS(currentEff.Damage, currentEff.RPM, currentEff.Num);
+      var currentDPSMin = calcArcCWDPS(currentEff.DamageMin, currentEff.RPM, currentEff.Num);
+      var dpsItems = container.querySelectorAll('.arccw-live-dps-item strong');
+      if (dpsItems && dpsItems[0]) dpsItems[0].textContent = currentDPS;
+      if (dpsItems && dpsItems[1]) dpsItems[1].textContent = currentDPSMin;
     });
   });
 
@@ -6410,8 +6417,7 @@ function renderArcCWInspector(wepClass) {
   var btnSaveSingle = document.getElementById('btn-arccw-save-single');
   if (btnSaveSingle) {
     btnSaveSingle.addEventListener('click', function() {
-      showToast('Параметры для ' + (eff.Name || wepClass) + ' применены в активный профиль!', 'success');
-      renderArcCWCatalog();
+      saveArcCWToServer();
     });
   }
 }
@@ -6513,7 +6519,9 @@ function generateArcCWLua() {
 async function saveArcCWToServer() {
   var saveBtn = document.getElementById('btn-arccw-save-server');
   var saveBtnExp = document.getElementById('btn-save-arccw-server-export');
+  var saveBtnSingle = document.getElementById('btn-arccw-save-single');
   var origText = saveBtn ? saveBtn.innerHTML : '';
+  var origTextSingle = saveBtnSingle ? saveBtnSingle.innerHTML : '';
 
   if (saveBtn) {
     saveBtn.disabled = true;
@@ -6523,11 +6531,21 @@ async function saveArcCWToServer() {
     saveBtnExp.disabled = true;
     saveBtnExp.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Сохранение...';
   }
+  if (saveBtnSingle) {
+    saveBtnSingle.disabled = true;
+    saveBtnSingle.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Сохранение...';
+  }
 
   try {
     var luaContent = generateArcCWLua();
     var apiUrl = getApiUrl('/api/save-arccw');
     console.log('[ArcCW] Sending save request to:', apiUrl);
+
+    var liveApi = (typeof api !== 'undefined' && api) || window.api;
+    var isSocketReady = liveApi && liveApi.socket && liveApi.socket.readyState === 1;
+    if (isSocketReady) {
+      liveApi.sendCommand('editor_save_arccw', '', { lua: luaContent });
+    }
 
     var res = await fetch(apiUrl, {
       method: 'POST',
@@ -6547,9 +6565,13 @@ async function saveArcCWToServer() {
     }
 
     if (res.ok && data.success) {
-      showToast('Баланс ArcCW успешно сохранён на сервере!', 'success');
+      var msg = isSocketReady
+        ? 'Баланс ArcCW сохранён и применён на сервере и у всех игроков в игре!'
+        : 'Баланс ArcCW успешно сохранён на сервере!';
+      showToast(msg, 'success', 5000);
       var exportArea = document.getElementById('export-arccw-lua-text');
       if (exportArea) exportArea.value = luaContent;
+      renderArcCWCatalog();
     } else {
       showToast('Ошибка сохранения баланса: ' + (data.error || data.message || ('HTTP ' + res.status)), 'error');
     }
@@ -6564,6 +6586,10 @@ async function saveArcCWToServer() {
     if (saveBtnExp) {
       saveBtnExp.disabled = false;
       saveBtnExp.innerHTML = 'Сохранить на сервере';
+    }
+    if (saveBtnSingle) {
+      saveBtnSingle.disabled = false;
+      saveBtnSingle.innerHTML = origTextSingle || '<i class="fas fa-check"></i> Применить к оружию';
     }
   }
 }
