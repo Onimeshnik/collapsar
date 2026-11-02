@@ -6578,7 +6578,7 @@ async function fetchArcCWData() {
         if (data.weapons && data.weapons.length > 0) {
           arccwState.weapons = data.weapons;
         }
-        if (data.overrides) {
+        if (data.overrides && Object.keys(data.overrides).length > 0) {
           arccwState.overrides = data.overrides;
         }
         if (data.rawLua) {
@@ -6589,6 +6589,9 @@ async function fetchArcCWData() {
         }
         console.log('[ArcCW Balance] Synchronized with server data:', arccwState.weapons.length, 'weapons,', Object.keys(arccwState.overrides).length, 'overrides');
         renderArcCWCatalog();
+        if (arccwState.selectedClass) {
+          renderArcCWInspector(arccwState.selectedClass);
+        }
       }
     }
   } catch (e) {
