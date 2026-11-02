@@ -33,21 +33,12 @@ function applyLiveServerConfig(payload) {
     }
   }
 
-  // Protect client edits: don't overwrite if user has unsaved edits, loaded a file, or recently saved
-  if (state.hasUnsavedChanges || (Date.now() - (window._lastEditorSaveTime || 0) < 120000) || (Date.now() - (window._lastFileLoadTime || 0) < 120000)) {
+  // Protect client edits: don't overwrite if user currently has active unsaved form edits
+  if (state.hasUnsavedChanges) {
     console.log('[COLLAPSAR] Protected local edits: skipped background overwrite from live server config.');
     return;
   }
 
-  // If initial sync was already done, only update status indicator unless user explicitly clicked reload
-  if (window._liveServerInitialSyncDone && !window._explicitLiveSyncRequested) {
-    const syncStatus = document.getElementById('editor-sync-status');
-    const syncDot = document.querySelector('#editor-sync-badge .sync-dot');
-    if (syncStatus) syncStatus.textContent = 'GMod Сервер: живые данные (' + new Date().toLocaleTimeString() + ')';
-    if (syncDot) syncDot.className = 'sync-dot live';
-    updateServerIndicator(true);
-    return;
-  }
   window._explicitLiveSyncRequested = false;
   window._liveServerInitialSyncDone = true;
   if (Array.isArray(payload.jobs) && payload.jobs.length > 0) {
