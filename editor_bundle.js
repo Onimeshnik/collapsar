@@ -2952,7 +2952,7 @@ function initEditorBundle() {
         fetch(getApiUrl('/api/save-inventory'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: inventoryState.items, wepWeights: inventoryState.wepWeights })
+          body: JSON.stringify({ luaContent: lua, items: inventoryState.items, wepWeights: inventoryState.wepWeights })
         }).catch(() => {});
       } catch(e) {}
       if (isSocketReady) {
@@ -3305,6 +3305,7 @@ const arsenalState = {
 
 async function initArsenalModule() {
   // 0. Fetch live data from server if online
+  let loadedFromServer = false;
   if (window.location.protocol.startsWith('http') || window.location.hostname.includes('github.io')) {
     try {
       const res = await fetch(getApiUrl('/api/arsenal'));
@@ -3316,6 +3317,7 @@ async function initArsenalModule() {
           if (data.attachments && data.attachments.length > 0) arsenalState.attachments = data.attachments;
           if (data.maxWeight) arsenalState.maxWeight = data.maxWeight;
           if (data.armorWeights) arsenalState.armorWeights = data.armorWeights;
+          loadedFromServer = true;
           saveArsenalState();
           if (typeof saveArsenalAttachmentsState === 'function') saveArsenalAttachmentsState();
         }
@@ -3326,22 +3328,24 @@ async function initArsenalModule() {
   }
 
   // 1. Load data from LocalStorage or Bundled Data
-  try {
-    const cached = localStorage.getItem('swrp_arsenal_saved_data');
-    if (cached) {
-      const parsed = JSON.parse(cached);
-      if (parsed && Array.isArray(parsed.weapons) && parsed.weapons.length > 0) {
-        arsenalState.weapons = parsed.weapons;
-        arsenalState.bodygroups = parsed.bodygroups || [];
-        arsenalState.maxWeight = parsed.maxWeight || 50;
-        arsenalState.armorWeights = parsed.armorWeights || {};
-        if (Array.isArray(parsed.attachments) && parsed.attachments.length > 0) {
-          arsenalState.attachments = parsed.attachments;
+  if (!loadedFromServer) {
+    try {
+      const cached = localStorage.getItem('swrp_arsenal_saved_data');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && Array.isArray(parsed.weapons) && parsed.weapons.length > 0) {
+          arsenalState.weapons = parsed.weapons;
+          arsenalState.bodygroups = parsed.bodygroups || [];
+          arsenalState.maxWeight = parsed.maxWeight || 50;
+          arsenalState.armorWeights = parsed.armorWeights || {};
+          if (Array.isArray(parsed.attachments) && parsed.attachments.length > 0) {
+            arsenalState.attachments = parsed.attachments;
+          }
         }
       }
+    } catch (e) {
+      console.warn('Could not load cached arsenal data:', e);
     }
-  } catch (e) {
-    console.warn('Could not load cached arsenal data:', e);
   }
 
   // Fallback to BUNDLED_ARSENAL_DATA if empty
@@ -3367,7 +3371,7 @@ async function initArsenalModule() {
 
     if (Array.isArray(arsenalState.bodygroups)) {
       arsenalState.bodygroups.forEach(bg => {
-        if (!bg.weight || bg.weight === 0) {
+        if (bg.weight === undefined || bg.weight === null) {
           const w = (arsenalState.armorWeights && arsenalState.armorWeights[bg.smd])
             || bundledWeights[bg.smd]
             || bundledWeights[(bg.smd || '').toLowerCase()];
@@ -3982,6 +3986,9 @@ function generateArsenalSharedLua() {
     if (w.desc) parts.push('desc = "' + w.desc + '"');
     if (w.category) parts.push('category = "' + w.category + '"');
     if (w.rank) parts.push('rank = "' + w.rank + '"');
+    if (w.weight !== undefined && w.weight !== null && !isNaN(Number(w.weight))) {
+      parts.push('weight = ' + Number(w.weight));
+    }
     if (w.spec) {
       if (Array.isArray(w.spec)) {
         if (w.spec.length === 1) parts.push('spec = "' + w.spec[0] + '"');
@@ -4037,6 +4044,22 @@ function generateArsenalSharedLua() {
     }
   });
   lua += '}\n\n';
+
+  lua += '-- ============================================================================\n';
+  lua += '-- 7. ВЕСА ОРУЖИЯ (NN_Arsenal.WeaponWeights & MAX_WEIGHT)\n';
+  lua += '-- ============================================================================\n';
+  lua += 'NN_Arsenal.MAX_WEIGHT = ' + (arsenalState.maxWeight || 50) + '\n\n';
+  lua += 'NN_Arsenal.WeaponWeights = NN_Arsenal.WeaponWeights or {}\n';
+  arsenalState.weapons.forEach(w => {
+    if (w.weight !== undefined && w.weight !== null && !isNaN(Number(w.weight))) {
+      lua += 'NN_Arsenal.WeaponWeights["' + w.class + '"] = ' + Number(w.weight) + '\n';
+    }
+  });
+  lua += 'if nn and nn.Config and nn.Config.WeaponWeights then\n';
+  lua += '    for k, v in pairs(nn.Config.WeaponWeights) do\n';
+  lua += '        if NN_Arsenal.WeaponWeights[k] == nil then NN_Arsenal.WeaponWeights[k] = v end\n';
+  lua += '    end\n';
+  lua += 'end\n\n';
 
   lua += '-- ============================================================================\n';
   lua += '-- 8. ТАБЛИЦА РАНГОВ И ИХ ВЕСОВ ДЛЯ ПРОВЕРКИ ДОСТУПА\n';
@@ -4105,6 +4128,34 @@ function generateArsenalSharedLua() {
   lua += '    nn.RankWeights = NN_Arsenal.RankWeights\n';
   lua += '    nn.GetRankWeight = NN_Arsenal.GetRankWeight\n';
   lua += 'end\n\n';
+
+  lua += '-- ============================================================================\n';
+  lua += '-- 12. БЕЗОПАСНЫЕ ФУНКЦИИ ПОЛУЧЕНИЯ ВЕСА\n';
+  lua += '-- ============================================================================\n';
+  lua += 'function NN_Arsenal.GetWeaponWeight(class, default)\n';
+  lua += '    if not isstring(class) or class == "" then return default or 2.5 end\n';
+  lua += '    local w = (NN_Arsenal.WeaponWeights and NN_Arsenal.WeaponWeights[class])\n';
+  lua += '        or (nn and nn.Config and nn.Config.WeaponWeights and nn.Config.WeaponWeights[class])\n';
+  lua += '        or (nn and nn.Inventory and nn.Inventory.Items and nn.Inventory.Items[class] and nn.Inventory.Items[class].weight)\n';
+  lua += '        or (ITEM_DB and ITEM_DB[class] and ITEM_DB[class].weight)\n';
+  lua += '    return w or default or 2.5\n';
+  lua += 'end\n\n';
+  lua += 'function NN_Arsenal.GetArmorWeight(smdName, default)\n';
+  lua += '    if not isstring(smdName) or smdName == "" or smdName == "empty" then return 0 end\n';
+  lua += '    local weights = NN_Arsenal.ArmorWeights or (nn and nn.Config and nn.Config.ArmorWeights) or ARMOR_WEIGHT or {}\n';
+  lua += '    if weights[smdName] then return weights[smdName] end\n';
+  lua += '    local clean = string.match(smdName, "[^/\\\\]+$") or smdName\n';
+  lua += '    if weights[clean] then return weights[clean] end\n';
+  lua += '    local lowerClean = string.lower(clean)\n';
+  lua += '    for k, v in pairs(weights) do\n';
+  lua += '        if string.lower(k) == lowerClean or string.lower(string.match(k, "[^/\\\\]+$") or k) == lowerClean then\n';
+  lua += '            return v\n';
+  lua += '        end\n';
+  lua += '    end\n';
+  lua += '    return default or 0\n';
+  lua += 'end\n\n';
+  lua += 'ARMOR_WEIGHT = NN_Arsenal.ArmorWeights\n';
+  lua += 'WEAPONS_WEIGHT = NN_Arsenal.WeaponWeights\n\n';
 
   lua += '-- Обратная совместимость\n';
   lua += 'ArsenalConfig = NN_Arsenal\n';
