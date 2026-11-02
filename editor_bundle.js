@@ -96,6 +96,18 @@ function triggerLiveWebSocketSync() {
  * Zero dependencies: works in any browser via double click (file://)
  */
 
+function getApiUrl(endpoint) {
+  var path = endpoint.startsWith('/') ? endpoint : '/' + endpoint;
+  if (typeof window === 'undefined') return path;
+  if (window.COLLAPSAR_API_BASE) {
+    return window.COLLAPSAR_API_BASE.replace(/\/+$/, '') + path;
+  }
+  if (window.location.hostname.includes('github.io') || window.location.protocol === 'file:') {
+    return 'https://collapsar-admin-panel.onrender.com' + path;
+  }
+  return path;
+}
+
 // Initial state
 const state = {
   jobs: [],
@@ -1003,9 +1015,9 @@ function updateServerIndicator(connected) {
 
 async function loadData() {
   // 1. Попытка загрузить актуальные данные с сервера Node.js при запуске через HTTP
-  if (window.location.protocol.startsWith('http')) {
+  if (window.location.protocol.startsWith('http') || window.location.hostname.includes('github.io')) {
     try {
-      const res = await fetch('/api/data');
+      const res = await fetch(getApiUrl('/api/data'));
       if (res.ok) {
         const data = await res.json();
         if (data && data.success && Array.isArray(data.jobs) && data.jobs.length > 0) {
@@ -2898,12 +2910,19 @@ function initEditorBundle() {
     const isSocketReady = liveApi && liveApi.socket && liveApi.socket.readyState === 1;
     const currentView = (typeof arsenalState !== 'undefined' && arsenalState.activeMainView) || 'jobs';
 
+    if (currentView === 'arccw') {
+      if (typeof saveArcCWToServer === 'function') {
+        saveArcCWToServer();
+      }
+      return;
+    }
+
     if (currentView === 'arsenal') {
       const lua = (typeof generateArsenalSharedLua === 'function') ? generateArsenalSharedLua() : '';
       if (typeof saveArsenalState === 'function') saveArsenalState();
       if (typeof saveArsenalAttachmentsState === 'function') saveArsenalAttachmentsState();
       try {
-        fetch('/api/save-arsenal', {
+        fetch(getApiUrl('/api/save-arsenal'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ luaContent: lua })
@@ -2924,7 +2943,7 @@ function initEditorBundle() {
       const lua = (typeof generateInventoryLua === 'function') ? generateInventoryLua() : '';
       if (typeof saveInventoryState === 'function') saveInventoryState();
       try {
-        fetch('/api/save-inventory', {
+        fetch(getApiUrl('/api/save-inventory'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ items: inventoryState.items, wepWeights: inventoryState.wepWeights })
@@ -2953,7 +2972,7 @@ function initEditorBundle() {
     createLocalBackupSnapshot('Автоматический бэкап при экспорте');
 
     try {
-      fetch('/api/save-config', {
+      fetch(getApiUrl('/api/save-config'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ luaContent: generatedLua })
@@ -3280,9 +3299,9 @@ const arsenalState = {
 
 async function initArsenalModule() {
   // 0. Fetch live data from server if online
-  if (window.location.protocol.startsWith('http')) {
+  if (window.location.protocol.startsWith('http') || window.location.hostname.includes('github.io')) {
     try {
-      const res = await fetch('/api/arsenal');
+      const res = await fetch(getApiUrl('/api/arsenal'));
       if (res.ok) {
         const data = await res.json();
         if (data && data.success && Array.isArray(data.weapons) && data.weapons.length > 0) {
@@ -4340,9 +4359,9 @@ const inventoryState = {
 async function initInventoryModule() {
   // 1. Try to fetch live data from server if running under HTTP
   let loadedFromServer = false;
-  if (window.location.protocol.startsWith('http')) {
+  if (window.location.protocol.startsWith('http') || window.location.hostname.includes('github.io')) {
     try {
-      const res = await fetch('/api/inventory');
+      const res = await fetch(getApiUrl('/api/inventory'));
       if (res.ok) {
         const data = await res.json();
         if (data && Array.isArray(data.items) && data.items.length > 0) {
@@ -6507,7 +6526,10 @@ async function saveArcCWToServer() {
 
   try {
     var luaContent = generateArcCWLua();
-    var res = await fetch('/api/save-arccw', {
+    var apiUrl = getApiUrl('/api/save-arccw');
+    console.log('[ArcCW] Sending save request to:', apiUrl);
+
+    var res = await fetch(apiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -6516,13 +6538,20 @@ async function saveArcCWToServer() {
       })
     });
 
-    var data = await res.json();
-    if (data.success) {
+    var rawText = await res.text();
+    var data;
+    try {
+      data = JSON.parse(rawText);
+    } catch (parseErr) {
+      throw new Error('Ответ сервера не является JSON (код ' + res.status + '): ' + rawText.slice(0, 100));
+    }
+
+    if (res.ok && data.success) {
       showToast('Баланс ArcCW успешно сохранён на сервере!', 'success');
       var exportArea = document.getElementById('export-arccw-lua-text');
       if (exportArea) exportArea.value = luaContent;
     } else {
-      showToast('Ошибка сохранения баланса: ' + (data.error || 'Неизвестная ошибка'), 'error');
+      showToast('Ошибка сохранения баланса: ' + (data.error || data.message || ('HTTP ' + res.status)), 'error');
     }
   } catch (err) {
     console.error('Save ArcCW balance error:', err);
@@ -6541,7 +6570,8 @@ async function saveArcCWToServer() {
 
 async function fetchArcCWData() {
   try {
-    var res = await fetch('/api/arccw');
+    var apiUrl = getApiUrl('/api/arccw');
+    var res = await fetch(apiUrl);
     if (res.ok) {
       var data = await res.json();
       if (data.success) {
