@@ -17,11 +17,13 @@ function applyLiveServerConfig(payload) {
   if (!payload) return;
 
   // Protect client edits: don't overwrite if user has unsaved edits, loaded a file, or recently saved
-  if (state.hasUnsavedChanges || (Date.now() - (window._lastEditorSaveTime || 0) < 60000) || (Date.now() - (window._lastFileLoadTime || 0) < 60000)) {
+  if (state.hasUnsavedChanges || (Date.now() - (window._lastEditorSaveTime || 0) < 120000) || (Date.now() - (window._lastFileLoadTime || 0) < 120000)) {
     console.log('[COLLAPSAR] Protected local edits: skipped background overwrite from live server config.');
     return;
   }
-  if (Date.now() - (window._lastEditorSaveTime || 0) < 15000) {
+
+  // If initial sync was already done, only update status indicator unless user explicitly clicked reload
+  if (window._liveServerInitialSyncDone && !window._explicitLiveSyncRequested) {
     const syncStatus = document.getElementById('editor-sync-status');
     const syncDot = document.querySelector('#editor-sync-badge .sync-dot');
     if (syncStatus) syncStatus.textContent = 'GMod Сервер: живые данные (' + new Date().toLocaleTimeString() + ')';
@@ -29,6 +31,8 @@ function applyLiveServerConfig(payload) {
     updateServerIndicator(true);
     return;
   }
+  window._explicitLiveSyncRequested = false;
+  window._liveServerInitialSyncDone = true;
   if (Array.isArray(payload.jobs) && payload.jobs.length > 0) {
     payload.jobs.forEach((job, idx) => {
       if (!job.teamVar || !String(job.teamVar).trim()) {
@@ -2559,6 +2563,26 @@ function parseArsenalLua(raw) {
   const mwMatch = raw.match(/MAX_WEIGHT\s*=\s*(\d+)/i);
   if (mwMatch) maxWeight = parseInt(mwMatch[1]);
 
+  const catMap = {};
+  const catMatch = raw.match(/NN_Arsenal\.Categories\s*=\s*\{([\s\S]*?)\n\}/);
+  if (catMatch) {
+    const cRegex = /\["([^"]+)"\]\s*=\s*"([^"]+)"/g;
+    let cm;
+    while ((cm = cRegex.exec(catMatch[1])) !== null) {
+      catMap[cm[1]] = cm[2];
+    }
+  }
+
+  const wepWeightMap = {};
+  const wwMatch = raw.match(/NN_Arsenal\.WeaponWeights\s*=\s*NN_Arsenal\.WeaponWeights\s*or\s*\{([\s\S]*?)\n\}/);
+  if (wwMatch) {
+    const wwRegex = /\["([^"]+)"\]\s*=\s*([\d\.]+)/g;
+    let wem;
+    while ((wem = wwRegex.exec(wwMatch[1])) !== null) {
+      wepWeightMap[wem[1]] = parseFloat(wem[2]);
+    }
+  }
+
   const weapons = [];
   const wepBlockMatch = raw.match(/NN_Arsenal\.WeaponConfig\s*=\s*\{([\s\S]*?)\n\}/);
   if (wepBlockMatch) {
@@ -2583,8 +2607,8 @@ function parseArsenalLua(raw) {
           desc: getStr('desc'),
           rank: getStr('rank') || 'RCT',
           spec: getStr('spec') || '',
-          weight: getNum('weight'),
-          category: getStr('category') || 'Табельное'
+          weight: getNum('weight') || wepWeightMap[cls] || 1,
+          category: getStr('category') || catMap[cls] || 'Табельное'
         });
       }
     }
@@ -2875,6 +2899,14 @@ function initEditorBundle() {
     if (currentView === 'arsenal') {
       const lua = (typeof generateArsenalSharedLua === 'function') ? generateArsenalSharedLua() : '';
       if (typeof saveArsenalState === 'function') saveArsenalState();
+      if (typeof saveArsenalAttachmentsState === 'function') saveArsenalAttachmentsState();
+      try {
+        fetch('/api/save-arsenal', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ luaContent: lua })
+        }).catch(() => {});
+      } catch(e) {}
       if (isSocketReady) {
         liveApi.sendCommand('editor_save_arsenal', '', { lua: lua });
         showToast('sh_arsenal_config.lua отправлен и применён на сервере в реальном времени!', 'success', 5000);
@@ -2889,6 +2921,13 @@ function initEditorBundle() {
     if (currentView === 'inventory') {
       const lua = (typeof generateInventoryLua === 'function') ? generateInventoryLua() : '';
       if (typeof saveInventoryState === 'function') saveInventoryState();
+      try {
+        fetch('/api/save-inventory', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: inventoryState.items, wepWeights: inventoryState.wepWeights })
+        }).catch(() => {});
+      } catch(e) {}
       if (isSocketReady) {
         liveApi.sendCommand('editor_save_inventory', '', { lua: lua });
         showToast('aa_sh_inventory_config.lua отправлен и применён на сервере в реальном времени!', 'success', 5000);
@@ -2910,6 +2949,14 @@ function initEditorBundle() {
     }
     const generatedLua = generateConfigLua({ categories: state.categories, jobs: state.jobs, formations: state.formations });
     createLocalBackupSnapshot('Автоматический бэкап при экспорте');
+
+    try {
+      fetch('/api/save-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ luaContent: generatedLua })
+      }).catch(() => {});
+    } catch(e) {}
 
     if (isSocketReady) {
       liveApi.sendCommand('editor_save_config', '', { lua: generatedLua });
@@ -3903,13 +3950,13 @@ function generateArsenalSharedLua() {
   lua += '-- 2. КАТЕГОРИИ ОРУЖИЯ\n';
   lua += '-- ============================================================================\n';
   lua += 'NN_Arsenal.CategoryOrder = {\n';
-  lua += '    "Карабины", "Винтовки", "Лучемёты", "Дробовики",\n';
-  lua += '    "Табельное", "Ближнее", "Взрывчатка", "Экипировка",\n';
+  lua += '    "Табельное", "Карабины", "Винтовки", "Лучемёты",\n';
+  lua += '    "Дробовики", "Взрывчатка", "Экипировка", "Ближнее",\n';
   lua += '}\n\n';
 
   lua += 'NN_Arsenal.Categories = {\n';
   arsenalState.weapons.forEach(w => {
-    const cat = w.category || 'Экипировка';
+    const cat = w.category || 'Табельное';
     lua += '    ["' + w.class + '"] = "' + cat + '",\n';
   });
   lua += '}\n\n';
@@ -3919,6 +3966,7 @@ function generateArsenalSharedLua() {
   lua += '-- ============================================================================\n';
   lua += generateAttachmentsConfigLua();
 
+  lua += 'NN_Arsenal.AttachmentRules = NN_Arsenal.AttachmentRules or {}\n';
   lua += 'for wepClass, slots in pairs(NN_Arsenal.AttachmentsConfig) do\n';
   lua += '    NN_Arsenal.AttachmentRules[wepClass] = {}\n';
   lua += '    for slotID, slotData in pairs(slots) do\n';
@@ -5031,7 +5079,7 @@ function setupInventoryEventListeners() {
 // ============================================================================
 // BUNDLED ATTACHMENTS DATA & STATE
 // ============================================================================
-const BUNDLED_ATTACHMENTS_DATA = [{"wepClass":"arccw_k_dc15s_grenadier","slots":{"4":{"name":"Подствольный модуль","options":[{"name":"Отсутствует","class":""},{"name":"Гранатомёт","class":"acwatt_ubgl_dc15"},{"name":"Виброклинок","class":"acwatt_universal_vibroknife"}]},"5":{"name":"Модификация картриджа","options":[{"name":"Классика","class":""},{"name":"Long Engagements","class":"acwatt_mode_le"},{"name":"Heat-Based","class":"acwatt_mode_heatbased"},{"name":"Anti-Tank","class":"acwatt_mode_at"}]}}},{"wepClass":"arccw_k_dc15a_grenadier","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел x8","class":"acwatt_arccw_k_dlt15x_scope"},{"name":"Прицел x4","class":"acwatt_arccw_k_dlt15a_scope"}]},"5":{"name":"Подствольный модуль","options":[{"name":"Отсутствует","class":""},{"name":"Виброклинок","class":"acwatt_universal_vibroknife"}]},"6":{"name":"Модификация картриджа","options":[{"name":"Классика","class":""},{"name":"Long Engagements","class":"acwatt_mode_le"},{"name":"Heat-Based","class":"acwatt_mode_heatbased"},{"name":"Anti-Tank","class":"acwatt_mode_at"}]}}},{"wepClass":"arccw_k_dc15s","slots":{"5":{"name":"Модификация картриджа","options":[{"name":"Классика","class":""},{"name":"Long Engagements","class":"acwatt_mode_le"},{"name":"Heat-Based","class":"acwatt_mode_heatbased"},{"name":"Anti-Tank","class":"acwatt_mode_at"}]}}},{"wepClass":"arccw_k_dc15x","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел x8","class":"acwatt_arccw_k_dlt15x_scope"},{"name":"Прицел x4","class":"acwatt_arccw_k_dlt15a_scope"}]},"5":{"name":"Модификация картриджа","options":[{"name":"Классика","class":""},{"name":"Super-Sonic","class":"acwatt_mode_supersonic"},{"name":"Overcharged","class":"acwatt_mode_overcharged"},{"name":"Heat-Based","class":"acwatt_mode_heatbased"}]}}},{"wepClass":"arccw_k_dc15xr","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел x8","class":"acwatt_arccw_k_dlt15x_scope"},{"name":"Прицел x4","class":"acwatt_arccw_k_dlt15a_scope"}]}}},{"wepClass":"arccw_k_valken38","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел №1 x8/IR","class":"acwatt_arccw_k_valken38_scope_ir"},{"name":"Прицел №1 x8","class":"acwatt_arccw_k_valken38_scope"},{"name":"Прицел №2 x8/IR","class":"acwatt_arccw_k_dc15x_scope_ir"},{"name":"Прицел №2 x8","class":"acwatt_arccw_k_dlt15x_scope"}]},"4":{"name":"Модификация картриджа","options":[{"name":"Классика","class":""},{"name":"Super-Sonic","class":"acwatt_mode_supersonic"},{"name":"Overcharged","class":"acwatt_mode_overcharged"},{"name":"Heat-Based","class":"acwatt_mode_heatbased"}]},"5":{"name":"Подствольный модуль","options":[{"name":"Отсутствует","class":""},{"name":"Ремень","class":"acwatt_valken38_sling"},{"name":"Виброклинок","class":"acwatt_universal_vibroknife"}]}}},{"wepClass":"arccw_k_dc17m_sniper_republic","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел x8","class":"acwatt_arccw_k_dlt15x_scope"}]}}},{"wepClass":"arccw_sops_republic_t702","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел x5","class":"acwatt_arccw_k_westar35_scope_ir"}]}}},{"wepClass":"arccw_k_westarm5","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел X6","class":"acwatt_arccw_k_westarm5_scope_x6ir"},{"name":"Прицел X2","class":"acwatt_arccw_k_westarm5_scope_x2"}]},"3":{"name":"Модификация картриджа","options":[{"name":"Классика","class":""},{"name":"Long Engagements","class":"acwatt_mode_le"},{"name":"Heat-Based","class":"acwatt_mode_heatbased"},{"name":"Anti-Tank","class":"acwatt_mode_at"}]}}},{"wepClass":"arccw_k_iqa11","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел X8/IR","class":"acwatt_arccw_k_valken38_scope_ir"},{"name":"Прицел X8","class":"acwatt_arccw_k_valken38_scope"}]}}},{"wepClass":"arccw_k_launcher_rps6","slots":{"2":{"name":"Вид ракетницы","options":[{"name":"Классическая","class":""},{"name":"Трекер","class":"acwatt_ammunition_track"},{"name":"Кластер","class":"acwatt_ammunition_cluster"}]}}},{"wepClass":"arccw_k_launcher_plx1","slots":{"2":{"name":"Вид ракетницы","options":[{"name":"Самонаводящаяся","class":""},{"name":"Противотанковая","class":"acwatt_ammxunition_heatfs"}]}}}];
+const BUNDLED_ATTACHMENTS_DATA = [{"wepClass":"arccw_k_dc15s_grenadier","slots":{"4":{"name":"Подствольный модуль","options":[{"name":"Отсутствует","class":""},{"name":"Гранатомёт","class":"acwatt_ubgl_dc15"},{"name":"Виброклинок","class":"acwatt_universal_vibroknife"}]},"5":{"name":"Модификация картриджа","options":[{"name":"Классика","class":""},{"name":"Long Engagements","class":"acwatt_mode_le"},{"name":"Heat-Based","class":"acwatt_mode_heatbased"},{"name":"Anti-Tank","class":"acwatt_mode_at"}]}}},{"wepClass":"arccw_k_dc15a_grenadier","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел x8","class":"acwatt_arccw_k_dlt15x_scope"},{"name":"Прицел x4","class":"acwatt_arccw_k_dlt15a_scope"}]},"5":{"name":"Подствольный модуль","options":[{"name":"Отсутствует","class":""},{"name":"Виброклинок","class":"acwatt_universal_vibroknife"}]},"6":{"name":"Модификация картриджа","options":[{"name":"Классика","class":""},{"name":"Long Engagements","class":"acwatt_mode_le"},{"name":"Heat-Based","class":"acwatt_mode_heatbased"},{"name":"Anti-Tank","class":"acwatt_mode_at"}]}}},{"wepClass":"arccw_k_dc15s","slots":{"5":{"name":"Модификация картриджа","options":[{"name":"Классика","class":""},{"name":"Long Engagements","class":"acwatt_mode_le"},{"name":"Heat-Based","class":"acwatt_mode_heatbased"}]}}},{"wepClass":"arccw_k_dc15x","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел x8","class":"acwatt_arccw_k_dlt15x_scope"},{"name":"Прицел x4","class":"acwatt_arccw_k_dlt15a_scope"}]},"5":{"name":"Модификация картриджа","options":[{"name":"Классика","class":""},{"name":"Super-Sonic","class":"acwatt_mode_supersonic"},{"name":"Overcharged","class":"acwatt_mode_overcharged"},{"name":"Heat-Based","class":"acwatt_mode_heatbased"}]}}},{"wepClass":"arccw_k_dc15xr","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел x8","class":"acwatt_arccw_k_dlt15x_scope"},{"name":"Прицел x4","class":"acwatt_arccw_k_dlt15a_scope"}]}}},{"wepClass":"arccw_k_valken38","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел №1 x8/IR","class":"acwatt_arccw_k_valken38_scope_ir"},{"name":"Прицел №1 x8","class":"acwatt_arccw_k_valken38_scope"},{"name":"Прицел №2 x8/IR","class":"acwatt_arccw_k_dc15x_scope_ir"},{"name":"Прицел №2 x8","class":"acwatt_arccw_k_dlt15x_scope"}]},"4":{"name":"Модификация картриджа","options":[{"name":"Классика","class":""},{"name":"Super-Sonic","class":"acwatt_mode_supersonic"},{"name":"Overcharged","class":"acwatt_mode_overcharged"},{"name":"Heat-Based","class":"acwatt_mode_heatbased"}]},"5":{"name":"Подствольный модуль","options":[{"name":"Отсутствует","class":""},{"name":"Ремень","class":"acwatt_valken38_sling"},{"name":"Виброклинок","class":"acwatt_universal_vibroknife"}]}}},{"wepClass":"arccw_k_dc17m_sniper_republic","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел x8","class":"acwatt_arccw_k_dlt15x_scope"}]}}},{"wepClass":"arccw_sops_republic_t702","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел x5","class":"acwatt_arccw_k_westar35_scope_ir"}]}}},{"wepClass":"arccw_k_westarm5","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел X6","class":"acwatt_arccw_k_westarm5_scope_x6ir"},{"name":"Прицел X2","class":"acwatt_arccw_k_westarm5_scope_x2"}]},"3":{"name":"Модификация картриджа","options":[{"name":"Классика","class":""},{"name":"Long Engagements","class":"acwatt_mode_le"},{"name":"Heat-Based","class":"acwatt_mode_heatbased"},{"name":"Anti-Tank","class":"acwatt_mode_at"}]}}},{"wepClass":"arccw_k_iqa11","slots":{"1":{"name":"Прицелы","options":[{"name":"Снять","class":""},{"name":"Прицел X8/IR","class":"acwatt_arccw_k_valken38_scope_ir"},{"name":"Прицел X8","class":"acwatt_arccw_k_valken38_scope"}]}}},{"wepClass":"arccw_k_launcher_rps6","slots":{"2":{"name":"Вид ракетницы","options":[{"name":"Классическая","class":""},{"name":"Трекер","class":"acwatt_ammunition_track"},{"name":"Кластер","class":"acwatt_ammunition_cluster"}]}}},{"wepClass":"arccw_k_launcher_plx1","slots":{"2":{"name":"Вид ракетницы","options":[{"name":"Самонаводящаяся","class":""},{"name":"Противотанковая","class":"acwatt_ammxunition_heatfs"}]}}}];
 
 // Initialize attachments in arsenalState
 if (typeof arsenalState !== 'undefined') {
