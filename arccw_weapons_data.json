@@ -17,7 +17,11 @@
       "MOA": 5,
       "Range": 300,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwcgigal",
@@ -36,7 +40,11 @@
       "MOA": 50,
       "Range": 75,
       "Penetration": 8,
-      "DmgType": "DMG_BUCKSHOT"
+      "DmgType": "DMG_BUCKSHOT",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwcgigal",
@@ -55,7 +63,11 @@
       "MOA": 5,
       "Range": 430,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 20,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwcgigal",
@@ -74,7 +86,11 @@
       "MOA": 0,
       "Range": 135,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwcgigal",
@@ -93,7 +109,11 @@
       "MOA": 5,
       "Range": 560,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwcgigal",
@@ -112,7 +132,11 @@
       "MOA": 0,
       "Range": 135,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwcgigal",
@@ -131,7 +155,11 @@
       "MOA": 5,
       "Range": 450,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwcgigal",
@@ -150,7 +178,11 @@
       "MOA": 5,
       "Range": 540,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwcgigal",
@@ -169,7 +201,11 @@
       "MOA": 5,
       "Range": 900,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 5,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 20
     },
     {
       "Addon": "arccwcgigal",
@@ -207,7 +243,11 @@
       "MOA": 5,
       "Range": 700,
       "Penetration": 10,
-      "DmgType": "DMG_BLAST"
+      "DmgType": "DMG_BLAST",
+      "HeatCapacity": 4,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 30
     },
     {
       "Addon": "arccwcgigal",
@@ -245,7 +285,11 @@
       "MOA": 5,
       "Range": 200,
       "Penetration": 8,
-      "DmgType": "DMG_BUCKSHOT"
+      "DmgType": "DMG_BUCKSHOT",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwcgigal",
@@ -264,7 +308,11 @@
       "MOA": 5,
       "Range": 350,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 20,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwcgigal",
@@ -283,7 +331,11 @@
       "MOA": 5,
       "Range": 420,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 20,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwcgigal",
@@ -321,7 +373,11 @@
       "MOA": 1.5,
       "Range": 280,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 18,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwcgigal",
@@ -340,7 +396,11 @@
       "MOA": 0,
       "Range": 135,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwcgigal",
@@ -359,7 +419,11 @@
       "MOA": 5,
       "Range": 330,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 30,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwcgigal",
@@ -378,7 +442,11 @@
       "MOA": 5,
       "Range": 700,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 5,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwcgigal",
@@ -397,7 +465,11 @@
       "MOA": 5,
       "Range": 300,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 20,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwcgigal",
@@ -416,7 +488,11 @@
       "MOA": 5,
       "Range": 250,
       "Penetration": 8,
-      "DmgType": "DMG_BUCKSHOT"
+      "DmgType": "DMG_BUCKSHOT",
+      "HeatCapacity": 20,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwcgigal",
@@ -435,7 +511,11 @@
       "MOA": 5,
       "Range": 280,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwcgigal",
@@ -454,7 +534,11 @@
       "MOA": 0.5,
       "Range": 330,
       "Penetration": 8,
-      "DmgType": "DMG_BLAST"
+      "DmgType": "DMG_BLAST",
+      "HeatCapacity": 85,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwcgigal",
@@ -511,7 +595,11 @@
       "MOA": 5,
       "Range": 0,
       "Penetration": 0,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 5,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccweffects",
@@ -530,7 +618,10 @@
       "MOA": 15,
       "Range": 200,
       "Penetration": 1,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 200,
+      "HeatDissipation": 2,
+      "HeatDelayTime": 0.5
     },
     {
       "Addon": "arccwexplosive",
@@ -1100,7 +1191,11 @@
       "MOA": 0.5,
       "Range": 320,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 17,
+      "HeatDissipation": 2,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1119,7 +1214,11 @@
       "MOA": 0,
       "Range": 340,
       "Penetration": 8,
-      "DmgType": "DMG_BUCKSHOT"
+      "DmgType": "DMG_BUCKSHOT",
+      "HeatCapacity": 6,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1138,7 +1237,11 @@
       "MOA": 1,
       "Range": 240,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1157,7 +1260,11 @@
       "MOA": 0,
       "Range": 650,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1176,7 +1283,11 @@
       "MOA": 0,
       "Range": 320,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1195,7 +1306,11 @@
       "MOA": 0,
       "Range": 430,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 20,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1214,7 +1329,11 @@
       "MOA": 0,
       "Range": 300,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1233,7 +1352,11 @@
       "MOA": 0,
       "Range": 540,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1252,7 +1375,11 @@
       "MOA": 0,
       "Range": 540,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1271,7 +1398,11 @@
       "MOA": 0,
       "Range": 200,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1290,7 +1421,11 @@
       "MOA": 0,
       "Range": 350,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 13,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1309,7 +1444,11 @@
       "MOA": 0,
       "Range": 320,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1328,7 +1467,11 @@
       "MOA": 0.5,
       "Range": 260,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1347,7 +1490,11 @@
       "MOA": 0.5,
       "Range": 300,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1366,7 +1513,11 @@
       "MOA": 0.5,
       "Range": 250,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1385,7 +1536,11 @@
       "MOA": 0,
       "Range": 500,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 16,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1594,7 +1749,11 @@
       "MOA": 0.5,
       "Range": 170,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 9,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1613,7 +1772,11 @@
       "MOA": 0.5,
       "Range": 170,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 6,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1632,7 +1795,11 @@
       "MOA": 0.5,
       "Range": 170,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 12,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1651,7 +1818,11 @@
       "MOA": 0.5,
       "Range": 270,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 20,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1670,7 +1841,11 @@
       "MOA": 0.5,
       "Range": 340,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 13,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1689,7 +1864,11 @@
       "MOA": 0.5,
       "Range": 400,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 14,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1708,7 +1887,11 @@
       "MOA": 0.5,
       "Range": 600,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 18,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1727,7 +1910,11 @@
       "MOA": 0.5,
       "Range": 600,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 18,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1765,7 +1952,11 @@
       "MOA": 0.5,
       "Range": 440,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 7,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1784,7 +1975,11 @@
       "MOA": 0.5,
       "Range": 600,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1803,7 +1998,11 @@
       "MOA": 0.5,
       "Range": 250,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1822,7 +2021,11 @@
       "MOA": 0,
       "Range": 250,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 20,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1841,7 +2044,11 @@
       "MOA": 0.5,
       "Range": 250,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1860,7 +2067,11 @@
       "MOA": 0,
       "Range": 370,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 60,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1879,7 +2090,11 @@
       "MOA": 0,
       "Range": 400,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 75,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1898,7 +2113,11 @@
       "MOA": 0,
       "Range": 370,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 55,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1917,7 +2136,11 @@
       "MOA": 0,
       "Range": 500,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 20,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1936,7 +2159,11 @@
       "MOA": 0,
       "Range": 650,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1955,7 +2182,11 @@
       "MOA": 0,
       "Range": 900,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -1993,7 +2224,11 @@
       "MOA": 0,
       "Range": 250,
       "Penetration": 8,
-      "DmgType": "DMG_BUCKSHOT"
+      "DmgType": "DMG_BUCKSHOT",
+      "HeatCapacity": 5,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2050,7 +2285,11 @@
       "MOA": 0,
       "Range": 500,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 16,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2088,7 +2327,11 @@
       "MOA": 0,
       "Range": 250,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 16,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2107,7 +2350,11 @@
       "MOA": 0,
       "Range": 350,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 16,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2126,7 +2373,11 @@
       "MOA": 0,
       "Range": 430,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 20,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2145,7 +2396,11 @@
       "MOA": 0,
       "Range": 470,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2164,7 +2419,11 @@
       "MOA": 0,
       "Range": 290,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2183,7 +2442,11 @@
       "MOA": 0,
       "Range": 450,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2202,7 +2465,11 @@
       "MOA": 0,
       "Range": 390,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2221,7 +2488,11 @@
       "MOA": 0,
       "Range": 410,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 20,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2240,7 +2511,11 @@
       "MOA": 0,
       "Range": 250,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2259,7 +2534,11 @@
       "MOA": 0,
       "Range": 400,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 30,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2278,7 +2557,11 @@
       "MOA": 0,
       "Range": 450,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 35,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2297,7 +2580,11 @@
       "MOA": 0,
       "Range": 200,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 30,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2316,7 +2603,11 @@
       "MOA": 0.5,
       "Range": 270,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2335,7 +2626,11 @@
       "MOA": 0.5,
       "Range": 300,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 8,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2354,7 +2649,10 @@
       "MOA": 0,
       "Range": 900,
       "Penetration": 11,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 5,
+      "HeatDissipation": 7,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2373,7 +2671,10 @@
       "MOA": 0,
       "Range": 650,
       "Penetration": 11,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 13,
+      "HeatDissipation": 7,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2392,7 +2693,10 @@
       "MOA": 0,
       "Range": 1200,
       "Penetration": 11,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 3,
+      "HeatDissipation": 7,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2411,7 +2715,11 @@
       "MOA": 0.5,
       "Range": 400,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2430,7 +2738,11 @@
       "MOA": 0,
       "Range": 200,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2449,7 +2761,11 @@
       "MOA": 0,
       "Range": 500,
       "Penetration": 8,
-      "DmgType": "DMG_BLAST"
+      "DmgType": "DMG_BLAST",
+      "HeatCapacity": 45,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2468,7 +2784,11 @@
       "MOA": 0,
       "Range": 450,
       "Penetration": 8,
-      "DmgType": "DMG_BLAST"
+      "DmgType": "DMG_BLAST",
+      "HeatCapacity": 45,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2487,7 +2807,11 @@
       "MOA": 0,
       "Range": 500,
       "Penetration": 8,
-      "DmgType": "DMG_BLAST"
+      "DmgType": "DMG_BLAST",
+      "HeatCapacity": 30,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2506,7 +2830,11 @@
       "MOA": 0,
       "Range": 500,
       "Penetration": 8,
-      "DmgType": "DMG_BUCKSHOT"
+      "DmgType": "DMG_BUCKSHOT",
+      "HeatCapacity": 8,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2525,7 +2853,11 @@
       "MOA": 0,
       "Range": 450,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2544,7 +2876,11 @@
       "MOA": 0.5,
       "Range": 430,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 7,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2563,7 +2899,11 @@
       "MOA": 0,
       "Range": 1000,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 6,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 30
     },
     {
       "Addon": "arccwgexpa",
@@ -2582,7 +2922,11 @@
       "MOA": 0,
       "Range": 1200,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 4,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 30
     },
     {
       "Addon": "arccwgexpa",
@@ -2601,7 +2945,11 @@
       "MOA": 0,
       "Range": 1700,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 5,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 20
     },
     {
       "Addon": "arccwgexpa",
@@ -2620,7 +2968,11 @@
       "MOA": 0,
       "Range": 1700,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 5,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 20
     },
     {
       "Addon": "arccwgexpa",
@@ -2639,7 +2991,11 @@
       "MOA": 0.5,
       "Range": 250,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2658,7 +3014,11 @@
       "MOA": 0,
       "Range": 500,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 5,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2677,7 +3037,11 @@
       "MOA": 0,
       "Range": 600,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 75,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2696,7 +3060,11 @@
       "MOA": 0,
       "Range": 550,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 45,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2715,7 +3083,11 @@
       "MOA": 0,
       "Range": 700,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 55,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2753,7 +3125,11 @@
       "MOA": 0.5,
       "Range": 500,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 7,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2772,7 +3148,11 @@
       "MOA": 0.5,
       "Range": 200,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 7,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2791,7 +3171,11 @@
       "MOA": 0.5,
       "Range": 200,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2810,7 +3194,11 @@
       "MOA": 0,
       "Range": 500,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 20,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2829,7 +3217,11 @@
       "MOA": 0,
       "Range": 450,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2867,7 +3259,11 @@
       "MOA": 0.5,
       "Range": 300,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2886,7 +3282,11 @@
       "MOA": 0.5,
       "Range": 330,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 4,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa",
@@ -2905,7 +3305,11 @@
       "MOA": 0,
       "Range": 1000,
       "Penetration": 8,
-      "DmgType": "DMG_CRUSH"
+      "DmgType": "DMG_CRUSH",
+      "HeatCapacity": 10,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -2924,7 +3328,11 @@
       "MOA": 1,
       "Range": 420,
       "Penetration": 8,
-      "DmgType": "DMG_CRUSH"
+      "DmgType": "DMG_CRUSH",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -2943,7 +3351,11 @@
       "MOA": 0.5,
       "Range": 340,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 35,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -2962,7 +3374,11 @@
       "MOA": 0.5,
       "Range": 560,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3000,7 +3416,11 @@
       "MOA": 0.5,
       "Range": 340,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 22,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3019,7 +3439,11 @@
       "MOA": 0.5,
       "Range": 260,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 30,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3057,7 +3481,11 @@
       "MOA": 0.5,
       "Range": 450,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 20,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3076,7 +3504,11 @@
       "MOA": 0.5,
       "Range": 270,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3095,7 +3527,11 @@
       "MOA": 0.5,
       "Range": 270,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 50,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3114,7 +3550,11 @@
       "MOA": 0.5,
       "Range": 180,
       "Penetration": 8,
-      "DmgType": "DMG_BLAST"
+      "DmgType": "DMG_BLAST",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3133,7 +3573,11 @@
       "MOA": 0.5,
       "Range": 200,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 30,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3190,7 +3634,11 @@
       "MOA": 0,
       "Range": 200,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 16,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3209,7 +3657,11 @@
       "MOA": 0,
       "Range": 350,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3228,7 +3680,11 @@
       "MOA": 0,
       "Range": 320,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 35,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3247,7 +3703,11 @@
       "MOA": 30,
       "Range": 200,
       "Penetration": 8,
-      "DmgType": "DMG_CRUSH"
+      "DmgType": "DMG_CRUSH",
+      "HeatCapacity": 15,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3285,7 +3745,11 @@
       "MOA": 0.5,
       "Range": 270,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3323,7 +3787,11 @@
       "MOA": 0.5,
       "Range": 200,
       "Penetration": 8,
-      "DmgType": "DMG_SHOCK"
+      "DmgType": "DMG_SHOCK",
+      "HeatCapacity": 15,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3399,7 +3867,11 @@
       "MOA": 0.5,
       "Range": 320,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3437,7 +3909,11 @@
       "MOA": 0.5,
       "Range": 228,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3513,7 +3989,11 @@
       "MOA": 0.5,
       "Range": 150,
       "Penetration": 8,
-      "DmgType": "DMG_DISSOLVE"
+      "DmgType": "DMG_DISSOLVE",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3551,7 +4031,11 @@
       "MOA": 0.5,
       "Range": 300,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 30,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3589,7 +4073,11 @@
       "MOA": 1,
       "Range": 270,
       "Penetration": 8,
-      "DmgType": "DMG_BUCKSHOT"
+      "DmgType": "DMG_BUCKSHOT",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3608,7 +4096,11 @@
       "MOA": 50,
       "Range": 160,
       "Penetration": 8,
-      "DmgType": "DMG_BUCKSHOT"
+      "DmgType": "DMG_BUCKSHOT",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3627,7 +4119,11 @@
       "MOA": 0,
       "Range": 540,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3646,7 +4142,11 @@
       "MOA": 0.5,
       "Range": 310,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 30,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwgexpa2",
@@ -3684,7 +4184,11 @@
       "MOA": 0,
       "Range": 380,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 45,
+      "HeatDissipation": 7,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -3703,7 +4207,11 @@
       "MOA": 5,
       "Range": 200,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 20,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -3741,7 +4249,11 @@
       "MOA": 5,
       "Range": 300,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -3760,7 +4272,11 @@
       "MOA": 5,
       "Range": 300,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -3779,7 +4295,11 @@
       "MOA": 5,
       "Range": 300,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -3798,7 +4318,11 @@
       "MOA": 5,
       "Range": 300,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -3817,7 +4341,11 @@
       "MOA": 5,
       "Range": 425,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -3836,7 +4364,11 @@
       "MOA": 5,
       "Range": 230,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 18,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -3855,7 +4387,11 @@
       "MOA": 5,
       "Range": 200,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 2,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -3874,7 +4410,11 @@
       "MOA": 5,
       "Range": 230,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 18,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -3893,7 +4433,11 @@
       "MOA": 5,
       "Range": 230,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 18,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -3912,7 +4456,11 @@
       "MOA": 5,
       "Range": 230,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 18,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -3931,7 +4479,11 @@
       "MOA": 5,
       "Range": 900,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 5,
+      "HeatDissipation": 2,
+      "HeatDelayTime": 1,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -3950,7 +4502,11 @@
       "MOA": 1,
       "Range": 900,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 5,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 20
     },
     {
       "Addon": "arccwrepes",
@@ -3969,7 +4525,11 @@
       "MOA": 5,
       "Range": 180,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 2,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -3988,7 +4548,11 @@
       "MOA": 5,
       "Range": 200,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 13,
+      "HeatDissipation": 2,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4026,7 +4590,11 @@
       "MOA": 5,
       "Range": 400,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4064,7 +4632,11 @@
       "MOA": 5,
       "Range": 400,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4083,7 +4655,11 @@
       "MOA": 5,
       "Range": 200,
       "Penetration": 8,
-      "DmgType": "DMG_BUCKSHOT"
+      "DmgType": "DMG_BUCKSHOT",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 10
     },
     {
       "Addon": "arccwrepes",
@@ -4102,7 +4678,11 @@
       "MOA": 5,
       "Range": 600,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 5,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 20
     },
     {
       "Addon": "arccwrepes",
@@ -4121,7 +4701,11 @@
       "MOA": 5,
       "Range": 200,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 2,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4140,7 +4724,11 @@
       "MOA": 5,
       "Range": 180,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 2,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4216,7 +4804,11 @@
       "MOA": 5,
       "Range": 180,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 2,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4235,7 +4827,11 @@
       "MOA": 5,
       "Range": 180,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 2,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4254,7 +4850,11 @@
       "MOA": 5,
       "Range": 230,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 20,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4273,7 +4873,11 @@
       "MOA": 7,
       "Range": 200,
       "Penetration": 8,
-      "DmgType": "DMG_BUCKSHOT"
+      "DmgType": "DMG_BUCKSHOT",
+      "HeatCapacity": 10,
+      "HeatDissipation": 2,
+      "HeatDelayTime": 1,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4292,7 +4896,11 @@
       "MOA": 5,
       "Range": 170,
       "Penetration": 8,
-      "DmgType": "DMG_BUCKSHOT"
+      "DmgType": "DMG_BUCKSHOT",
+      "HeatCapacity": 10,
+      "HeatDissipation": 2,
+      "HeatDelayTime": 1,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4311,7 +4919,11 @@
       "MOA": 5,
       "Range": 250,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 2,
+      "HeatDelayTime": 1,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4330,7 +4942,11 @@
       "MOA": 5,
       "Range": 120,
       "Penetration": 8,
-      "DmgType": "DMG_BUCKSHOT"
+      "DmgType": "DMG_BUCKSHOT",
+      "HeatCapacity": 5,
+      "HeatDissipation": 2,
+      "HeatDelayTime": 1,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4349,7 +4965,11 @@
       "MOA": 5,
       "Range": 300,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4368,7 +4988,11 @@
       "MOA": 5,
       "Range": 300,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 20,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4387,7 +5011,11 @@
       "MOA": 5,
       "Range": 300,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4406,7 +5034,11 @@
       "MOA": 1,
       "Range": 700,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 4,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 30
     },
     {
       "Addon": "arccwrepes",
@@ -4425,7 +5057,11 @@
       "MOA": 5,
       "Range": 250,
       "Penetration": 8,
-      "DmgType": "DMG_SHOCK"
+      "DmgType": "DMG_SHOCK",
+      "HeatCapacity": 10,
+      "HeatDissipation": 2,
+      "HeatDelayTime": 1,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4463,7 +5099,11 @@
       "MOA": 5,
       "Range": 300,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 20,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4482,7 +5122,11 @@
       "MOA": 5,
       "Range": 180,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4501,7 +5145,11 @@
       "MOA": 5,
       "Range": 170,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 10
     },
     {
       "Addon": "arccwrepes",
@@ -4520,7 +5168,11 @@
       "MOA": 5,
       "Range": 200,
       "Penetration": 8,
-      "DmgType": "DMG_BUCKSHOT"
+      "DmgType": "DMG_BUCKSHOT",
+      "HeatCapacity": 10,
+      "HeatDissipation": 2,
+      "HeatDelayTime": 1,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4539,7 +5191,11 @@
       "MOA": 5,
       "Range": 600,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 2,
+      "HeatDelayTime": 1,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4558,7 +5214,11 @@
       "MOA": 5,
       "Range": 360,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4577,7 +5237,11 @@
       "MOA": 5.5,
       "Range": 320,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 110,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4596,7 +5260,11 @@
       "MOA": 5.5,
       "Range": 300,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 85,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwrepes",
@@ -4615,7 +5283,11 @@
       "MOA": 5.5,
       "Range": 350,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 100,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -4634,7 +5306,11 @@
       "MOA": 0.5,
       "Range": 750,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -4653,7 +5329,11 @@
       "MOA": 0,
       "Range": 400,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 75,
+      "HeatDissipation": 10,
+      "HeatDelayTime": 0.1,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -4672,7 +5352,11 @@
       "MOA": 0.5,
       "Range": 600,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 60,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -4691,7 +5375,11 @@
       "MOA": 0.5,
       "Range": 900,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -4710,7 +5398,11 @@
       "MOA": 0,
       "Range": 400,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -4748,7 +5440,11 @@
       "MOA": 0.5,
       "Range": 200,
       "Penetration": 10,
-      "DmgType": "DMG_BLAST"
+      "DmgType": "DMG_BLAST",
+      "HeatCapacity": 20,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -4786,7 +5482,11 @@
       "MOA": 0.5,
       "Range": 200,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 34,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -4805,7 +5505,11 @@
       "MOA": 0.5,
       "Range": 400,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -4824,7 +5528,11 @@
       "MOA": 0.5,
       "Range": 400,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 30,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -4843,7 +5551,11 @@
       "MOA": 0,
       "Range": 135,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -4862,7 +5574,11 @@
       "MOA": 0,
       "Range": 500,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -4881,7 +5597,11 @@
       "MOA": 0.5,
       "Range": 200,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 34,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -4900,7 +5620,11 @@
       "MOA": 0,
       "Range": 270,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 35,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -4919,7 +5643,11 @@
       "MOA": 0.5,
       "Range": 600,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 22,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -4938,7 +5666,11 @@
       "MOA": 0.5,
       "Range": 190,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -4995,7 +5727,11 @@
       "MOA": 0,
       "Range": 270,
       "Penetration": 4,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5014,7 +5750,11 @@
       "MOA": 0.5,
       "Range": 120,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5033,7 +5773,11 @@
       "MOA": 0,
       "Range": 270,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 20,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5052,7 +5796,11 @@
       "MOA": 0.5,
       "Range": 220,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5071,7 +5819,10 @@
       "MOA": 0,
       "Range": 250,
       "Penetration": 10,
-      "DmgType": "DMG_BLAST"
+      "DmgType": "DMG_BLAST",
+      "HeatCapacity": 1,
+      "HeatDissipation": 5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5090,7 +5841,11 @@
       "MOA": 0,
       "Range": 200,
       "Penetration": 10,
-      "DmgType": "DMG_BLAST"
+      "DmgType": "DMG_BLAST",
+      "HeatCapacity": 4,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5109,7 +5864,11 @@
       "MOA": 0,
       "Range": 450,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 20,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5128,7 +5887,11 @@
       "MOA": 0,
       "Range": 400,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5147,7 +5910,11 @@
       "MOA": 0,
       "Range": 250,
       "Penetration": 10,
-      "DmgType": "DMG_DISSOLVE"
+      "DmgType": "DMG_DISSOLVE",
+      "HeatCapacity": 5,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5166,7 +5933,11 @@
       "MOA": 0.5,
       "Range": 140,
       "Penetration": 8,
-      "DmgType": "DMG_SHOCK"
+      "DmgType": "DMG_SHOCK",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5185,7 +5956,11 @@
       "MOA": 0.5,
       "Range": 140,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 20,
+      "HeatDissipation": 3,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5204,7 +5979,11 @@
       "MOA": 0,
       "Range": 305,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5223,7 +6002,11 @@
       "MOA": 0,
       "Range": 240,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5242,7 +6025,11 @@
       "MOA": 0,
       "Range": 900,
       "Penetration": 10,
-      "DmgType": "DMG_DISSOLVE"
+      "DmgType": "DMG_DISSOLVE",
+      "HeatCapacity": 4,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 30
     },
     {
       "Addon": "arccwspecf",
@@ -5261,7 +6048,11 @@
       "MOA": 0,
       "Range": 120,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 6,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5280,7 +6071,11 @@
       "MOA": 0,
       "Range": 170,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 40,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5299,7 +6094,11 @@
       "MOA": 0,
       "Range": 200,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 15,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5318,7 +6117,11 @@
       "MOA": 0.5,
       "Range": 90,
       "Penetration": 8,
-      "DmgType": "DMG_BUCKSHOT"
+      "DmgType": "DMG_BUCKSHOT",
+      "HeatCapacity": 5,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5337,7 +6140,11 @@
       "MOA": 0,
       "Range": 400,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 40,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5356,7 +6163,11 @@
       "MOA": 0.5,
       "Range": 200,
       "Penetration": 10,
-      "DmgType": "DMG_BUCKSHOT"
+      "DmgType": "DMG_BUCKSHOT",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5375,7 +6186,11 @@
       "MOA": 0,
       "Range": 200,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5470,7 +6285,11 @@
       "MOA": 0,
       "Range": 700,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 20,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5489,7 +6308,11 @@
       "MOA": 0,
       "Range": 400,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 75,
+      "HeatDissipation": 10,
+      "HeatDelayTime": 0.1,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5508,7 +6331,11 @@
       "MOA": 0.5,
       "Range": 120,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5527,7 +6354,11 @@
       "MOA": 0.5,
       "Range": 400,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 25,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5546,7 +6377,11 @@
       "MOA": 0,
       "Range": 600,
       "Penetration": 10,
-      "DmgType": "DMG_BLAST"
+      "DmgType": "DMG_BLAST",
+      "HeatCapacity": 3,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5565,7 +6400,11 @@
       "MOA": 0,
       "Range": 220,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 10,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5584,7 +6423,11 @@
       "MOA": 0.5,
       "Range": 400,
       "Penetration": 8,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 95,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.2,
+      "HeatGain": 1
     },
     {
       "Addon": "arccwspecf",
@@ -5603,7 +6446,11 @@
       "MOA": 0,
       "Range": 600,
       "Penetration": 10,
-      "DmgType": "DMG_BULLET"
+      "DmgType": "DMG_BULLET",
+      "HeatCapacity": 75,
+      "HeatDissipation": 5,
+      "HeatDelayTime": 0.5,
+      "HeatGain": 1
     }
   ],
   "overrides": {
