@@ -6607,7 +6607,15 @@ async function fetchArcCWData() {
         if (data.rawLua) {
           var splitIdx = data.rawLua.indexOf('ArcCW_Balance.Grenades = {');
           if (splitIdx !== -1) {
-            arccwState.rawLuaTail = '\n-- ============================================================================\n-- БАЛАНС ГРАНАТ И ВЗРЫВЧАТКИ (Сущности брошенных гранат)\n-- ============================================================================\n' + data.rawLua.substring(splitIdx);
+            var tail = data.rawLua.substring(splitIdx);
+            var autoLoadIdx = tail.indexOf('collapsar_arccw_balance_latest.txt');
+            if (autoLoadIdx !== -1) {
+              var commentIdx = tail.lastIndexOf('--', autoLoadIdx);
+              if (commentIdx !== -1) {
+                tail = tail.substring(0, commentIdx).trimEnd() + '\n';
+              }
+            }
+            arccwState.rawLuaTail = '\n-- ============================================================================\n-- БАЛАНС ГРАНАТ И ВЗРЫВЧАТКИ (Сущности брошенных гранат)\n-- ============================================================================\n' + tail;
           }
         }
         console.log('[ArcCW Balance] Synchronized with server data:', arccwState.weapons.length, 'weapons,', Object.keys(arccwState.overrides).length, 'overrides');
