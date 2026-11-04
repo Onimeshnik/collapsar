@@ -53,6 +53,20 @@ function applyLiveServerConfig(payload) {
         }
       }
     });
+    payload.jobs.forEach(job => {
+      if (job.playerSpawn === undefined || job.isStandardPlayerSpawn === undefined) {
+        const existing = state.jobs.find(j => j.teamVar === job.teamVar || j.jobID === job.jobID) ||
+                         (typeof BUNDLED_DATA !== 'undefined' && BUNDLED_DATA.jobs && BUNDLED_DATA.jobs.find(j => j.teamVar === job.teamVar || j.jobID === job.jobID));
+        if (existing) {
+          if (job.playerSpawn === undefined && existing.playerSpawn) job.playerSpawn = existing.playerSpawn;
+          if (job.isStandardPlayerSpawn === undefined && existing.isStandardPlayerSpawn !== undefined) job.isStandardPlayerSpawn = existing.isStandardPlayerSpawn;
+          if (job.health === 100 && existing.health && existing.health !== 100) job.health = existing.health;
+          if (job.maxHealth === 100 && existing.maxHealth && existing.maxHealth !== 100) job.maxHealth = existing.maxHealth;
+          if (job.armor === 100 && existing.armor && existing.armor !== 100) job.armor = existing.armor;
+          if (job.maxArmor === 100 && existing.maxArmor && existing.maxArmor !== 100) job.maxArmor = existing.maxArmor;
+        }
+      }
+    });
     state.jobs = payload.jobs;
   }
   if (Array.isArray(payload.categories) && payload.categories.length > 0) {
@@ -373,9 +387,9 @@ function parseConfigString(content) {
 
     let playerSpawn = '';
     let health = 100, maxHealth = 100, armor = 0, maxArmor = 0, isStandardPlayerSpawn = true;
-    const psM = blockText.match(/PlayerSpawn\s*=\s*function\s*\([^\)]*\)([\s\S]*?)end/);
-    if (psM) {
-      playerSpawn = psM[1].trim();
+    const rawPs = extractPlayerSpawnBlock(blockText);
+    if (rawPs) {
+      playerSpawn = rawPs.trim();
       const hpM = playerSpawn.match(/ply:SetHealth\s*\(\s*(\d+)\s*\)/);
       const maxHpM = playerSpawn.match(/ply:SetMaxHealth\s*\(\s*(\d+)\s*\)/);
       const armM = playerSpawn.match(/ply:SetArmor\s*\(\s*(\d+)\s*\)/);
@@ -1539,10 +1553,10 @@ function closeJobModal() {
 }
 
 function switchJobModalTab(tabId) {
-  document.querySelectorAll('.tab-btn').forEach(btn => {
+  document.querySelectorAll('#job-modal .tab-btn').forEach(btn => {
     btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
   });
-  document.querySelectorAll('.tab-pane').forEach(pane => {
+  document.querySelectorAll('#job-modal .tab-pane').forEach(pane => {
     pane.classList.toggle('active', pane.id === tabId);
   });
 }
@@ -3197,7 +3211,16 @@ function initEditorBundle() {
   });
 
   document.getElementById('toggle-custom-spawn').addEventListener('change', (e) => {
-    document.getElementById('custom-spawn-container').style.display = e.target.checked ? 'block' : 'none';
+    const isChecked = e.target.checked;
+    document.getElementById('custom-spawn-container').style.display = isChecked ? 'block' : 'none';
+    const inputCustom = document.getElementById('input-custom-spawn');
+    if (isChecked && (!inputCustom.value || !inputCustom.value.trim())) {
+      const curHp = document.getElementById('input-job-health').value || 100;
+      const curMaxHp = document.getElementById('input-job-maxhealth').value || 100;
+      const curArm = document.getElementById('input-job-armor').value || 100;
+      const curMaxArm = document.getElementById('input-job-maxarmor').value || 100;
+      inputCustom.value = `-- Пользовательский код спавна\nply:SetMaxArmor(${curMaxArm})\nply:SetArmor(${curArm})\nply:SetMaxHealth(${curMaxHp})\nply:SetHealth(${curHp})`;
+    }
   });
 
   document.getElementById('btn-quick-new-cat').addEventListener('click', () => {
