@@ -123,7 +123,7 @@ function getApiUrl(endpoint) {
     return window.COLLAPSAR_API_BASE.replace(/\/+$/, '') + path;
   }
   if (window.location.hostname.includes('github.io') || window.location.protocol === 'file:') {
-    return 'https://collapsar-admin-panel.onrender.com' + path;
+    return 'http://s6.yufu.su:16269' + path;
   }
   return path;
 }
