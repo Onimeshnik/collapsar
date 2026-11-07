@@ -4948,6 +4948,9 @@
                         if (canUseSettings()) this.sendCommand('get_settings', '');
                     } else {
                         document.getElementById('loginError').textContent = data.message || 'Ошибка авторизации';
+                        document.getElementById('mainApp').style.display = 'none';
+                        const ls = document.getElementById('loginScreen');
+                        if (ls) { ls.style.display = 'flex'; ls.classList.remove('hidden'); }
                         if (this._token) localStorage.removeItem(SESSION_TOKEN_KEY);
                         this._token = null;
                         currentRole = null;
