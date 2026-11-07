@@ -333,23 +333,28 @@
             }
         }
 
-        // Live stats fetch from web server backend
-        async function fetchLiveStats() {
+        // Live stats fetch from web server backend (Compatible with older Awesomium & Chromium)
+        function fetchLiveStats() {
             try {
-                const res = await fetch('/api/stats');
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data && typeof data.online === 'number') {
-                        onlinePlayers = data.online;
-                        refreshPlayerDisplay();
-                        if (data.map && (!document.getElementById('map-name').innerText || document.getElementById('map-name').innerText === 'Загрузка...')) {
-                            document.getElementById('map-name').innerText = data.map;
-                        }
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/api/stats', true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        try {
+                            var data = JSON.parse(xhr.responseText);
+                            if (data && typeof data.online === 'number') {
+                                onlinePlayers = data.online;
+                                refreshPlayerDisplay();
+                                var mapEl = document.getElementById('map-name');
+                                if (data.map && mapEl && (!mapEl.innerText || mapEl.innerText === 'Загрузка...')) {
+                                    mapEl.innerText = data.map;
+                                }
+                            }
+                        } catch (err) {}
                     }
-                }
-            } catch (e) {
-                // Ignore background polling errors
-            }
+                };
+                xhr.send();
+            } catch (e) {}
         }
         fetchLiveStats();
         setInterval(fetchLiveStats, 3000);

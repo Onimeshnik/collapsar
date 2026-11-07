@@ -2598,6 +2598,82 @@
                             <span id="webhookTestResult" style="color:var(--text-secondary);font-size:11px;"></span>
                         </div>
                     </div>
+
+                    <!-- Chat Logs in Discord -->
+                    <div class="settings-card" style="margin-top:16px;">
+                        <h3><i class="fas fa-comments" style="color:#00E5FF;"></i> Логирование игрового чата в Discord</h3>
+                        <p class="sub">Автоматическая пересылка сообщений игрового чата в текстовые каналы вашего Discord сервера с поддержкой тегов и форматирования.</p>
+                        
+                        <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:16px;padding:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:6px;">
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:#fff;">
+                                <input type="checkbox" id="cfgChatLogsEnabled" checked>
+                                <span>Включить логирование чата</span>
+                            </label>
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:#fff;">
+                                <input type="checkbox" id="cfgChatLogsPlayerIdentity" checked>
+                                <span>Использовать ник и аватарку игрока из Steam</span>
+                            </label>
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:#fff;">
+                                <input type="checkbox" id="cfgChatLogsEmbeds" checked>
+                                <span>Цветной формат Embed</span>
+                            </label>
+                        </div>
+
+                        <div class="settings-grid-2">
+                            <div class="settings-input-group" style="grid-column:1/-1;">
+                                <label><i class="fas fa-asterisk" style="color:#94a3b8;margin-right:6px;"></i> Основной вебхук чата (По умолчанию / Fallback)</label>
+                                <span class="desc">Все каналы чата, для которых ниже не указан отдельный вебхук, будут отправляться сюда</span>
+                                <input type="text" id="cfgChatWebhookDefault" placeholder="https://discord.com/api/webhooks/...">
+                            </div>
+                            <div class="settings-input-group">
+                                <label><i class="fas fa-globe" style="color:#4da6ff;margin-right:6px;"></i> Внеигровой чат (OOC / LOOC)</label>
+                                <span class="desc">Глобальный (/ooc, //) и локальный ([[) внеролевой чат</span>
+                                <input type="text" id="cfgChatWebhookOOC" placeholder="https://discord.com/api/webhooks/...">
+                            </div>
+                            <div class="settings-input-group">
+                                <label><i class="fas fa-theater-masks" style="color:#ffaa00;margin-right:6px;"></i> RP Отыгровка и действия (/me, /do, /try, /roll)</label>
+                                <span class="desc">Ролевые действия от 3 лица, описания и броски кубика</span>
+                                <input type="text" id="cfgChatWebhookRP" placeholder="https://discord.com/api/webhooks/...">
+                            </div>
+                            <div class="settings-input-group">
+                                <label><i class="fas fa-comment-dots" style="color:#e2e8f0;margin-right:6px;"></i> Локальный чат (Say, Крик, Шепот)</label>
+                                <span class="desc">Обычный разговор игроков вблизи (/say, /y, /w)</span>
+                                <input type="text" id="cfgChatWebhookSay" placeholder="https://discord.com/api/webhooks/...">
+                            </div>
+                            <div class="settings-input-group">
+                                <label><i class="fas fa-broadcast-tower" style="color:#00e5ff;margin-right:6px;"></i> Рация, Комлинк и Объявления (/comms, /advert)</label>
+                                <span class="desc">Каналы связи гарнизона, флота и общие объявления</span>
+                                <input type="text" id="cfgChatWebhookComms" placeholder="https://discord.com/api/webhooks/...">
+                            </div>
+                        </div>
+
+                        <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                            <button class="modal-btn confirm" type="button" onclick="testChatLogWebhook('DEFAULT')">
+                                <i class="fas fa-paper-plane"></i> Проверить основной вебхук чата
+                            </button>
+                            <button class="modal-btn" type="button" onclick="testChatLogWebhook('OOC')">
+                                <i class="fas fa-paper-plane"></i> Тест OOC
+                            </button>
+                            <button class="modal-btn" type="button" onclick="testChatLogWebhook('RP')">
+                                <i class="fas fa-paper-plane"></i> Тест RP
+                            </button>
+                            <button class="modal-btn" type="button" onclick="testChatLogWebhook('COMMS')">
+                                <i class="fas fa-paper-plane"></i> Тест Рации
+                            </button>
+                            <span id="chatWebhookTestResult" style="color:var(--text-secondary);font-size:11px;"></span>
+                        </div>
+                    </div>
+
+                    <!-- Steam API Key -->
+                    <div class="settings-card" style="margin-top:16px;">
+                        <h3><i class="fab fa-steam" style="color:#00dee6;"></i> Steam Web-API & Аватарки игроков</h3>
+                        <p class="sub">Ключ Steam Web API используется сервером для загрузки аватарок и актуальных профилей игроков из Steam.</p>
+                        <div class="settings-input-group">
+                            <label><i class="fas fa-key" style="color:var(--amber);margin-right:6px;"></i> Ключ Web-API Steam</label>
+                            <span class="desc">Получить ключ можно на официальной странице: <a href="https://steamcommunity.com/dev/apikey" target="_blank" style="color:var(--amber);text-decoration:underline;">steamcommunity.com/dev/apikey</a></span>
+                            <input type="text" id="cfgSteamApiKey" placeholder="068369973F920164C593D44BFB497329">
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Pane 4: Backup Accounts -->
@@ -4820,6 +4896,10 @@
                     if (webhookResult && data.message && (data.message.includes('вебхук') || data.message.includes('сообщений') || data.message.includes('Вебхуки'))) {
                         webhookResult.textContent = `${icon} ${data.message}`;
                     }
+                    const chatWebhookResult = document.getElementById('chatWebhookTestResult');
+                    if (chatWebhookResult && data.message && (data.message.includes('чат') || data.message.includes('вебхук') || data.message.includes('канал'))) {
+                        chatWebhookResult.textContent = `${icon} ${data.message}`;
+                    }
                 }
                 if (data.type === 'auth_result') {
                     if (data.success) {
@@ -5456,6 +5536,31 @@
                 if (sLogInput && b.serverLogWebhook !== undefined) sLogInput.value = b.serverLogWebhook || '';
             }
 
+            // Chat Logs configuration
+            const cl = panelSettingsCache.chatLogs || {};
+            const clWebhooks = cl.webhooks || {};
+            const clEnabled = document.getElementById('cfgChatLogsEnabled');
+            if (clEnabled) clEnabled.checked = cl.enabled !== undefined ? !!cl.enabled : true;
+            const clIdentity = document.getElementById('cfgChatLogsPlayerIdentity');
+            if (clIdentity) clIdentity.checked = cl.usePlayerIdentity !== undefined ? !!cl.usePlayerIdentity : true;
+            const clEmbeds = document.getElementById('cfgChatLogsEmbeds');
+            if (clEmbeds) clEmbeds.checked = cl.useEmbeds !== undefined ? !!cl.useEmbeds : true;
+
+            const clDef = document.getElementById('cfgChatWebhookDefault');
+            if (clDef) clDef.value = clWebhooks.DEFAULT || '';
+            const clOoc = document.getElementById('cfgChatWebhookOOC');
+            if (clOoc) clOoc.value = clWebhooks.OOC || '';
+            const clRp = document.getElementById('cfgChatWebhookRP');
+            if (clRp) clRp.value = clWebhooks.RP || '';
+            const clSay = document.getElementById('cfgChatWebhookSay');
+            if (clSay) clSay.value = clWebhooks.SAY || '';
+            const clComms = document.getElementById('cfgChatWebhookComms');
+            if (clComms) clComms.value = clWebhooks.COMMS || '';
+
+            // Steam API Key
+            const steamKeyInput = document.getElementById('cfgSteamApiKey');
+            if (steamKeyInput) steamKeyInput.value = panelSettingsCache.steamApiKey || '';
+
             const accountsBox = document.getElementById('settingsAccounts');
             accountsBox.innerHTML = Object.entries(panelSettingsCache.accounts || {}).map(([login, acc]) => `
                 <div class="settings-account" style="border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;margin-bottom:10px;background:rgba(255,255,255,0.03);">
@@ -5804,7 +5909,45 @@
                 serverLogWebhook: (document.getElementById('cfgServerLogWebhook')?.value || '').trim(),
             };
 
-            return { accounts, discordRoleMap, discordCommandRoleMap, discordUnitRoleMap, discordPermissionRoleMap, discordRankRoleMap, discordFormationRoleMap, discordBot };
+            const chatLogs = {
+                enabled: !!document.getElementById('cfgChatLogsEnabled')?.checked,
+                usePlayerIdentity: !!document.getElementById('cfgChatLogsPlayerIdentity')?.checked,
+                useEmbeds: !!document.getElementById('cfgChatLogsEmbeds')?.checked,
+                webhooks: {
+                    DEFAULT: (document.getElementById('cfgChatWebhookDefault')?.value || '').trim(),
+                    OOC: (document.getElementById('cfgChatWebhookOOC')?.value || '').trim(),
+                    RP: (document.getElementById('cfgChatWebhookRP')?.value || '').trim(),
+                    SAY: (document.getElementById('cfgChatWebhookSay')?.value || '').trim(),
+                    COMMS: (document.getElementById('cfgChatWebhookComms')?.value || '').trim(),
+                }
+            };
+
+            const steamApiKey = (document.getElementById('cfgSteamApiKey')?.value || '').trim();
+
+            return { accounts, discordRoleMap, discordCommandRoleMap, discordUnitRoleMap, discordPermissionRoleMap, discordRankRoleMap, discordFormationRoleMap, discordBot, chatLogs, steamApiKey };
+        }
+
+        function testChatLogWebhook(channel) {
+            if (!canUseSettings()) return;
+            const channelIdMap = {
+                'DEFAULT': 'cfgChatWebhookDefault',
+                'OOC': 'cfgChatWebhookOOC',
+                'RP': 'cfgChatWebhookRP',
+                'SAY': 'cfgChatWebhookSay',
+                'COMMS': 'cfgChatWebhookComms'
+            };
+            const inputId = channelIdMap[channel] || 'cfgChatWebhookDefault';
+            let webhookUrl = (document.getElementById(inputId)?.value || '').trim();
+            if (!webhookUrl && channel !== 'DEFAULT') {
+                webhookUrl = (document.getElementById('cfgChatWebhookDefault')?.value || '').trim();
+            }
+            const statusEl = document.getElementById('chatWebhookTestResult');
+            if (!webhookUrl) {
+                if (statusEl) statusEl.textContent = `Ошибка: вебхук для [${channel}] не заполнен!`;
+                return;
+            }
+            if (statusEl) statusEl.textContent = `Отправляю проверочное сообщение в [${channel}]...`;
+            api.sendCommand('test_discord_chat_webhook', '', { webhookUrl, channel });
         }
 
         function refreshSettings() {
