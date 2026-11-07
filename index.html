@@ -2012,6 +2012,29 @@
                 width: 100%;
             }
         }
+
+        .preset-btn {
+            padding: 12px 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            color: #cbd5e1;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .preset-btn:hover {
+            background: rgba(56, 189, 248, 0.12);
+            border-color: rgba(56, 189, 248, 0.4);
+            color: #38bdf8;
+            transform: translateY(-1px);
+        }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2100,6 +2123,7 @@
             <button class="tab-btn" id="donateTabBtn" onclick="switchTab('donate')" style="display:none;"><i class="fas fa-gem"></i> Донат</button>
             <button class="tab-btn" id="serverLogsTabBtn" onclick="switchTab('server-logs')" style="display:none;"><i class="fas fa-terminal"></i> Логи сервера</button>
             <button class="tab-btn" id="logsTabBtn" onclick="switchTab('logs')" style="display:none;"><i class="fas fa-clipboard-list"></i> Логи панели</button>
+            <button class="tab-btn" id="musicTabBtn" onclick="switchTab('music')" style="display:none;"><i class="fas fa-music"></i> Музыка / Ивенты</button>
             <button class="tab-btn" id="configEditorTabBtn" onclick="switchTab('config-editor')" style="display:none;"><i class="fas fa-sliders-h"></i> Редактор конфигов</button>
             <button class="tab-btn" id="settingsTabBtn" onclick="switchTab('settings')" style="display:none;"><i class="fas fa-cog"></i> Настройки</button>
             <div class="sidebar-profile">
@@ -2403,6 +2427,82 @@
                 </div>
                 <div class="server-logs-list" id="serverLogsList">
                     <div class="server-logs-empty">Логи ещё не загружались</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Event Room / Music -->
+        <div class="tab-content" id="tab-music">
+            <div class="server-logs-controls" style="margin-bottom: 20px;">
+                <div>
+                    <span class="server-logs-eyebrow">EVENT ROOM</span>
+                    <h2>Музыка и Саундтреки</h2>
+                    <p>Трансляция музыки и звуковых эффектов на сервер Garry's Mod в реальном времени</p>
+                </div>
+                <div id="musicLiveBadge" class="meta-pill" style="display: flex; align-items: center; gap: 8px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.3); padding: 8px 16px; border-radius: 6px;">
+                    <span class="status-dot" id="musicStatusDot" style="width: 8px; height: 8px; border-radius: 50%; background: #64748b;"></span>
+                    <span id="musicLiveText" style="font-size: 13px; font-weight: 600; color: #94a3b8;">Сейчас ничего не играет</span>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px;">
+                <!-- Left: Control Panel -->
+                <div class="panel" style="background: rgba(14, 18, 27, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 24px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); padding-bottom: 12px;">
+                        <i class="fas fa-play-circle" style="color: #38bdf8; font-size: 18px;"></i>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #f8fafc;">Управление воспроизведением</h3>
+                    </div>
+
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 12px; font-weight: 600; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">URL аудио (Прямая ссылка MP3 / SoundCloud / Web Audio)</label>
+                        <input type="text" id="musicUrlInput" class="input" placeholder="https://example.com/soundtrack.mp3 или ссылка SoundCloud" style="width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 6px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <label style="display: block; font-size: 12px; font-weight: 600; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Название трека / Описание для уведомления в игре</label>
+                        <input type="text" id="musicTitleInput" class="input" placeholder="The Imperial March - Battle Theme" style="width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 6px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                    </div>
+
+                    <div style="margin-bottom: 22px; background: rgba(15, 23, 42, 0.5); padding: 14px 16px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.05);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-size: 13px; font-weight: 600; color: #cbd5e1;"><i class="fas fa-volume-up" style="margin-right: 6px; color: #38bdf8;"></i>Громкость на сервере:</span>
+                            <span id="musicVolumeValue" style="font-family: monospace; font-size: 15px; font-weight: 700; color: #f59e0b;">50%</span>
+                        </div>
+                        <input type="range" id="musicVolumeSlider" min="0" max="100" value="50" oninput="updateMusicVolume(this.value)" style="width: 100%; accent-color: #f59e0b; cursor: pointer;">
+                    </div>
+
+                    <div style="display: flex; gap: 12px;">
+                        <button onclick="playMusicOnServer()" class="modal-btn confirm" style="flex: 1; padding: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 14px; cursor: pointer;">
+                            <i class="fas fa-play"></i> Запустить на сервере
+                        </button>
+                        <button onclick="stopMusicOnServer()" class="modal-btn" style="flex: 1; padding: 14px; background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 14px; cursor: pointer;">
+                            <i class="fas fa-stop"></i> Остановить музыку
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right: Presets -->
+                <div class="panel" style="background: rgba(14, 18, 27, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 24px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); padding-bottom: 12px;">
+                        <i class="fas fa-list-ul" style="color: #f59e0b; font-size: 18px;"></i>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #f8fafc;">Готовые саундтреки Star Wars</h3>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="preset-btn" onclick="setMusicPreset('https://ia800908.us.archive.org/24/items/StarWarsTheImperialMarchDarthVadersTheme/Star%20Wars%20-%20The%20Imperial%20March%20%28Darth%20Vader%27s%20Theme%29.mp3', 'The Imperial March')">⚔️ Imperial March</button>
+                        <button class="preset-btn" onclick="setMusicPreset('https://ia800701.us.archive.org/34/items/StarWarsMainTheme_201701/StarWarsMainTheme.mp3', 'Star Wars Main Theme')">🌌 Star Wars Theme</button>
+                        <button class="preset-btn" onclick="setMusicPreset('https://ia600903.us.archive.org/19/items/DuelOfTheFates_201610/Duel%20of%20the%20Fates.mp3', 'Duel of the Fates')">🔥 Duel of Fates</button>
+                        <button class="preset-btn" onclick="setMusicPreset('https://ia800504.us.archive.org/11/items/CantinaBand_201612/Cantina%20Band.mp3', 'Cantina Band')">🎷 Cantina Band</button>
+                        <button class="preset-btn" onclick="setMusicPreset('https://ia801509.us.archive.org/15/items/StarWarsAttackOfTheClonesSoundtrack/02%20-%20Across%20the%20Stars.mp3', 'Across the Stars (Love Theme)')">✨ Across the Stars</button>
+                        <button class="preset-btn" onclick="setMusicPreset('https://ia801509.us.archive.org/15/items/StarWarsAttackOfTheClonesSoundtrack/13%20-%20Love%20Pledge%20and%20the%20Arena.mp3', 'Battle of Geonosis - Arena')">🛡️ Geonosis Arena</button>
+                        <button class="preset-btn" onclick="setMusicPreset('https://ia801508.us.archive.org/11/items/StarWarsRevengeOfTheSithSoundtrack/03%20-%20Battle%20Over%20Coruscant.mp3', 'Battle Over Coruscant')">🚀 Battle of Coruscant</button>
+                        <button class="preset-btn" onclick="setMusicPreset('https://ia801508.us.archive.org/11/items/StarWarsRevengeOfTheSithSoundtrack/11%20-%20Enter%20Lord%20Vader.mp3', 'March on the Jedi Temple')">🏛️ Jedi Temple March</button>
+                    </div>
+
+                    <div style="margin-top: 20px; padding: 12px; background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.15); border-radius: 6px; font-size: 12px; color: #94a3b8; line-height: 1.5;">
+                        <i class="fas fa-info-circle" style="color: #38bdf8; margin-right: 6px;"></i>
+                        Поддерживаются прямые ссылки на <code>.mp3</code>, <code>.ogg</code>, веб-радиостанции, а также треки с <strong>SoundCloud</strong>.
+                    </div>
                 </div>
             </div>
         </div>
@@ -4196,6 +4296,9 @@
         function canUseConfigEditor() {
             return canUseSettings() || hasCommanderAccess() || ['superadmin', 'admin', 'commander', 'head_admin'].includes(currentRole) || hasPanelPermission('jobs');
         }
+        function canUseMusic() {
+            return canUseSettings() || ['superadmin', 'admin', 'gamemaster', 'eventmaster'].includes(currentRole) || hasPanelPermission('music');
+        }
         function getFormationName(id) {
             const formation = FORMATIONS.find(f => f.id === normalizeUnit(id));
             return formation ? formation.name : (id || 'Не указано');
@@ -4265,10 +4368,15 @@
             if (settingsBtn) settingsBtn.style.display = canUseSettings() ? '' : 'none';
             const configEditorBtn = document.getElementById('configEditorTabBtn');
             if (configEditorBtn) configEditorBtn.style.display = canUseConfigEditor() ? '' : 'none';
+            const musicBtn = document.getElementById('musicTabBtn');
+            if (musicBtn) musicBtn.style.display = canUseMusic() ? '' : 'none';
             if (!canSeePanelLogs() && document.getElementById('tab-logs')?.classList.contains('active')) {
                 switchTab('players');
             }
             if (!canSeeServerLogs() && document.getElementById('tab-server-logs')?.classList.contains('active')) {
+                switchTab('players');
+            }
+            if (!canUseMusic() && document.getElementById('tab-music')?.classList.contains('active')) {
                 switchTab('players');
             }
             if (!canUseDonate() && document.getElementById('tab-donate')?.classList.contains('active')) {
@@ -4476,6 +4584,11 @@
                     addToConsole(`[${ts()}] Получена живая конфигурация сервера (${(data.jobs || []).length} профессий)`);
                     if (window.applyLiveServerConfig) {
                         window.applyLiveServerConfig(data);
+                    }
+                }
+                if (data.type === 'music_state') {
+                    if (typeof handleMusicStateUpdate === 'function') {
+                        handleMusicStateUpdate(data);
                     }
                 }
                 if (data.type === 'ranks_data') {
@@ -5448,6 +5561,7 @@
             donate: 'Донат',
             'server-logs': 'Логи сервера',
             logs: 'Логи панели',
+            music: 'Event Room — Музыка и Ивенты',
             'config-editor': 'Редактор конфигураций',
             settings: 'Настройки доступа',
         };
@@ -5496,6 +5610,7 @@
         function switchTab(tab) {
             if (tab === 'logs' && !canSeePanelLogs()) return;
             if (tab === 'server-logs' && !canSeeServerLogs()) return;
+            if (tab === 'music' && !canUseMusic()) return;
             if (tab === 'subordinates' && !hasCommanderAccess()) return;
             if (tab === 'donate' && !canUseDonate()) return;
             if (tab === 'bans' && !canManageBans()) return;
@@ -5512,7 +5627,7 @@
             const topbarSearch = document.getElementById('topbarSearch');
             if (topbarSearch) {
                 topbarSearch.value = '';
-                topbarSearch.style.display = ['donate', 'settings', 'config-editor'].includes(tab) ? 'none' : '';
+                topbarSearch.style.display = ['donate', 'settings', 'config-editor', 'music'].includes(tab) ? 'none' : '';
             }
             if (tab === 'subordinates') refreshSubordinates();
             if (tab === 'bans') refreshBans();
@@ -5528,6 +5643,68 @@
                 if (api && api.socket && api.socket.readyState === WebSocket.OPEN) {
                     api.sendCommand('get_editor_data', '');
                 }
+            }
+        }
+
+        // ----- EVENT ROOM МУЗЫКА И ИВЕНТЫ -----
+        function setMusicPreset(url, title) {
+            const urlInput = document.getElementById('musicUrlInput');
+            const titleInput = document.getElementById('musicTitleInput');
+            if (urlInput) urlInput.value = url;
+            if (titleInput) titleInput.value = title;
+            showToast('Выбран трек: ' + title, 'info');
+        }
+
+        function playMusicOnServer() {
+            const url = (document.getElementById('musicUrlInput')?.value || '').trim();
+            const title = (document.getElementById('musicTitleInput')?.value || '').trim() || 'Event Track';
+            const volume = (parseInt(document.getElementById('musicVolumeSlider')?.value, 10) || 50) / 100;
+
+            if (!url) {
+                showToast('Введите ссылку на аудио', 'warning');
+                return;
+            }
+
+            api.sendCommand('eventroom_music_play', '', { url, title, volume });
+            showToast(`Трек "${title}" запущен на сервере`, 'success');
+        }
+
+        function stopMusicOnServer() {
+            api.sendCommand('eventroom_music_stop', '');
+            showToast('Остановка музыки отправлена на сервер', 'info');
+        }
+
+        let musicVolumeDebounceTimer = null;
+        function updateMusicVolume(val) {
+            const display = document.getElementById('musicVolumeValue');
+            if (display) display.textContent = val + '%';
+            clearTimeout(musicVolumeDebounceTimer);
+            musicVolumeDebounceTimer = setTimeout(() => {
+                api.sendCommand('eventroom_music_volume', '', { volume: (parseInt(val, 10) || 50) / 100 }, true);
+            }, 150);
+        }
+
+        function handleMusicStateUpdate(data) {
+            const dot = document.getElementById('musicStatusDot');
+            const text = document.getElementById('musicLiveText');
+            if (!dot || !text) return;
+
+            if (data.playing && data.title) {
+                dot.style.background = '#10b981';
+                dot.style.boxShadow = '0 0 10px #10b981';
+                text.innerHTML = '<span style="color:#10b981;">Играет:</span> ' + escapeHtml(data.title) + (data.actor ? ' <span style="color:#64748b;">(запустил: ' + escapeHtml(data.actor) + ')</span>' : '');
+            } else {
+                dot.style.background = '#64748b';
+                dot.style.boxShadow = 'none';
+                text.textContent = 'Сейчас ничего не играет';
+            }
+
+            if (typeof data.volume === 'number') {
+                const slider = document.getElementById('musicVolumeSlider');
+                const display = document.getElementById('musicVolumeValue');
+                const volPct = Math.round(data.volume * 100);
+                if (slider && !slider.matches(':active')) slider.value = volPct;
+                if (display) display.textContent = volPct + '%';
             }
         }
 
