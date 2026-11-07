@@ -2171,7 +2171,250 @@
             color: #38bdf8;
             transform: translateY(-1px);
         }
-    </style>
+    
+/* ==========================================================================
+   WIKI & CHARTER EDITOR (ADMIN PANEL)
+   ========================================================================== */
+.wiki-editor-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 120px);
+    background: #0f0f10;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+}
+
+.wiki-editor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    background: #141416;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.wiki-header-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    font-family: 'Chakra Petch', sans-serif;
+    letter-spacing: 0.03em;
+}
+
+.wiki-header-sub {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.wiki-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.charter-select {
+    padding: 7px 12px;
+    background: #1c1c1f;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 6px;
+    color: #fff;
+    font-size: 13px;
+    font-family: inherit;
+    min-width: 280px;
+    outline: none;
+}
+
+.charter-select:focus {
+    border-color: var(--amber);
+}
+
+.wiki-editor-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    background: #18181b;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-wrap: wrap;
+}
+
+.toolbar-btn-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.w-tool-btn {
+    padding: 5px 9px;
+    background: #222226;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.w-tool-btn:hover {
+    background: #2c2c32;
+    color: var(--amber);
+    border-color: var(--amber);
+}
+
+.w-toolbar-divider {
+    width: 1px;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 0 4px;
+}
+
+.w-toolbar-status {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.status-indicator {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #3fb950;
+}
+
+.wiki-editor-split {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.wiki-pane {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.wiki-pane-edit {
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pane-meta {
+    padding: 6px 14px;
+    background: #141416;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+}
+
+.live-pill {
+    color: var(--amber);
+}
+
+#charterTextarea {
+    flex: 1;
+    width: 100%;
+    padding: 16px;
+    background: #0f0f10;
+    color: #e6e6e6;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    border: none;
+    outline: none;
+    resize: none;
+    overflow-y: auto;
+}
+
+.wiki-preview-body {
+    flex: 1;
+    padding: 24px;
+    background: #111113;
+    overflow-y: auto;
+    color: #d1d5db;
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.preview-placeholder {
+    padding: 60px 20px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 13px;
+}
+
+.wiki-preview-body h1, .wiki-preview-body h2, .wiki-preview-body h3 {
+    color: #fff;
+    font-family: 'Chakra Petch', sans-serif;
+    margin-top: 24px;
+    margin-bottom: 12px;
+}
+
+.wiki-preview-body h1 { font-size: 24px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px; }
+.wiki-preview-body h2 { font-size: 19px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; }
+.wiki-preview-body h3 { font-size: 16px; color: var(--amber); }
+
+.wiki-preview-body p { margin-bottom: 12px; }
+
+.wiki-preview-body ul, .wiki-preview-body ol {
+    margin-left: 20px;
+    margin-bottom: 12px;
+}
+
+.wiki-preview-body li { margin-bottom: 4px; }
+
+.wiki-preview-body blockquote {
+    margin: 14px 0;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 3px solid var(--amber);
+    border-radius: 0 4px 4px 0;
+}
+
+.wiki-preview-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13px;
+}
+
+.wiki-preview-body th, .wiki-preview-body td {
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    text-align: left;
+}
+
+.wiki-preview-body th {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--amber);
+    font-weight: 600;
+}
+
+.wiki-preview-body code {
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--amber);
+}
+
+</style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -2261,6 +2504,7 @@
             <button class="tab-btn" id="logsTabBtn" onclick="switchTab('logs')" style="display:none;"><i class="fas fa-clipboard-list"></i> Логи панели</button>
             <button class="tab-btn" id="musicTabBtn" onclick="switchTab('music')" style="display:none;"><i class="fas fa-music"></i> Музыка / Ивенты</button>
             <button class="tab-btn" id="configEditorTabBtn" onclick="switchTab('config-editor')" style="display:none;"><i class="fas fa-sliders-h"></i> Редактор конфигов</button>
+            <button class="tab-btn" id="wikiEditorTabBtn" onclick="switchTab('wiki-editor')" style="display:none;"><i class="fas fa-book-open"></i> Редактор устава</button>
             <a class="tab-btn" href="/wiki/" target="_blank" style="text-decoration:none;"><i class="fas fa-book"></i> База знаний / Устав <i class="fas fa-external-link-alt" style="font-size:10px; margin-left:auto; opacity:0.6;"></i></a>
             <button class="tab-btn" id="settingsTabBtn" onclick="switchTab('settings')" style="display:none;"><i class="fas fa-cog"></i> Настройки</button>
             <div class="sidebar-profile">
@@ -4382,6 +4626,74 @@
       </div>
     </div>
 
+
+        <!-- Tab: Wiki & Charter Editor -->
+        <div class="tab-content" id="tab-wiki-editor">
+            <div class="wiki-editor-container">
+                <div class="wiki-editor-header">
+                    <div class="wiki-header-left">
+                        <div class="wiki-header-title">
+                            <i class="fas fa-book-open" style="color: var(--amber);"></i>
+                            <span>Редактор устава и регламентов ВАР</span>
+                        </div>
+                        <span class="wiki-header-sub">Централизованное управление базой знаний Республики</span>
+                    </div>
+                    <div class="wiki-header-actions">
+                        <select id="charterArticleSelect" class="charter-select" onchange="onCharterArticleChange(this.value)">
+                            <option value="">Загрузка списка статей...</option>
+                        </select>
+                        <button type="button" class="action-btn connect-btn" id="charterSaveBtn" onclick="saveCharterArticle()">
+                            <i class="fas fa-save"></i> Сохранить на хост
+                        </button>
+                        <a id="charterOpenSiteBtn" href="/wiki/" target="_blank" class="action-btn view-btn" style="text-decoration:none;">
+                            <i class="fas fa-external-link-alt"></i> База знаний
+                        </a>
+                    </div>
+                </div>
+
+                <div class="wiki-editor-toolbar">
+                    <div class="toolbar-btn-group">
+                        <button type="button" class="w-tool-btn" onclick="charterInsert('## ', '')" title="Заголовок H2">H2</button>
+                        <button type="button" class="w-tool-btn" onclick="charterInsert('### ', '')" title="Заголовок H3">H3</button>
+                        <button type="button" class="w-tool-btn" onclick="charterInsert('**', '**', 'жирный текст')" title="Жирный"><i class="fas fa-bold"></i></button>
+                        <button type="button" class="w-tool-btn" onclick="charterInsert('*', '*', 'курсив')" title="Курсив"><i class="fas fa-italic"></i></button>
+                        <button type="button" class="w-tool-btn" onclick="charterInsert('`', '`', 'код')" title="Код"><i class="fas fa-code"></i></button>
+                    </div>
+                    <div class="w-toolbar-divider"></div>
+                    <div class="toolbar-btn-group">
+                        <button type="button" class="w-tool-btn" onclick="charterInsert('\n* ', '', 'Пункт списка')" title="Список"><i class="fas fa-list-ul"></i></button>
+                        <button type="button" class="w-tool-btn" onclick="charterInsert('\n1. ', '', 'Пункт списка')" title="Нумерованный"><i class="fas fa-list-ol"></i></button>
+                        <button type="button" class="w-tool-btn" onclick="charterInsert('\n\n| Параметр | Значение | Описание |\n| :--- | :--- | :--- |\n| Пункт 1 | Значение 1 | Описание 1 |\n', '')" title="Таблица"><i class="fas fa-table"></i> Таблица</button>
+                        <button type="button" class="w-tool-btn" onclick="charterInsert('\n\n> [!NOTE]\n> ', '\n', 'текст примечания')" title="Инфо-блок"><i class="fas fa-info-circle"></i> Примечание</button>
+                        <button type="button" class="w-tool-btn" onclick="charterInsert('\n\n> [!WARNING]\n> ', '\n', 'текст предупреждения')" title="Предупреждение"><i class="fas fa-exclamation-triangle"></i> Внимание</button>
+                    </div>
+                    <div class="w-toolbar-status" id="charterStatus">
+                        <span class="status-indicator"></span>
+                        <span class="status-text">Готов к редактированию</span>
+                    </div>
+                </div>
+
+                <div class="wiki-editor-split">
+                    <div class="wiki-pane wiki-pane-edit">
+                        <div class="pane-meta">
+                            <span>Markdown разметка</span>
+                            <span id="charterCharCount">0 символов</span>
+                        </div>
+                        <textarea id="charterTextarea" spellcheck="false" placeholder="Выберите статью из списка выше для начала редактирования..." oninput="onCharterTextareaInput()"></textarea>
+                    </div>
+                    <div class="wiki-pane wiki-pane-preview">
+                        <div class="pane-meta">
+                            <span>Предпросмотр документа</span>
+                            <span class="live-pill">Live Preview</span>
+                        </div>
+                        <div id="charterPreview" class="wiki-preview-body">
+                            <div class="preview-placeholder">Выберите статью из списка для загрузки текста...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     <!-- Toast Notifications Container -->
     <div id="toast-container" class="toast-container"></div>
   </div>
@@ -4598,12 +4910,13 @@
             donate: 'Донат',
             jobs: 'Профессии',
             config_editor: 'Редактор конфигов',
+            charter_editor: 'Редактор устава и регламентов',
             music: 'Музыка / Ивенты',
         };
         const DEFAULT_PANEL_ROLE_PERMISSIONS = {
             viewer: [],
             moderator: ['kick', 'message', 'whitelist', 'jobs'],
-            admin: ['logs', 'server_logs', 'bans', 'kick', 'message', 'rank', 'whitelist', 'subordinates', 'jobs', 'config_editor', 'music'],
+            admin: ['logs', 'server_logs', 'bans', 'kick', 'message', 'rank', 'whitelist', 'subordinates', 'jobs', 'config_editor', 'charter_editor', 'music'],
             superadmin: Object.keys(PERMISSION_LABELS),
             gamemaster: ['music', 'whitelist', 'message'],
             commander: ['whitelist', 'subordinates', 'jobs', 'config_editor'],
@@ -4694,6 +5007,9 @@
         function canUseSettings() {
             return !!currentIsOwner;
         }
+        function canUseCharterEditor() {
+            return canUseSettings() || hasPanelPermission('charter_editor') || hasPanelPermission('config_editor') || ['superadmin', 'admin', 'curator', 'head_admin'].includes(currentRole);
+        }
         function canUseConfigEditor() {
             return canUseSettings() || hasCommanderAccess() || ['superadmin', 'admin', 'commander', 'head_admin'].includes(currentRole) || hasPanelPermission('jobs');
         }
@@ -4768,6 +5084,8 @@
             const settingsBtn = document.getElementById('settingsTabBtn');
             if (settingsBtn) settingsBtn.style.display = canUseSettings() ? '' : 'none';
             const configEditorBtn = document.getElementById('configEditorTabBtn');
+            const wikiEditorBtn = document.getElementById('wikiEditorTabBtn');
+            if (wikiEditorBtn) wikiEditorBtn.style.display = canUseCharterEditor() ? 'flex' : 'none';
             if (configEditorBtn) configEditorBtn.style.display = canUseConfigEditor() ? '' : 'none';
             const musicBtn = document.getElementById('musicTabBtn');
             if (musicBtn) musicBtn.style.display = canUseMusic() ? '' : 'none';
@@ -4792,11 +5110,216 @@
             if (!canUseConfigEditor() && document.getElementById('tab-config-editor')?.classList.contains('active')) {
                 switchTab('players');
             }
+            if (!canUseCharterEditor() && document.getElementById('tab-wiki-editor')?.classList.contains('active')) {
+                switchTab('players');
+            }
             if (!hasPanelPermission('rank') && document.getElementById('tab-accesses')?.classList.contains('active')) {
                 switchTab('players');
             }
             setupSubordinateFilters();
             setupDonateForm();
+        }
+
+        
+        // ==========================================================================
+        // CHARTER / WIKI EDITOR LOGIC (ADMIN PANEL)
+        // ==========================================================================
+        let charterArticlesList = [];
+        let currentCharterFile = null;
+        let charterPreviewTimer = null;
+
+        async function loadCharterArticles() {
+            const select = document.getElementById('charterArticleSelect');
+            if (!select) return;
+
+            try {
+                const res = await fetch('/api/wiki/articles');
+                const data = await res.json();
+                if (data.success && Array.isArray(data.articles)) {
+                    charterArticlesList = data.articles;
+                    select.innerHTML = '<option value="">-- Выберите статью для редактирования --</option>';
+                    charterArticlesList.forEach(art => {
+                        const opt = document.createElement('option');
+                        opt.value = art.file;
+                        opt.textContent = art.title ? `${art.title} (${art.file})` : art.file;
+                        select.appendChild(opt);
+                    });
+
+                    if (currentCharterFile) {
+                        select.value = currentCharterFile;
+                    } else if (charterArticlesList.length > 0) {
+                        select.value = charterArticlesList[0].file;
+                        onCharterArticleChange(charterArticlesList[0].file);
+                    }
+                }
+            } catch (err) {
+                console.error('Error loading charter articles:', err);
+                select.innerHTML = '<option value="">Ошибка загрузки списка статей</option>';
+            }
+        }
+
+        async function onCharterArticleChange(file) {
+            if (!file) return;
+            currentCharterFile = file;
+
+            const statusEl = document.getElementById('charterStatus');
+            const textarea = document.getElementById('charterTextarea');
+            const openBtn = document.getElementById('charterOpenSiteBtn');
+
+            if (statusEl) statusEl.querySelector('.status-text').textContent = 'Загрузка статьи...';
+
+            const art = charterArticlesList.find(a => a.file === file);
+            if (openBtn) {
+                const docId = art ? art.id : file.replace(/\.md$/, '');
+                openBtn.href = `/wiki/#${docId}`;
+            }
+
+            try {
+                const res = await fetch(`/api/wiki/article?file=${encodeURIComponent(file)}`);
+                const data = await res.json();
+                if (data.success && typeof data.content === 'string') {
+                    if (textarea) textarea.value = data.content;
+                    updateCharterCharCount(data.content);
+                    renderCharterLivePreview(data.content);
+                    if (statusEl) {
+                        statusEl.querySelector('.status-indicator').style.background = '#3fb950';
+                        statusEl.querySelector('.status-text').textContent = 'Статья загружена';
+                    }
+                } else {
+                    showToast('Ошибка загрузки статьи: ' + (data.message || 'Неизвестная ошибка'));
+                }
+            } catch (err) {
+                console.error('Error loading article content:', err);
+                showToast('Ошибка связи с сервером при загрузке статьи');
+            }
+        }
+
+        function onCharterTextareaInput() {
+            const textarea = document.getElementById('charterTextarea');
+            if (!textarea) return;
+
+            const text = textarea.value;
+            updateCharterCharCount(text);
+
+            const statusEl = document.getElementById('charterStatus');
+            if (statusEl) {
+                statusEl.querySelector('.status-indicator').style.background = '#e5a93c';
+                statusEl.querySelector('.status-text').textContent = 'Есть несохранённые изменения';
+            }
+
+            if (charterPreviewTimer) clearTimeout(charterPreviewTimer);
+            charterPreviewTimer = setTimeout(() => {
+                renderCharterLivePreview(text);
+            }, 120);
+        }
+
+        function updateCharterCharCount(text) {
+            const countEl = document.getElementById('charterCharCount');
+            if (countEl) countEl.textContent = `${text.length} симв. · ${text.split(/\s+/).filter(Boolean).length} слов`;
+        }
+
+        function charterInsert(before, after = '', placeholder = '') {
+            const textarea = document.getElementById('charterTextarea');
+            if (!textarea) return;
+
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selected = textarea.value.slice(start, end) || placeholder;
+
+            textarea.setRangeText(before + selected + after, start, end, 'select');
+            textarea.focus();
+            onCharterTextareaInput();
+        }
+
+        function renderCharterLivePreview(md) {
+            const preview = document.getElementById('charterPreview');
+            if (!preview) return;
+
+            if (!md || !md.trim()) {
+                preview.innerHTML = '<div class="preview-placeholder">Статья пуста</div>';
+                return;
+            }
+
+            // Compact Markdown Parser for Panel Preview
+            let html = md
+                // Escape HTML
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                // Callouts > [!NOTE] and > [!WARNING]
+                .replace(/^>\s*\[!(NOTE|TIP|INFO)\]\s*\n([\s\S]*?)(?=\n\n|$)/gm, '<blockquote class="alert-info"><strong>ИНФОРМАЦИЯ:</strong><br>$2</blockquote>')
+                .replace(/^>\s*\[!(WARNING|CAUTION|IMPORTANT)\]\s*\n([\s\S]*?)(?=\n\n|$)/gm, '<blockquote class="alert-warn"><strong>ВНИМАНИЕ:</strong><br>$2</blockquote>')
+                // Generic blockquotes
+                .replace(/^>\s+(.*)$/gm, '<blockquote>$1</blockquote>')
+                // Headers
+                .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+                // Bold & Italic
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`([^\`]+)`/g, '<code>$1</code>')
+                // Lists
+                .replace(/^\* (.*$)/gm, '<li>$1</li>')
+                .replace(/^\d+\. (.*$)/gm, '<li>$1</li>')
+                // Line breaks
+                .replace(/\n\n/g, '<p></p>');
+
+            preview.innerHTML = html;
+        }
+
+        async function saveCharterArticle() {
+            if (!currentCharterFile) {
+                showToast('Выберите статью для сохранения');
+                return;
+            }
+
+            const textarea = document.getElementById('charterTextarea');
+            const saveBtn = document.getElementById('charterSaveBtn');
+            const statusEl = document.getElementById('charterStatus');
+
+            if (!textarea) return;
+
+            const content = textarea.value;
+            const art = charterArticlesList.find(a => a.file === currentCharterFile);
+            const docId = art ? art.id : currentCharterFile.replace(/\.md$/, '');
+            const title = (content.split('\n')[0] || '').replace(/^#\s*/, '').trim() || currentCharterFile;
+
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Сохранение...';
+            }
+
+            try {
+                const res = await fetch('/api/wiki/save_article', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token: currentToken,
+                        file: currentCharterFile,
+                        id: docId,
+                        title: title,
+                        content: content
+                    })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Статья устава успешно сохранена на хосте!');
+                    if (statusEl) {
+                        statusEl.querySelector('.status-indicator').style.background = '#3fb950';
+                        statusEl.querySelector('.status-text').textContent = 'Синхронизировано на хосте';
+                    }
+                } else {
+                    showToast('Ошибка сохранения: ' + (data.message || 'Отказано в доступе'));
+                }
+            } catch (err) {
+                console.error('Error saving charter article:', err);
+                showToast('Ошибка соединения при сохранении статьи');
+            } finally {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Сохранить на хост';
+                }
+            }
         }
 
         // ----- API КЛАСС -----
@@ -6193,6 +6716,7 @@
             logs: 'Логи панели',
             music: 'Event Room — Музыка и Ивенты',
             'config-editor': 'Редактор конфигураций',
+                'wiki-editor': 'Редактор устава и регламентов ВАР',
             settings: 'Настройки доступа',
         };
 
@@ -6247,6 +6771,7 @@
             if (tab === 'accesses' && !hasPanelPermission('rank')) return;
             if (tab === 'settings' && !canUseSettings()) return;
             if (tab === 'config-editor' && !canUseConfigEditor()) return;
+            if (tab === 'wiki-editor' && !canUseCharterEditor()) return;
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-' + tab).classList.add('active');
@@ -6267,6 +6792,9 @@
             if (tab === 'donate') {
                 setupDonateForm();
                 if (jobsList.length === 0) api.sendCommand('get_jobs', '');
+            }
+            if (tab === 'wiki-editor') {
+                loadCharterArticles();
             }
             if (tab === 'config-editor') {
                 if (window.refreshConfigEditorView) window.refreshConfigEditorView();
