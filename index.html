@@ -1793,6 +1793,142 @@
             font-size: 11px;
         }
 
+        .settings-subtabs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .settings-subtab {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            color: var(--text-secondary);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-control);
+            background: var(--card);
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.18s ease;
+        }
+
+        .settings-subtab:hover {
+            color: var(--text);
+            border-color: var(--amber-border);
+            background: var(--amber-subtle);
+        }
+
+        .settings-subtab.active {
+            color: var(--amber);
+            border-color: var(--amber);
+            background: var(--amber-subtle);
+            box-shadow: 0 0 12px rgba(255, 187, 51, 0.15);
+        }
+
+        .settings-card {
+            padding: 18px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-card);
+            background: var(--card);
+            margin-bottom: 16px;
+        }
+
+        .settings-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text);
+            font-size: 13px;
+            margin: 0 0 6px 0;
+        }
+
+        .settings-card p.sub {
+            color: var(--text-muted);
+            font-size: 11px;
+            line-height: 1.5;
+            margin: 0 0 14px 0;
+        }
+
+        .settings-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
+        }
+
+        .settings-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .settings-input-group label {
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .settings-input-group span.desc {
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+
+        .settings-input-group input,
+        .settings-input-group select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-control);
+            background: var(--elevated);
+            color: var(--text);
+            font-size: 11px;
+            font-family: inherit;
+        }
+
+        .settings-input-group input:focus,
+        .settings-input-group select:focus {
+            outline: none;
+            border-color: var(--amber);
+            box-shadow: 0 0 8px rgba(255, 187, 51, 0.2);
+        }
+
+        .discord-embed-preview {
+            border-left: 4px solid var(--amber);
+            background: #2b2d31;
+            border-radius: 4px;
+            padding: 14px 16px;
+            color: #dbdee1;
+            font-family: 'gg sans', 'Noto Sans', sans-serif, system-ui;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .discord-embed-preview .embed-title {
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .discord-embed-preview .embed-desc {
+            color: #dbdee1;
+            line-height: 1.5;
+            margin-bottom: 12px;
+            white-space: pre-wrap;
+        }
+
+        .discord-embed-preview .embed-footer {
+            font-size: 10px;
+            color: #949ba4;
+            margin-top: 10px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
         /* ==========================================================================
            WHITELIST MODAL
            ========================================================================== */
@@ -2282,34 +2418,214 @@
         <div class="tab-content" id="tab-settings">
             <div class="players-section">
                 <div class="section-header">
-                    <h2><i class="fas fa-cog" style="color:var(--amber);"></i> Настройки</h2>
+                    <h2><i class="fas fa-cog" style="color:var(--amber);"></i> Настройки и Управление доступом</h2>
                     <span class="player-count" id="settingsOwnerHint">owner</span>
                 </div>
-                <div class="settings-guide">
-                    <div>
-                        <span>НАСТРОЙКА ДОСТУПА</span>
-                        <strong>Выбери Discord-роль и настрой её возможности</strong>
-                        <p>Уровень панели, формирования, функции и выдаваемые привилегии сохраняются отдельно для каждой роли.</p>
+
+                <div class="settings-subtabs">
+                    <button class="settings-subtab active" type="button" onclick="switchSettingsSection('roles', this)">
+                        <i class="fab fa-discord"></i> Discord-роли и Доступ
+                    </button>
+                    <button class="settings-subtab" type="button" onclick="switchSettingsSection('bot', this)">
+                        <i class="fas fa-robot"></i> Discord Бот и Живой Статус
+                    </button>
+                    <button class="settings-subtab" type="button" onclick="switchSettingsSection('webhooks', this)">
+                        <i class="fas fa-bell"></i> Вебхуки и Логи
+                    </button>
+                    <button class="settings-subtab" type="button" onclick="switchSettingsSection('accounts', this)">
+                        <i class="fas fa-key"></i> Резервные Аккаунты
+                    </button>
+                    <button class="settings-subtab" type="button" onclick="switchSettingsSection('links', this)">
+                        <i class="fas fa-link"></i> Привязки SteamID
+                    </button>
+                </div>
+
+                <div class="settings-toolbar" style="margin-bottom:16px;">
+                    <button class="modal-btn confirm" type="button" onclick="saveSettings()" style="background:var(--amber);color:#0f141c;font-weight:700;">
+                        <i class="fas fa-save"></i> Сохранить все настройки
+                    </button>
+                    <button class="modal-btn" type="button" onclick="refreshSettings()">
+                        <i class="fas fa-sync"></i> Обновить из памяти
+                    </button>
+                    <span id="settingsSaveStatus" style="color:var(--amber);font-size:11px;align-self:center;margin-left:8px;"></span>
+                </div>
+
+                <!-- Pane 1: Roles & Permissions -->
+                <div id="settingsPane-roles" class="settings-pane">
+                    <div class="settings-guide">
+                        <div>
+                            <span>НАСТРОЙКА ДОСТУПА ПО DISCORD РОЛЯМ</span>
+                            <strong>Выберите или добавьте Discord-роль и настройте её возможности</strong>
+                            <p>Уровень панели, доступ к формированиям, все 13 прав панели и разрешённые в игре привилегии.</p>
+                        </div>
+                        <div class="settings-steps"><b>1</b> Роль <i></i><b>2</b> Доступ <i></i><b>3</b> Права <i></i><b>4</b> Сохранить</div>
                     </div>
-                    <div class="settings-steps"><b>1</b> Роль <i></i><b>2</b> Доступ <i></i><b>3</b> Права <i></i><b>4</b> Сохранить</div>
-                </div>
-                <div class="settings-toolbar">
-                    <button class="modal-btn confirm" onclick="refreshSettings()"><i class="fas fa-sync"></i> Обновить</button>
-                    <button class="modal-btn confirm" onclick="saveSettings()"><i class="fas fa-save"></i> Сохранить</button>
-                    <button class="modal-btn cancel" onclick="loadDiscordRoles()"><i class="fab fa-discord"></i> Загрузить роли Discord</button>
+
+                    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
+                        <button class="modal-btn" type="button" onclick="loadDiscordRoles()" style="border-color:rgba(114,137,218,0.5);color:#7289da;">
+                            <i class="fab fa-discord"></i> Загрузить роли с сервера Discord
+                        </button>
+                        <div style="display:flex;gap:6px;align-items:center;flex:1;max-width:420px;">
+                            <input type="text" id="manualDiscordRoleIdInput" placeholder="Discord Role ID (например 126105...)" style="flex:1;padding:8px 10px;background:var(--elevated);border:1px solid var(--line);border-radius:var(--radius-control);color:var(--text);font-size:11px;">
+                            <button class="modal-btn confirm" type="button" onclick="addManualDiscordRole()"><i class="fas fa-plus"></i> Добавить роль</button>
+                        </div>
+                        <span id="discordRolesStatus" style="font-size:10px;color:var(--text-muted);"></span>
+                    </div>
+
+                    <div id="settingsDiscordRoles" class="settings-role-workspace"></div>
+
+                    <div class="settings-card" style="margin-top:16px;">
+                        <h3><i class="fas fa-sync-alt" style="color:var(--amber);"></i> Авто-синхронизация Discord-ролей по формированиям</h3>
+                        <p class="sub">Этими ролями управляет синхронизация персонажей: бот автоматически выдает роль Discord при заходе за персонажа формирования и снимает её при смене.</p>
+                        <div id="formationRoleMappings"></div>
+                        <button class="modal-btn" type="button" onclick="addFormationRoleMapping()" style="margin-top:8px;">
+                            <i class="fas fa-plus"></i> Добавить соответствие формирования
+                        </button>
+                    </div>
                 </div>
 
-                <details class="settings-accounts-panel">
-                    <summary><i class="fas fa-key"></i> Резервные аккаунты панели <span>логин и пароль без Discord</span></summary>
-                    <div id="settingsAccounts"></div>
-                    <button class="modal-btn confirm" onclick="addSettingsAccount()"><i class="fas fa-plus"></i> Добавить аккаунт</button>
-                </details>
+                <!-- Pane 2: Discord Bot & Server Live Status -->
+                <div id="settingsPane-bot" class="settings-pane" style="display:none;">
+                    <div class="settings-card">
+                        <h3><i class="fas fa-robot" style="color:var(--amber);"></i> Параметры Discord Бота</h3>
+                        <p class="sub">Бот необходим для отправки и постоянного обновления эмбеда статуса сервера в Discord-канале, чтения списка ролей сервера и управления ролями игроков.</p>
+                        <div class="settings-grid-2">
+                            <div class="settings-input-group">
+                                <label>Токен Discord-бота (Bot Token) *</label>
+                                <span class="desc">Discord Developer Portal → Applications → Bot → Reset Token</span>
+                                <div style="display:flex;gap:6px;">
+                                    <input type="password" id="cfgBotToken" placeholder="MTE5... (секретный токен бота)">
+                                    <button class="modal-btn" type="button" onclick="togglePasswordVisibility('cfgBotToken')"><i class="fas fa-eye"></i></button>
+                                </div>
+                            </div>
+                            <div class="settings-input-group">
+                                <label>ID Сервера Discord (Guild ID) *</label>
+                                <span class="desc">ПКМ по серверу в Discord → Копировать ID</span>
+                                <input type="text" id="cfgGuildId" placeholder="1261052839720124487">
+                            </div>
+                            <div class="settings-input-group">
+                                <label>ID Приложения Discord (Application / Client ID)</label>
+                                <span class="desc">General Information → Application ID (для слэш-команд /link)</span>
+                                <input type="text" id="cfgClientId" placeholder="1492429366746021918">
+                            </div>
+                            <div class="settings-input-group" style="justify-content:flex-end;">
+                                <label style="visibility:hidden;">Действие</label>
+                                <button class="modal-btn confirm" type="button" onclick="testDiscordBot()" style="padding:10px 16px;">
+                                    <i class="fas fa-vial"></i> Проверить подключение бота
+                                </button>
+                            </div>
+                        </div>
+                        <div id="discordBotTestResult" style="margin-top:12px;"></div>
+                    </div>
 
-                <div class="settings-section-title">
-                    <div><i class="fab fa-discord"></i><strong>Discord-роли</strong></div>
-                    <span id="discordRolesStatus">Нажми «Загрузить роли Discord», чтобы получить названия и цвета.</span>
+                    <div class="settings-card">
+                        <h3><i class="fas fa-broadcast-tower" style="color:var(--amber);"></i> Живой Статус Сервера в Discord (Status Embed)</h3>
+                        <p class="sub">Бот отправляет в указанный канал специальное сообщение со статусом (онлайн, карта, аптайм, список игроков) и постоянно обновляет его.</p>
+                        <div class="settings-grid-2">
+                            <div class="settings-input-group">
+                                <label>ID Канала для статуса (Status Channel ID) *</label>
+                                <span class="desc">ID текстового канала, в котором закрепить сообщение со статусом</span>
+                                <input type="text" id="cfgStatusChannelId" placeholder="126105... (ID текстового канала)">
+                            </div>
+                            <div class="settings-input-group">
+                                <label>ID Сообщения статуса (Message ID, опционально)</label>
+                                <span class="desc">Если пусто, бот сам найдёт своё предыдущее сообщение или создаст новое</span>
+                                <input type="text" id="cfgStatusMessageId" placeholder="Оставьте пустым для автосоздания">
+                            </div>
+                            <div class="settings-input-group">
+                                <label>Интервал автообновления</label>
+                                <span class="desc">Как часто бот перезаписывает статус сервера в Discord</span>
+                                <select id="cfgStatusInterval">
+                                    <option value="1">Каждую 1 минуту</option>
+                                    <option value="2">Каждые 2 минуты</option>
+                                    <option value="5" selected>Каждые 5 минут (Рекомендуется)</option>
+                                    <option value="10">Каждые 10 минут</option>
+                                </select>
+                            </div>
+                            <div class="settings-input-group" style="justify-content:flex-end;">
+                                <label style="visibility:hidden;">Действие</label>
+                                <button class="modal-btn confirm" type="button" onclick="forceDiscordStatus()" style="padding:10px 16px;">
+                                    <i class="fas fa-paper-plane"></i> Обновить статус в Discord сейчас
+                                </button>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:18px;">
+                            <label style="color:var(--text-secondary);font-size:11px;font-weight:600;display:block;margin-bottom:8px;">Превью сообщения в Discord:</label>
+                            <div class="discord-embed-preview">
+                                <div class="embed-title">🛰️ Collapsar | StarWarsRP — Статус сервера</div>
+                                <div class="embed-desc">
+                                    <b>Карта:</b> <code>rp_rishi_rework_extended</code><br>
+                                    <b>Игроки в сети:</b> <code>1 / 84</code><br>
+                                    <b>Администрация:</b> <code>1</code><br>
+                                    <b>Аптайм:</b> <code>1ч 24м</code><br>
+                                    <b>Подключение:</b> <code>connect s6.yufu.su:27006</code>
+                                </div>
+                                <div style="color:#ffffff;font-weight:600;font-size:11px;margin-bottom:4px;">👥 Список игроков (1):</div>
+                                <div style="color:#b5bac1;font-size:11px;line-height:1.4;">• <b>NoName</b> — <i>Высшее Командование</i> (129ms)</div>
+                                <div class="embed-footer">Collapsar Tactical Simulation • Обновляется автоматически</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div id="settingsDiscordRoles" class="settings-role-workspace"></div>
+
+                <!-- Pane 3: Webhooks & Logs -->
+                <div id="settingsPane-webhooks" class="settings-pane" style="display:none;">
+                    <div class="settings-card">
+                        <h3><i class="fas fa-bell" style="color:var(--amber);"></i> Вебхуки уведомлений в Discord</h3>
+                        <p class="sub">Вставьте ссылки вебхуков из настроек каналов вашего сервера Discord (Настройки канала → Интеграция → Вебхуки → Создать вебхук → Скопировать URL).</p>
+                        <div class="settings-grid-2">
+                            <div class="settings-input-group" style="grid-column:1/-1;">
+                                <label><i class="fas fa-door-open" style="color:#57F287;margin-right:6px;"></i> Вебхук входов и выходов игроков (Join / Leave)</label>
+                                <span class="desc">Уведомляет о заходе новых и старых игроков, нике, SteamID, последнем входе и причине выхода</span>
+                                <input type="text" id="cfgJoinLeaveWebhook" placeholder="https://discord.com/api/webhooks/...">
+                            </div>
+                            <div class="settings-input-group" style="grid-column:1/-1;">
+                                <label><i class="fas fa-shield-alt" style="color:#FEE75C;margin-right:6px;"></i> Вебхук аудита действий веб-панели (Admin Panel Audit)</label>
+                                <span class="desc">Отправляет подробные логи всех действий администрации: баны, кики, ранги, вайтлист, музыка, конфиги, настройки</span>
+                                <input type="text" id="cfgAuditWebhook" placeholder="https://discord.com/api/webhooks/...">
+                            </div>
+                            <div class="settings-input-group" style="grid-column:1/-1;">
+                                <label><i class="fas fa-terminal" style="color:#5865F2;margin-right:6px;"></i> Вебхук логов игрового сервера / консоли</label>
+                                <span class="desc">Опциональный вебхук для дублирования серверных логов</span>
+                                <input type="text" id="cfgServerLogWebhook" placeholder="https://discord.com/api/webhooks/...">
+                            </div>
+                        </div>
+                        <div style="margin-top:14px;display:flex;gap:10px;align-items:center;">
+                            <button class="modal-btn confirm" type="button" onclick="testDiscordWebhooks()">
+                                <i class="fas fa-paper-plane"></i> Отправить тестовые логи во все вебхуки
+                            </button>
+                            <span id="webhookTestResult" style="color:var(--text-secondary);font-size:11px;"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pane 4: Backup Accounts -->
+                <div id="settingsPane-accounts" class="settings-pane" style="display:none;">
+                    <div class="settings-card">
+                        <h3><i class="fas fa-key" style="color:var(--amber);"></i> Резервные аккаунты панели (Логин и Пароль)</h3>
+                        <p class="sub">Локальные аккаунты для входа в панель без использования Discord OAuth2.</p>
+                        <div id="settingsAccounts"></div>
+                        <button class="modal-btn confirm" type="button" onclick="addSettingsAccount()" style="margin-top:10px;">
+                            <i class="fas fa-plus"></i> Добавить резервный аккаунт
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pane 5: Discord Links -->
+                <div id="settingsPane-links" class="settings-pane" style="display:none;">
+                    <div class="settings-card">
+                        <h3><i class="fas fa-link" style="color:var(--amber);"></i> Привязанные аккаунты SteamID ↔ Discord</h3>
+                        <p class="sub">Список игроков, связавших свой игровой аккаунт с Discord с помощью команды /link.</p>
+                        <div style="margin-bottom:12px;">
+                            <button class="modal-btn" type="button" onclick="loadDiscordLinks()">
+                                <i class="fas fa-sync"></i> Обновить список привязок
+                            </button>
+                        </div>
+                        <div id="discordLinksList" style="color:var(--text-secondary);font-size:12px;">Нажмите «Обновить список привязок».</div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -4199,15 +4515,18 @@
             subordinates: 'Подчинённые',
             donate: 'Донат',
             jobs: 'Профессии',
+            config_editor: 'Редактор конфигов',
+            music: 'Музыка / Ивенты',
         };
         const DEFAULT_PANEL_ROLE_PERMISSIONS = {
             viewer: [],
             moderator: ['kick', 'message', 'whitelist', 'jobs'],
-            admin: ['logs', 'server_logs', 'bans', 'kick', 'message', 'rank', 'whitelist', 'subordinates', 'jobs'],
+            admin: ['logs', 'server_logs', 'bans', 'kick', 'message', 'rank', 'whitelist', 'subordinates', 'jobs', 'config_editor', 'music'],
             superadmin: Object.keys(PERMISSION_LABELS),
-            commander: ['whitelist', 'subordinates', 'jobs'],
-            depcom: ['whitelist', 'subordinates', 'jobs'],
-            gcmd: ['whitelist', 'subordinates', 'jobs'],
+            gamemaster: ['music', 'whitelist', 'message'],
+            commander: ['whitelist', 'subordinates', 'jobs', 'config_editor'],
+            depcom: ['whitelist', 'subordinates', 'jobs', 'config_editor'],
+            gcmd: ['whitelist', 'subordinates', 'jobs', 'config_editor'],
         };
 
         function defaultPermissionsForPanelRoles(accessRole, commandRole) {
@@ -4492,6 +4811,15 @@
                 if (data.type === 'response') {
                     const icon = data.success ? '✅' : '❌';
                     addToConsole(`[${ts()}] ${icon} ${data.message || data.command}`);
+                    const saveStatus = document.getElementById('settingsSaveStatus');
+                    if (saveStatus && data.message && (data.message.includes('Настройки') || data.message.includes('Discord') || data.message.includes('сохранены'))) {
+                        saveStatus.textContent = `${icon} ${data.message}`;
+                        setTimeout(() => { if (saveStatus && saveStatus.textContent.includes(data.message)) saveStatus.textContent = ''; }, 6000);
+                    }
+                    const webhookResult = document.getElementById('webhookTestResult');
+                    if (webhookResult && data.message && (data.message.includes('вебхук') || data.message.includes('сообщений') || data.message.includes('Вебхуки'))) {
+                        webhookResult.textContent = `${icon} ${data.message}`;
+                    }
                 }
                 if (data.type === 'auth_result') {
                     if (data.success) {
@@ -4656,6 +4984,9 @@
                 }
                 if (data.type === 'discord_links_data') {
                     renderDiscordLinks(Array.isArray(data.links) ? data.links : []);
+                }
+                if (data.type === 'discord_bot_test_result') {
+                    showDiscordBotTestResult(data);
                 }
                 if (data.type === 'panel_log') {
                     if (!canSeePanelLogs()) return;
@@ -5103,6 +5434,28 @@
             const owner = document.getElementById('settingsOwnerHint');
             if (owner) owner.textContent = 'Owner Discord ID: ' + (panelSettingsCache.ownerDiscordId || '');
 
+            if (panelSettingsCache.discordBot) {
+                const b = panelSettingsCache.discordBot;
+                const tokenInput = document.getElementById('cfgBotToken');
+                if (tokenInput && b.botToken !== undefined) tokenInput.value = b.botToken || '';
+                const guildInput = document.getElementById('cfgGuildId');
+                if (guildInput && b.guildId !== undefined) guildInput.value = b.guildId || '';
+                const clientInput = document.getElementById('cfgClientId');
+                if (clientInput && b.clientId !== undefined) clientInput.value = b.clientId || '';
+                const chInput = document.getElementById('cfgStatusChannelId');
+                if (chInput && b.statusChannelId !== undefined) chInput.value = b.statusChannelId || '';
+                const msgInput = document.getElementById('cfgStatusMessageId');
+                if (msgInput && b.statusMessageId !== undefined) msgInput.value = b.statusMessageId || '';
+                const intSelect = document.getElementById('cfgStatusInterval');
+                if (intSelect && b.statusIntervalMinutes) intSelect.value = String(b.statusIntervalMinutes);
+                const jlInput = document.getElementById('cfgJoinLeaveWebhook');
+                if (jlInput && b.joinLeaveWebhook !== undefined) jlInput.value = b.joinLeaveWebhook || '';
+                const auditInput = document.getElementById('cfgAuditWebhook');
+                if (auditInput && b.auditWebhook !== undefined) auditInput.value = b.auditWebhook || '';
+                const sLogInput = document.getElementById('cfgServerLogWebhook');
+                if (sLogInput && b.serverLogWebhook !== undefined) sLogInput.value = b.serverLogWebhook || '';
+            }
+
             const accountsBox = document.getElementById('settingsAccounts');
             accountsBox.innerHTML = Object.entries(panelSettingsCache.accounts || {}).map(([login, acc]) => `
                 <div class="settings-account" style="border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;margin-bottom:10px;background:rgba(255,255,255,0.03);">
@@ -5114,7 +5467,7 @@
                         <button class="modal-btn cancel" onclick="removeSettingsBlock(this, '.settings-account')"><i class="fas fa-trash"></i></button>
                     </div>
                     <div style="margin-top:8px;">${accessCheckboxes(acc.accessRoles || [acc.role])}</div>
-                    <div style="margin-top:8px;"><div style="color:#ffbb33;font-size:12px;margin-bottom:3px;">Права панели</div>${permissionCheckboxes(acc.permissions || [])}</div>
+                    <div style="margin-top:8px;"><div style="color:#ffbb33;font-size:12px;margin-bottom:3px;">Права панели (все 13 функций)</div>${permissionCheckboxes(acc.permissions || [])}</div>
                     <div style="margin-top:8px;"><div style="color:#ffbb33;font-size:12px;margin-bottom:3px;">Какие привилегии может выдавать</div>${rankCheckboxes(acc.allowedRanks || ['user'])}</div>
                     <div style="margin-top:4px;">${unitCheckboxes(acc.units || [])}</div>
                 </div>`).join('');
@@ -5133,7 +5486,7 @@
             });
             const workspace = document.getElementById('settingsDiscordRoles');
             if (orderedRoleIds.length === 0) {
-                workspace.innerHTML = '<div class="settings-empty"><i class="fab fa-discord" style="display:block;font-size:25px;margin-bottom:9px;"></i>Загрузи роли Discord или сначала добавь Role ID в настройки.</div>';
+                workspace.innerHTML = '<div class="settings-empty"><i class="fab fa-discord" style="display:block;font-size:25px;margin-bottom:9px;"></i>Загрузи роли Discord или нажми «Добавить роль» выше.</div>';
                 return;
             }
 
@@ -5165,8 +5518,11 @@
                     </button>`);
                 roleDetails.push(`
                     <div class="settings-role-detail ${index === 0 ? 'active' : ''}" data-settings-role-id="${roleId}">
-                        <h4>${escapeHtml(roleName)}</h4>
-                        <p>Настройки ниже применяются только к этой Discord-роли (${roleId}).</p>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                            <h4 style="margin:0;"><i class="fas fa-shield-alt" style="color:${roleColor};margin-right:6px;"></i>${escapeHtml(roleName)}</h4>
+                            <span style="font-size:10px;color:var(--text-muted);background:var(--elevated);padding:3px 8px;border-radius:4px;border:1px solid var(--line);">${roleId}</span>
+                        </div>
+                        <p style="margin:0 0 12px;color:var(--text-muted);font-size:11px;">Настройки прав и доступа для участников с этой Discord-ролью.</p>
                         <div class="settings-access-grid">
                             <label class="settings-field"><span>Уровень доступа панели</span>
                                 <select class="discord-access-value">${accessOptions.replace(`value="${access}"`, `value="${access}" selected`)}</select>
@@ -5174,15 +5530,30 @@
                             <label class="settings-field"><span>Командный уровень</span>
                                 <select class="discord-command-value">${commandOptions.replace(`value="${command}"`, `value="${command}" selected`)}</select>
                             </label>
-                            <div class="settings-permission-group"><strong>Доступные формирования</strong><p class="settings-group-hint">Если ничего не выбрано, роль видит все формирования.</p><div class="settings-check-grid">
-                                ${FORMATIONS.map(formation => `<label class="settings-check"><input type="checkbox" data-role-unit="${formation.id}" ${units.includes(formation.id) ? 'checked' : ''}>${escapeHtml(formation.name)}</label>`).join('')}
-                            </div></div>
-                            <div class="settings-permission-group"><strong>Разрешённые функции панели</strong><div class="settings-check-grid">
-                                ${Object.entries(PERMISSION_LABELS).map(([permission, label]) => `<label class="settings-check"><input type="checkbox" data-role-permission="${permission}" ${permissions.includes(permission) ? 'checked' : ''}>${escapeHtml(label)}</label>`).join('')}
-                            </div></div>
-                            <div class="settings-permission-group"><strong>Какие привилегии разрешено выдавать</strong><div class="settings-check-grid">
+                            <div class="settings-permission-group">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                                    <strong>Разрешённые функции веб-панели (13 прав)</strong>
+                                    <div style="display:flex;gap:4px;">
+                                        <button class="modal-btn" type="button" onclick="toggleAllRolePermissions('${roleId}', true)" style="font-size:9px;padding:2px 6px;">Все</button>
+                                        <button class="modal-btn cancel" type="button" onclick="toggleAllRolePermissions('${roleId}', false)" style="font-size:9px;padding:2px 6px;">Снять</button>
+                                        <button class="modal-btn" type="button" onclick="setRolePermissionsDefault('${roleId}')" style="font-size:9px;padding:2px 6px;">Сброс</button>
+                                    </div>
+                                </div>
+                                <div class="settings-check-grid">
+                                    ${Object.entries(PERMISSION_LABELS).map(([permission, label]) => `<label class="settings-check"><input type="checkbox" data-role-permission="${permission}" ${permissions.includes(permission) ? 'checked' : ''}>${escapeHtml(label)}</label>`).join('')}
+                                </div>
+                            </div>
+                            <div class="settings-permission-group"><strong>Какие привилегии разрешено выдавать в игре</strong><div class="settings-check-grid">
                                 ${[{ key: '*', name: 'Все привилегии' }, ...ranksList].map(rank => `<label class="settings-check"><input type="checkbox" data-role-rank="${rank.key}" ${ranks.includes(rank.key) ? 'checked' : ''}>${escapeHtml(rank.name)} (${escapeHtml(rank.key)})</label>`).join('')}
                             </div></div>
+                            <div class="settings-permission-group"><strong>Доступные формирования (подчинённые / вайтлист)</strong><p class="settings-group-hint">Если ничего не выбрано, роль имеет доступ ко всем формированиям.</p><div class="settings-check-grid">
+                                ${FORMATIONS.map(formation => `<label class="settings-check"><input type="checkbox" data-role-unit="${formation.id}" ${units.includes(formation.id) ? 'checked' : ''}>${escapeHtml(formation.name)}</label>`).join('')}
+                            </div></div>
+                        </div>
+                        <div style="margin-top:14px;text-align:right;">
+                            <button class="modal-btn cancel" type="button" onclick="removeSettingsDiscordRole('${roleId}')" style="font-size:11px;padding:6px 12px;">
+                                <i class="fas fa-trash"></i> Удалить роль из настроек
+                            </button>
                         </div>
                     </div>`);
             });
@@ -5195,17 +5566,114 @@
                     ${discordRoleSelect(roleId)}
                     <button class="modal-btn cancel" onclick="this.closest('.formation-role-map').remove()"><i class="fas fa-trash"></i></button>
                 </div>`).join('');
-            workspace.insertAdjacentHTML('beforeend', `<section style="grid-column:1/-1;margin-top:16px;padding:14px;border:1px solid rgba(114,137,218,.35);border-radius:8px;">
-                <h4 style="margin:0 0 8px;">Discord-роли по формированиям</h4>
-                <p style="margin:0 0 10px;color:rgba(255,255,255,.65);font-size:12px;">Этими ролями управляет синхронизация персонажей: лишняя роль снимается автоматически.</p>
-                <div id="formationRoleMappings">${mappedRows}</div>
-                <button class="modal-btn" type="button" onclick="addFormationRoleMapping()">Добавить соответствие</button>
-            </section>`);
-            workspace.insertAdjacentHTML('beforeend', `<section style="grid-column:1/-1;margin-top:12px;padding:14px;border:1px solid rgba(255,255,255,.12);border-radius:8px;">
-                <h4 style="margin:0 0 8px;">Привязанные Discord-аккаунты</h4>
-                <button class="modal-btn" type="button" onclick="loadDiscordLinks()">Обновить список</button>
-                <div id="discordLinksList" style="margin-top:10px;color:rgba(255,255,255,.75);font-size:12px;">Нажмите «Обновить список».</div>
-            </section>`);
+            const formMappingsEl = document.getElementById('formationRoleMappings');
+            if (formMappingsEl) formMappingsEl.innerHTML = mappedRows;
+        }
+
+        function switchSettingsSection(paneName, btn) {
+            document.querySelectorAll('.settings-subtab').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            document.querySelectorAll('.settings-pane').forEach(p => p.style.display = 'none');
+            const target = document.getElementById('settingsPane-' + paneName);
+            if (target) target.style.display = 'block';
+        }
+
+        function togglePasswordVisibility(inputId) {
+            const el = document.getElementById(inputId);
+            if (!el) return;
+            el.type = el.type === 'password' ? 'text' : 'password';
+        }
+
+        function addManualDiscordRole() {
+            const input = document.getElementById('manualDiscordRoleIdInput');
+            const roleId = String(input ? input.value : '').trim();
+            if (!/^\d{10,30}$/.test(roleId)) {
+                alert('Введите корректный числовой ID роли Discord (от 10 до 30 цифр)');
+                return;
+            }
+            if (!panelSettingsCache) panelSettingsCache = { accounts: {}, discordRoleMap: {}, discordCommandRoleMap: {}, discordPermissionRoleMap: {}, discordRankRoleMap: {}, discordUnitRoleMap: {}, discordFormationRoleMap: {}, discordBot: {} };
+            if (!panelSettingsCache.discordRoleMap) panelSettingsCache.discordRoleMap = {};
+            if (!panelSettingsCache.discordRoleMap[roleId]) {
+                panelSettingsCache.discordRoleMap[roleId] = 'moderator';
+            }
+            if (input) input.value = '';
+            renderSettings();
+            selectSettingsDiscordRole(roleId);
+        }
+
+        function removeSettingsDiscordRole(roleId) {
+            if (!confirm(`Удалить конфигурацию роли ${roleId}?`)) return;
+            if (panelSettingsCache) {
+                delete panelSettingsCache.discordRoleMap?.[roleId];
+                delete panelSettingsCache.discordCommandRoleMap?.[roleId];
+                delete panelSettingsCache.discordPermissionRoleMap?.[roleId];
+                delete panelSettingsCache.discordRankRoleMap?.[roleId];
+                Object.values(panelSettingsCache.discordUnitRoleMap || {}).forEach(arr => {
+                    const idx = arr.indexOf(roleId);
+                    if (idx !== -1) arr.splice(idx, 1);
+                });
+            }
+            renderSettings();
+        }
+
+        function toggleAllRolePermissions(roleId, state) {
+            const card = document.querySelector(`.settings-role-detail[data-settings-role-id="${roleId}"]`);
+            if (!card) return;
+            card.querySelectorAll('[data-role-permission]').forEach(cb => cb.checked = !!state);
+        }
+
+        function setRolePermissionsDefault(roleId) {
+            const card = document.querySelector(`.settings-role-detail[data-settings-role-id="${roleId}"]`);
+            if (!card) return;
+            const access = card.querySelector('.discord-access-value')?.value || '';
+            const command = card.querySelector('.discord-command-value')?.value || '';
+            const defs = defaultPermissionsForPanelRoles(access, command);
+            card.querySelectorAll('[data-role-permission]').forEach(cb => {
+                cb.checked = defs.includes(cb.dataset.rolePermission);
+            });
+        }
+
+        function testDiscordBot() {
+            if (!canUseSettings()) return;
+            const botToken = document.getElementById('cfgBotToken')?.value.trim();
+            const guildId = document.getElementById('cfgGuildId')?.value.trim();
+            const resEl = document.getElementById('discordBotTestResult');
+            if (resEl) resEl.innerHTML = '<span style="color:var(--amber);"><i class="fas fa-spinner fa-spin"></i> Проверяю бота через Discord API...</span>';
+            api.sendCommand('test_discord_bot', '', { botToken, guildId });
+        }
+
+        function showDiscordBotTestResult(data) {
+            const resEl = document.getElementById('discordBotTestResult');
+            if (!resEl) return;
+            if (data.ok) {
+                resEl.innerHTML = `<div style="padding:10px 14px;border:1px solid #57F287;border-radius:6px;background:rgba(87,242,135,0.08);color:#57F287;font-size:11px;display:flex;align-items:center;gap:10px;">
+                    <i class="fas fa-check-circle" style="font-size:16px;"></i>
+                    <div>
+                        <b>${escapeHtml(data.message)}</b>
+                        <div style="font-size:10px;color:rgba(255,255,255,0.7);margin-top:2px;">ID бота: ${escapeHtml(data.bot?.id || '')} · Сервер: ${escapeHtml(data.guild?.name || '—')}</div>
+                    </div>
+                </div>`;
+            } else {
+                resEl.innerHTML = `<div style="padding:10px 14px;border:1px solid #ED4245;border-radius:6px;background:rgba(237,66,69,0.08);color:#ED4245;font-size:11px;display:flex;align-items:center;gap:10px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size:16px;"></i>
+                    <div><b>Ошибка:</b> ${escapeHtml(data.message || 'Не удалось связаться с Discord API')}</div>
+                </div>`;
+            }
+        }
+
+        function forceDiscordStatus() {
+            if (!canUseSettings()) return;
+            addToConsole(`[${ts()}] Отправляю запрос на обновление статуса в Discord...`);
+            api.sendCommand('force_discord_status', '');
+        }
+
+        function testDiscordWebhooks() {
+            if (!canUseSettings()) return;
+            const auditWebhook = document.getElementById('cfgAuditWebhook')?.value.trim();
+            const joinLeaveWebhook = document.getElementById('cfgJoinLeaveWebhook')?.value.trim();
+            const statusEl = document.getElementById('webhookTestResult');
+            if (statusEl) statusEl.textContent = 'Отправляю проверочные сообщения...';
+            api.sendCommand('test_discord_webhooks', '', { auditWebhook, joinLeaveWebhook });
         }
 
         function addFormationRoleMapping() {
@@ -5310,8 +5778,6 @@
 
                 if (access) discordRoleMap[roleId] = access;
                 if (command) discordCommandRoleMap[roleId] = command;
-                // Save even an empty list so the server can distinguish an
-                // explicit revocation from untouched role defaults.
                 discordPermissionRoleMap[roleId] = permissions;
                 if (ranks.length > 0) discordRankRoleMap[roleId] = ranks;
                 units.forEach(unit => {
@@ -5326,7 +5792,19 @@
                 if (formation && roleId) discordFormationRoleMap[formation] = roleId;
             });
 
-            return { accounts, discordRoleMap, discordCommandRoleMap, discordUnitRoleMap, discordPermissionRoleMap, discordRankRoleMap, discordFormationRoleMap };
+            const discordBot = {
+                botToken: (document.getElementById('cfgBotToken')?.value || '').trim(),
+                guildId: (document.getElementById('cfgGuildId')?.value || '').trim(),
+                clientId: (document.getElementById('cfgClientId')?.value || '').trim(),
+                statusChannelId: (document.getElementById('cfgStatusChannelId')?.value || '').trim(),
+                statusMessageId: (document.getElementById('cfgStatusMessageId')?.value || '').trim(),
+                statusIntervalMinutes: Number(document.getElementById('cfgStatusInterval')?.value) || 5,
+                joinLeaveWebhook: (document.getElementById('cfgJoinLeaveWebhook')?.value || '').trim(),
+                auditWebhook: (document.getElementById('cfgAuditWebhook')?.value || '').trim(),
+                serverLogWebhook: (document.getElementById('cfgServerLogWebhook')?.value || '').trim(),
+            };
+
+            return { accounts, discordRoleMap, discordCommandRoleMap, discordUnitRoleMap, discordPermissionRoleMap, discordRankRoleMap, discordFormationRoleMap, discordBot };
         }
 
         function refreshSettings() {
