@@ -2178,7 +2178,8 @@
 .wiki-editor-container {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 120px);
+    height: calc(100vh - 140px);
+    min-height: 550px;
     background: #0f0f10;
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -4627,7 +4628,12 @@
     </div>
 
 
-        <!-- Tab: Wiki & Charter Editor -->
+        <!-- Toast Notifications Container -->
+    <div id="toast-container" class="toast-container"></div>
+  </div>
+</div>
+
+<!-- Tab: Wiki & Charter Editor -->
         <div class="tab-content" id="tab-wiki-editor">
             <div class="wiki-editor-container">
                 <div class="wiki-editor-header">
@@ -4694,10 +4700,6 @@
             </div>
         </div>
 
-    <!-- Toast Notifications Container -->
-    <div id="toast-container" class="toast-container"></div>
-  </div>
-</div>
 
     </div>
 
@@ -5008,7 +5010,7 @@
             return !!currentIsOwner;
         }
         function canUseCharterEditor() {
-            return canUseSettings() || hasPanelPermission('charter_editor') || hasPanelPermission('config_editor') || ['superadmin', 'admin', 'curator', 'head_admin'].includes(currentRole);
+            return canUseSettings() || hasPanelPermission('charter_editor') || hasPanelPermission('config_editor') || ['superadmin', 'admin', 'curator', 'head_admin', 'commander'].includes(currentRole);
         }
         function canUseConfigEditor() {
             return canUseSettings() || hasCommanderAccess() || ['superadmin', 'admin', 'commander', 'head_admin'].includes(currentRole) || hasPanelPermission('jobs');
